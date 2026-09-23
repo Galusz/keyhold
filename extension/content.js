@@ -389,15 +389,16 @@ function capture(scope) {
   if (key === lastSent) return;
   lastSent = key;
   api.runtime.sendMessage({ type: 'save', username, password }).catch(() => {});
-  watchOutcome(passwords[passwords.length - 1], refusals());
+  watchOutcome(passwords[passwords.length - 1]);
 }
 
 const hasPasswordField = () => deepInputs().some((i) => i.type === 'password' && shown(i));
 
-// Words a site shows when it refuses a login, counted inside shadow roots too.
-const REFUSED = /invalid|incorrect|wrong|failed|not match|try again|błędn|nieprawidłow|niepoprawn|nie udało|spróbuj ponownie/gi;
+// Words a site shows when it refuses a login, looked for inside shadow roots too.
+const REFUSED = /invalid|incorrect|wrong|failed|not match|try again|błędn|nieprawidłow|niepoprawn|nie udało|spróbuj ponownie/i;
 
-function refusals() {
+function refused(field) {
+  if (field.getAttribute('aria-invalid') === 'true') return true;
   let text = document.body ? document.body.innerText : '';
   const walk = (root) => {
     for (const el of root.querySelectorAll('*')) {
@@ -407,16 +408,17 @@ function refusals() {
     }
   };
   walk(document);
-  return (text.match(REFUSED) || []).length;
+  return REFUSED.test(text);
 }
 
 // Pages that log in without reloading: after a moment, a vanished password
-// field means it worked; an emptied one or a new error message means it failed.
-function watchOutcome(field, before) {
+// field means it worked. One still asking, emptied or next to an error
+// message — even one left from an earlier try — means it failed.
+function watchOutcome(field) {
   setTimeout(() => {
     let verdict;
     if (!shown(field)) verdict = false;
-    else if (field.value === '' || refusals() > before) verdict = true;
+    else if (field.value === '' || refused(field)) verdict = true;
     api.runtime.sendMessage({ type: 'outcome', passwordField: verdict, final: true }).catch(() => {});
   }, 4000);
 }
