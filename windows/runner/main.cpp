@@ -13,6 +13,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     CreateAndAttachConsole();
   }
 
+  // Starting Keyhold again brings the running one forward instead of a copy.
+  ::CreateMutexW(nullptr, TRUE, L"Keyhold.SingleInstance");
+  if (::GetLastError() == ERROR_ALREADY_EXISTS) {
+    HWND running = ::FindWindowW(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Keyhold");
+    if (running) {
+      ::ShowWindow(running, ::IsIconic(running) ? SW_RESTORE : SW_SHOW);
+      ::SetForegroundWindow(running);
+    }
+    return EXIT_SUCCESS;
+  }
+
   // Initialize COM, so that it is available for use in the library and/or
   // plugins.
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);

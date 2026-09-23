@@ -22,6 +22,37 @@ class TrayController {
     return null;
   }
 
+  /// Whether Windows shows the icon on the taskbar. By default it hides new
+  /// icons behind the arrow, and only the user can change that; the choice
+  /// is kept per program path under NotifyIconSettings.
+  bool get visibleOnTaskbar {
+    if (!Platform.isWindows) return true;
+    final result = Process.runSync(
+        'reg', ['query', r'HKCU\Control Panel\NotifyIconSettings', '/s']);
+    if (result.exitCode != 0) return false;
+    final exe = Platform.resolvedExecutable.toLowerCase();
+    // One block per icon, starting with its key name; values come in any order.
+    for (final block in (result.stdout as String).split(RegExp(r'\r?\n(?=HKEY_)'))) {
+      String? path;
+      var promoted = false;
+      for (final line in block.split('\n')) {
+        final parts = line.trim().split(RegExp(r'\s{2,}'));
+        if (parts.length < 3) continue;
+        if (parts[0] == 'ExecutablePath') path = parts[2].toLowerCase();
+        if (parts[0] == 'IsPromoted') promoted = parts[2] == '0x1';
+      }
+      if (path != null && _samePath(path, exe)) return promoted;
+    }
+    return false;
+  }
+
+  // Paths under known folders are stored as "{folder-guid}\rest\app.exe".
+  bool _samePath(String stored, String exe) {
+    if (stored == exe) return true;
+    final close = stored.indexOf('}');
+    return stored.startsWith('{') && close > 0 && exe.endsWith(stored.substring(close + 1));
+  }
+
   bool init({required void Function() onShow, required void Function() onQuit}) {
     final icon = tray.TrayIcon.create();
     if (icon == null) {

@@ -120,14 +120,20 @@ class _TrayShellState extends State<TrayShell> with WindowListener {
     await windowManager.close();
   }
 
+  // Hiding the window is only safe when the tray icon can be seen; otherwise
+  // the program would seem to vanish, so it stays on the taskbar.
   @override
   void onWindowClose() {
-    windowManager.hide();
+    if (_tray.visibleOnTaskbar) {
+      windowManager.hide();
+    } else {
+      windowManager.minimize();
+    }
   }
 
   @override
   void onWindowMinimize() {
-    windowManager.hide();
+    if (_tray.visibleOnTaskbar) windowManager.hide();
   }
 
   @override
