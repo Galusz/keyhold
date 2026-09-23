@@ -191,31 +191,66 @@ class _QrPageState extends State<QrPage> {
     final code = item.code;
     final title = code.issuer.isNotEmpty ? code.issuer : code.account;
 
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.pin_outlined),
-      title: Text(title),
-      subtitle: Text(code.issuer.isNotEmpty ? code.account : ''),
-      trailing: SizedBox(
-        width: 320,
-        child: DropdownButtonFormField<VaultEntry?>(
-          initialValue: item.target,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Save to', isDense: true),
-          items: [
-            const DropdownMenuItem(value: null, child: Text('New entry')),
-            for (final e in item.suggestions)
-              DropdownMenuItem(
-                value: e,
-                child: Text(
-                  '${e.title} — ${e.username}',
-                  overflow: TextOverflow.ellipsis,
-                ),
+    final target = DropdownButtonFormField<VaultEntry?>(
+      initialValue: item.target,
+      isExpanded: true,
+      decoration: const InputDecoration(labelText: 'Save to', isDense: true),
+      items: [
+        const DropdownMenuItem(value: null, child: Text('New entry')),
+        for (final e in item.suggestions)
+          DropdownMenuItem(
+            value: e,
+            child: Text(
+              '${e.title} — ${e.username}',
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+      ],
+      onChanged: (value) => setState(() => item.target = value),
+    );
+
+    final theme = Theme.of(context);
+    Widget line(String label, String value, {TextStyle? style}) => Padding(
+          padding: const EdgeInsets.only(bottom: 2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 76,
+                child: Text(label, style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor)),
               ),
-          ],
-          onChanged: (value) => setState(() => item.target = value),
-        ),
+              Expanded(child: Text(value.isEmpty ? '—' : value, style: style)),
+            ],
+          ),
+        );
+
+    final name = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(padding: EdgeInsets.only(right: 16, top: 2), child: Icon(Icons.pin_outlined)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                line('Title', title, style: theme.textTheme.titleMedium),
+                line('Username', code.issuer.isNotEmpty ? code.account : ''),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+
+    // On a phone the choice goes under the name, so the name keeps the width.
+    return LayoutBuilder(
+      builder: (context, box) => box.maxWidth < 600
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Column(children: [name, Padding(padding: const EdgeInsets.only(left: 40), child: target)]),
+            )
+          : Row(children: [Expanded(child: name), SizedBox(width: 320, child: target)]),
     );
   }
 }

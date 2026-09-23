@@ -300,6 +300,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
           ),
         ],
       ),
+      bottomNavigationBar: _backupBar(),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Add',
         onPressed: _add,
@@ -352,6 +353,55 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  String _ago(DateTime when) {
+    final diff = DateTime.now().difference(when);
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
+    if (diff.inHours < 24) return '${diff.inHours} h ago';
+    return '${diff.inDays} days ago';
+  }
+
+  /// Always on screen: losing the phone must never mean losing the codes.
+  Widget _backupBar() {
+    final theme = Theme.of(context);
+    final synced = _drive.syncedAt;
+    final (IconData icon, Color color, String text) = switch (_drive) {
+      _ when !_drive.connected => (
+          Icons.cloud_off_outlined,
+          theme.colorScheme.error,
+          'Not backed up — tap to connect Google Drive',
+        ),
+      _ when _syncing => (Icons.cloud_sync_outlined, theme.hintColor, 'Backing up…'),
+      _ when _drive.lastError != null => (
+          Icons.sync_problem,
+          theme.colorScheme.error,
+          'Backup failed: ${_drive.lastError}',
+        ),
+      _ when synced == null => (Icons.cloud_upload_outlined, theme.hintColor, 'Waiting for the first backup'),
+      _ => (Icons.cloud_done_outlined, theme.colorScheme.primary, 'Backed up to Google Drive ${_ago(synced)}'),
+    };
+
+    return Material(
+      color: theme.colorScheme.surfaceContainer,
+      child: InkWell(
+        onTap: _settings,
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(icon, size: 20, color: color),
+                const SizedBox(width: 10),
+                Expanded(child: Text(text, style: TextStyle(color: color))),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

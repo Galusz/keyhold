@@ -148,10 +148,18 @@ QrResult parseOtp(String text) {
   ]);
 }
 
+// Some sites write the label as "Google - me@mail.com" or "Shop (me@mail.com)"
+// instead of the standard "Issuer:account".
+final _nameAndMail = RegExp(r'^(.*?)\s*(?:[-–|(])\s*([^\s()]+@[^\s()]+)\)?$');
+
 (String, String) _splitLabel(String label) {
   final colon = label.indexOf(':');
-  if (colon < 0) return ('', label.trim());
-  return (label.substring(0, colon).trim(), label.substring(colon + 1).trim());
+  if (colon >= 0) {
+    return (label.substring(0, colon).trim(), label.substring(colon + 1).trim());
+  }
+  final m = _nameAndMail.firstMatch(label.trim());
+  if (m != null && m.group(1)!.isNotEmpty) return (m.group(1)!.trim(), m.group(2)!);
+  return ('', label.trim());
 }
 
 // Google's export is a protobuf message:
