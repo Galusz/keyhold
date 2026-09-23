@@ -4,10 +4,16 @@ import '../core/models.dart';
 import '../core/totp.dart';
 
 class EntryPage extends StatefulWidget {
-  const EntryPage({super.key, required this.entry, required this.isNew});
+  const EntryPage({
+    super.key,
+    required this.entry,
+    required this.isNew,
+    this.groups = const [],
+  });
 
   final VaultEntry entry;
   final bool isNew;
+  final List<String> groups;
 
   @override
   State<EntryPage> createState() => _EntryPageState();
@@ -20,6 +26,7 @@ class _EntryPageState extends State<EntryPage> {
   late final TextEditingController _url;
   late final TextEditingController _totp;
   late final TextEditingController _notes;
+  late final TextEditingController _group;
   bool _showPassword = false;
 
   @override
@@ -32,6 +39,7 @@ class _EntryPageState extends State<EntryPage> {
     _url = TextEditingController(text: e.url);
     _totp = TextEditingController(text: e.totpSecret ?? '');
     _notes = TextEditingController(text: e.notes);
+    _group = TextEditingController(text: e.group);
   }
 
   @override
@@ -42,6 +50,7 @@ class _EntryPageState extends State<EntryPage> {
     _url.dispose();
     _totp.dispose();
     _notes.dispose();
+    _group.dispose();
     super.dispose();
   }
 
@@ -52,6 +61,7 @@ class _EntryPageState extends State<EntryPage> {
     e.password = _password.text;
     e.url = _url.text.trim();
     e.notes = _notes.text;
+    e.group = _group.text.trim();
 
     final secret = _totp.text.trim();
     e.totpSecret = secret.isEmpty
@@ -114,6 +124,18 @@ class _EntryPageState extends State<EntryPage> {
               labelText: 'Two-factor secret',
               helperText: 'Paste the setup key or the whole otpauth:// link',
             ),
+          ),
+          const SizedBox(height: 16),
+          DropdownMenu<String>(
+            controller: _group,
+            requestFocusOnTap: true,
+            enableFilter: true,
+            expandedInsets: EdgeInsets.zero,
+            label: const Text('Group'),
+            helperText: 'Pick one or type a new name',
+            dropdownMenuEntries: [
+              for (final g in widget.groups) DropdownMenuEntry(value: g, label: g),
+            ],
           ),
           const SizedBox(height: 16),
           TextField(

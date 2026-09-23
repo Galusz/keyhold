@@ -8,6 +8,7 @@ class VaultEntry {
   String password;
   String url;
   String notes;
+  String group;
   String? totpSecret;
   int updatedAt;
   bool deleted;
@@ -19,6 +20,7 @@ class VaultEntry {
     this.password = '',
     this.url = '',
     this.notes = '',
+    this.group = '',
     this.totpSecret,
     int? updatedAt,
     this.deleted = false,
@@ -31,6 +33,7 @@ class VaultEntry {
         'password': password,
         'url': url,
         'notes': notes,
+        if (group.isNotEmpty) 'group': group,
         if (totpSecret != null) 'totp': totpSecret,
         'updatedAt': updatedAt,
         if (deleted) 'deleted': true,
@@ -43,6 +46,7 @@ class VaultEntry {
         password: (j['password'] ?? '') as String,
         url: (j['url'] ?? '') as String,
         notes: (j['notes'] ?? '') as String,
+        group: (j['group'] ?? '') as String,
         totpSecret: j['totp'] as String?,
         updatedAt: (j['updatedAt'] ?? 0) as int,
         deleted: (j['deleted'] ?? false) as bool,
@@ -136,6 +140,16 @@ class Vault {
     final list = entries.values.where((e) => !e.deleted).toList();
     list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return list;
+  }
+
+  List<String> get groups {
+    final names = entries.values
+        .where((e) => !e.deleted && e.group.isNotEmpty)
+        .map((e) => e.group)
+        .toSet()
+        .toList();
+    names.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return names;
   }
 
   void put(VaultEntry e) {

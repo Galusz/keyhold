@@ -37,6 +37,8 @@ class _VaultPageState extends State<VaultPage> {
   Timer? _ticker;
   bool _loading = true;
   EntryFilter _filter = EntryFilter.all;
+  String? _group;
+  final _selected = <String>{};
   BrowserBridge? _bridge;
   Timer? _watchTimer;
   WatchResult? _lastScan;
@@ -73,6 +75,7 @@ class _VaultPageState extends State<VaultPage> {
       }
     }
     _vault = await _store.load();
+    if (_autoGroup()) await _store.save(_vault);
     setState(() => _loading = false);
     await _startBridge();
     await _startWatching();
@@ -85,20 +88,8 @@ class _VaultPageState extends State<VaultPage> {
       String url, String username, String password) async {
     if (password.isEmpty) return 'ignored';
 
-    final host = Uri.tryParse(url)?.host ?? url;
-    final clean = host.startsWith('www.') ? host.substring(4) : host;
-
-    final existing = _vault.visible.firstWhere(
-      (e) {
-        final entryHost = Uri.tryParse(e.url)?.host ?? '';
-        final entryClean =
-            entryHost.startsWith('www.') ? entryHost.substring(4) : entryHost;
-        return entryClean == clean && e.username == username;
-      },
-      orElse: () => VaultEntry(id: ''),
-    );
-
-    if (existing.id.isNotEmpty) {
+    final existing = _findLogin(_vault.visible, url, '', username);
+    if (existing != null) {
       if (existing.password == password) return 'unchanged';
       existing.password = password;
       _vault.put(existing);
@@ -108,13 +99,57 @@ class _VaultPageState extends State<VaultPage> {
 
     _vault.put(VaultEntry(
       id: UniqueKey().toString(),
-      title: clean,
+      title: _hostOf(url),
       username: username,
       password: password,
       url: url,
+      group: 'Web',
     ));
     await _persist();
     return 'created';
+  }
+
+  /// The same login already in the vault: same site (or same title when there
+  /// is no address) and the same username.
+  VaultEntry? _findLogin(
+      List<VaultEntry> entries, String url, String title, String username) {
+    final host = _hostOf(url);
+    final name = title.trim().toLowerCase();
+    for (final e in entries) {
+      if (e.username != username) continue;
+      if (host.isNotEmpty ? _hostOf(e.url) == host : e.title.toLowerCase() == name) {
+        return e;
+      }
+    }
+    return null;
+  }
+
+  static final _ipPattern = RegExp(r'^\d{1,3}(\.\d{1,3}){3}$');
+
+  bool _isLocal(String host) =>
+      host == 'localhost' ||
+      host.endsWith('.local') ||
+      host.endsWith('.lan') ||
+      host.startsWith('192.168.') ||
+      host.startsWith('10.') ||
+      host.startsWith('127.') ||
+      RegExp(r'^172\.(1[6-9]|2\d|3[01])\.').hasMatch(host);
+
+  /// A vault without any groups gets a first split: home devices, servers
+  /// reached by address, and websites.
+  bool _autoGroup() {
+    final entries = _vault.visible;
+    if (entries.isEmpty || entries.any((e) => e.group.isNotEmpty)) return false;
+    for (final e in entries) {
+      final host = _hostOf(e.url.isNotEmpty ? e.url : e.title);
+      e.group = _isLocal(host)
+          ? 'Local network'
+          : _ipPattern.hasMatch(host)
+              ? 'Servers'
+              : 'Web';
+      _vault.put(e);
+    }
+    return true;
   }
 
   String _extensionFolder() {
@@ -184,7 +219,7 @@ class _VaultPageState extends State<VaultPage> {
   Future<void> _open(VaultEntry entry, {required bool isNew}) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute<Object?>(
-        builder: (_) => EntryPage(entry: entry, isNew: isNew),
+        builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups),
       ),
     );
     if (result == 'delete') {
@@ -295,7 +330,7 @@ class _VaultPageState extends State<VaultPage> {
 
   List<VaultEntry> get _filtered {
     final q = _search.text.trim().toLowerCase();
-    final key = '$_revision|${_filter.name}|$q';
+    final key = '$_revision|${_filter.name}|$_group|$q';
     if (key == _filteredKey) return _filteredCache;
 
     _filteredKey = key;
@@ -306,6 +341,9 @@ class _VaultPageState extends State<VaultPage> {
       EntryFilter.plain => all.where((e) => !_hasCode(e)).toList(),
       EntryFilter.all || EntryFilter.files => all,
     };
+
+    final group = _group;
+    if (group != null) all = all.where((e) => e.group == group).toList();
 
     if (q.isNotEmpty) {
       all = all
@@ -320,27 +358,139 @@ class _VaultPageState extends State<VaultPage> {
     return all;
   }
 
-  Widget _filterChips() {
+  Widget _sidebar() {
+    final theme = Theme.of(context);
     final visible = _vault.visible;
     final withCode = visible.where(_hasCode).length;
+    final counts = <String, int>{};
+    for (final e in visible) {
+      counts[e.group] = (counts[e.group] ?? 0) + 1;
+    }
+    final groups = _vault.groups;
 
-    Widget chip(EntryFilter value, String label, int count) => Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: ChoiceChip(
-            label: Text('$label  $count'),
-            selected: _filter == value,
-            onSelected: (_) => setState(() => _filter = value),
-          ),
+    Widget item(IconData icon, String label, int count, bool selected,
+            VoidCallback onTap) =>
+        ListTile(
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          selected: selected,
+          selectedTileColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          leading: Icon(icon, size: 20),
+          title: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+          trailing: Text('$count', style: theme.textTheme.bodySmall),
+          onTap: onTap,
         );
 
-    return Row(
-      children: [
-        chip(EntryFilter.all, 'All', visible.length),
-        chip(EntryFilter.twoFactor, '2FA', withCode),
-        chip(EntryFilter.plain, 'Passwords', visible.length - withCode),
-        chip(EntryFilter.files, 'Files', _vault.visibleFiles.length),
-      ],
+    Widget filter(IconData icon, String label, int count, EntryFilter value) =>
+        item(icon, label, count, _group == null && _filter == value,
+            () => setState(() {
+                  _filter = value;
+                  _group = null;
+                }));
+
+    Widget group(IconData icon, String label, String name) =>
+        item(icon, label, counts[name] ?? 0, _group == name,
+            () => setState(() {
+                  _filter = EntryFilter.all;
+                  _group = name;
+                }));
+
+    return SizedBox(
+      width: 220,
+      child: ListView(
+        padding: const EdgeInsets.all(8),
+        children: [
+          filter(Icons.all_inbox_outlined, 'All', visible.length, EntryFilter.all),
+          filter(Icons.pin_outlined, '2FA', withCode, EntryFilter.twoFactor),
+          filter(Icons.key_outlined, 'Passwords', visible.length - withCode,
+              EntryFilter.plain),
+          filter(Icons.attach_file, 'Files', _vault.visibleFiles.length,
+              EntryFilter.files),
+          if (groups.isNotEmpty) ...[
+            const Divider(height: 24),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+              child: Text('Groups',
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor)),
+            ),
+            for (final name in groups) group(Icons.folder_outlined, name, name),
+            if ((counts[''] ?? 0) > 0) group(Icons.folder_off_outlined, 'No group', ''),
+          ],
+        ],
+      ),
     );
+  }
+
+  void _toggle(VaultEntry e) {
+    setState(() {
+      if (!_selected.remove(e.id)) _selected.add(e.id);
+    });
+  }
+
+  Future<void> _moveSelected() async {
+    final target = await _askGroup();
+    if (target == null) return;
+    for (final id in _selected) {
+      final e = _vault.entries[id];
+      if (e == null) continue;
+      e.group = target;
+      _vault.put(e);
+    }
+    _selected.clear();
+    await _persist();
+  }
+
+  Future<String?> _askGroup() async {
+    final groups = _vault.groups;
+    final name = TextEditingController();
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Move ${_selected.length} to group'),
+        content: SizedBox(
+          width: 380,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (groups.isNotEmpty) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final g in groups)
+                      ActionChip(
+                        avatar: const Icon(Icons.folder_outlined, size: 18),
+                        label: Text(g),
+                        onPressed: () => Navigator.pop(context, g),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+              TextField(
+                controller: name,
+                decoration: const InputDecoration(
+                  labelText: 'New group',
+                  helperText: 'Leave empty to take them out of any group',
+                ),
+                onSubmitted: (v) => Navigator.pop(context, v.trim()),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, name.text.trim()),
+            child: const Text('Move'),
+          ),
+        ],
+      ),
+    );
+    name.dispose();
+    return result;
   }
 
   @override
@@ -350,11 +500,28 @@ class _VaultPageState extends State<VaultPage> {
     }
 
     final items = _filtered;
+    final selecting = _selected.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Keyhold'),
-        actions: [
+        leading: selecting
+            ? IconButton(
+                tooltip: 'Clear selection',
+                icon: const Icon(Icons.close),
+                onPressed: () => setState(_selected.clear),
+              )
+            : null,
+        title: Text(selecting ? '${_selected.length} selected' : 'Keyhold'),
+        actions: selecting
+            ? [
+                FilledButton.icon(
+                  onPressed: _moveSelected,
+                  icon: const Icon(Icons.drive_file_move_outlined),
+                  label: const Text('Move to group'),
+                ),
+                const SizedBox(width: 16),
+              ]
+            : [
           IconButton(
             tooltip: 'Browser extension',
             icon: const Icon(Icons.extension_outlined),
@@ -391,25 +558,18 @@ class _VaultPageState extends State<VaultPage> {
           const SizedBox(width: 8),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(108),
+          preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _search,
-                  onChanged: (_) => setState(() {}),
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Search',
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Align(alignment: Alignment.centerLeft, child: _filterChips()),
-              ],
+            child: TextField(
+              controller: _search,
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Search',
+                isDense: true,
+                border: OutlineInputBorder(),
+              ),
             ),
           ),
         ),
@@ -421,12 +581,23 @@ class _VaultPageState extends State<VaultPage> {
               label: const Text('Add file'),
             )
           : FloatingActionButton.extended(
-              onPressed: () => _open(VaultEntry(id: UniqueKey().toString()), isNew: true),
+              onPressed: () => _open(
+                  VaultEntry(id: UniqueKey().toString(), group: _group ?? ''),
+                  isNew: true),
               icon: const Icon(Icons.add),
               label: const Text('New'),
             ),
       bottomNavigationBar: _backupBar(items.length),
-      body: _filter == EntryFilter.files ? _filesBody() : _body(items),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _sidebar(),
+          const VerticalDivider(width: 1),
+          Expanded(
+            child: _filter == EntryFilter.files ? _filesBody() : _body(items),
+          ),
+        ],
+      ),
     );
   }
 
@@ -827,10 +998,21 @@ class _VaultPageState extends State<VaultPage> {
 
   Widget _row(VaultEntry e) {
     final code = _codes[e.id];
+    final selected = _selected.contains(e.id);
     return ListTile(
-      onTap: () => _open(e, isNew: false),
-      leading: CircleAvatar(
-        child: Text(e.title.isEmpty ? '?' : e.title.characters.first.toUpperCase()),
+      selected: selected,
+      onTap: () => _selected.isEmpty ? _open(e, isNew: false) : _toggle(e),
+      leading: Tooltip(
+        message: 'Select',
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: () => _toggle(e),
+          child: CircleAvatar(
+            child: selected
+                ? const Icon(Icons.check)
+                : Text(e.title.isEmpty ? '?' : e.title.characters.first.toUpperCase()),
+          ),
+        ),
       ),
       title: Text(e.title.isEmpty ? '(no title)' : e.title),
       subtitle: Text(e.username, maxLines: 1, overflow: TextOverflow.ellipsis),

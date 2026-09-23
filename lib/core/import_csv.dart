@@ -15,6 +15,7 @@ const _userNames = ['username', 'login', 'user', 'login_username', 'email'];
 const _passwordNames = ['password', 'login_password', 'pass'];
 const _urlNames = ['url', 'website', 'login_uri', 'origin', 'web site'];
 const _noteNames = ['note', 'notes', 'comment'];
+const _groupNames = ['group', 'folder'];
 
 int _indexOf(List<String> header, List<String> candidates) {
   for (var i = 0; i < header.length; i++) {
@@ -50,6 +51,7 @@ ImportResult parseCsv(String source) {
   final passwordAt = _indexOf(header, _passwordNames);
   final urlAt = _indexOf(header, _urlNames);
   final noteAt = _indexOf(header, _noteNames);
+  final groupAt = _indexOf(header, _groupNames);
 
   if (passwordAt < 0 && userAt < 0) {
     return ImportResult(
@@ -76,6 +78,13 @@ ImportResult parseCsv(String source) {
     if (title.isEmpty) title = _hostOf(url);
     if (title.isEmpty) title = username;
 
+    // KeePassXC writes the whole path with the root first: "Root/Web".
+    var group = _cell(row, groupAt);
+    if (groupAt >= 0 && header[groupAt] == 'group') {
+      final slash = group.indexOf('/');
+      group = slash < 0 ? '' : group.substring(slash + 1);
+    }
+
     entries.add(VaultEntry(
       id: '${DateTime.now().microsecondsSinceEpoch}-${entries.length}',
       title: title,
@@ -83,6 +92,7 @@ ImportResult parseCsv(String source) {
       password: password,
       url: url,
       notes: _cell(row, noteAt),
+      group: group,
     ));
   }
 
