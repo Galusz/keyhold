@@ -8,10 +8,16 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/autotype.dart';
 import 'tray.dart';
+import 'ui/mobile_page.dart';
 import 'ui/vault_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    runApp(const KeyholdApp(home: MobilePage()));
+    return;
+  }
+
   await windowManager.ensureInitialized();
 
   await windowManager.waitUntilReadyToShow(
@@ -28,11 +34,13 @@ Future<void> main() async {
   await windowManager.setPreventClose(true);
   await hotKeyManager.unregisterAll();
 
-  runApp(const KeyholdApp());
+  runApp(const KeyholdApp(home: TrayShell(child: VaultPage())));
 }
 
 class KeyholdApp extends StatelessWidget {
-  const KeyholdApp({super.key});
+  const KeyholdApp({super.key, required this.home});
+
+  final Widget home;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +56,7 @@ class KeyholdApp extends StatelessWidget {
         brightness: Brightness.dark,
         useMaterial3: true,
       ),
-      home: const TrayShell(child: VaultPage()),
+      home: home,
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'dart:ffi';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:win32/win32.dart';
 
@@ -62,7 +62,7 @@ class VaultStore {
   }
 
   Future<void> _storeKey(Uint8List key) async {
-    _keyFile.writeAsBytesSync(protect(key));
+    _keyFile.writeAsBytesSync(await protect(key));
   }
 
   String get vaultPath => _vaultFile.path;
@@ -192,8 +192,19 @@ class VaultStore {
     }
   }
 
-  Uint8List protect(Uint8List input) => _dpapi(input, protect: true);
-  Uint8List unprotect(Uint8List input) => _dpapi(input, protect: false);
+  static const _keystore = MethodChannel('keyhold/keystore');
+
+  /// Seals secrets for this user on this device: DPAPI on Windows, the
+  /// Android Keystore on a phone.
+  Future<Uint8List> protect(Uint8List input) async {
+    if (Platform.isAndroid) return (await _keystore.invokeMethod<Uint8List>('protect', input))!;
+    return _dpapi(input, protect: true);
+  }
+
+  Future<Uint8List> unprotect(Uint8List input) async {
+    if (Platform.isAndroid) return (await _keystore.invokeMethod<Uint8List>('unprotect', input))!;
+    return _dpapi(input, protect: false);
+  }
 
   Uint8List _dpapi(Uint8List input, {required bool protect}) {
     if (!Platform.isWindows) return input;

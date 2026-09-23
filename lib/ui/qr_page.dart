@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../core/models.dart';
 import '../core/qr.dart';
+import 'camera_scan_page.dart';
 
 /// A scanned account and where it goes: an existing entry or a new one.
 class QrImport {
@@ -89,6 +92,12 @@ class _QrPageState extends State<QrPage> {
     }
   }
 
+  Future<void> _scanCamera() async {
+    final text = await Navigator.of(context)
+        .push(MaterialPageRoute<String>(builder: (_) => const CameraScanPage()));
+    if (text != null) _add(parseOtp(text));
+  }
+
   Future<void> _scanImage() async {
     const type = XTypeGroup(label: 'Images', extensions: ['png', 'jpg', 'jpeg', 'bmp', 'webp']);
     final file = await openFile(acceptedTypeGroups: const [type]);
@@ -121,9 +130,12 @@ class _QrPageState extends State<QrPage> {
         padding: const EdgeInsets.all(24),
         children: [
           Text(
-            'Show the QR code on the screen and scan it. It can be the code a website shows '
-            'when you turn on two-factor login, or the export from Google Authenticator '
-            '(Transfer accounts → Export). A photo of the code works too.',
+            Platform.isAndroid
+                ? 'Point the camera at the QR code a website shows when you turn on two-factor '
+                    'login, or at the export from Google Authenticator (Transfer accounts → Export).'
+                : 'Show the QR code on the screen and scan it. It can be the code a website shows '
+                    'when you turn on two-factor login, or the export from Google Authenticator '
+                    '(Transfer accounts → Export). A photo of the code works too.',
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
           ),
           const SizedBox(height: 8),
@@ -137,11 +149,18 @@ class _QrPageState extends State<QrPage> {
             spacing: 12,
             runSpacing: 12,
             children: [
-              FilledButton.icon(
-                onPressed: _busy ? null : _scanScreen,
-                icon: const Icon(Icons.screenshot_monitor_outlined),
-                label: const Text('Scan the screen'),
-              ),
+              if (Platform.isAndroid)
+                FilledButton.icon(
+                  onPressed: _busy ? null : _scanCamera,
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Scan with the camera'),
+                )
+              else
+                FilledButton.icon(
+                  onPressed: _busy ? null : _scanScreen,
+                  icon: const Icon(Icons.screenshot_monitor_outlined),
+                  label: const Text('Scan the screen'),
+                ),
               OutlinedButton.icon(
                 onPressed: _busy ? null : _scanImage,
                 icon: const Icon(Icons.image_outlined),

@@ -25,10 +25,10 @@ class BackupService {
   final File _settingsFile;
   static const int keepCopies = 30;
 
-  List<String> targets = [
-    r'E:\ACCESS\keyhold',
-    r'D:\_KOPIA_ACCESS\keyhold',
-  ];
+  // A phone has no backup folders; its copy is the one in Google Drive.
+  List<String> targets = Platform.isWindows
+      ? [r'E:\ACCESS\keyhold', r'D:\_KOPIA_ACCESS\keyhold']
+      : [];
 
   RemoteConfig remote = RemoteConfig();
   String bridgeToken = '';

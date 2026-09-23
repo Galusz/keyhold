@@ -80,6 +80,9 @@ void main() {
   File('assets/tray_icon.ico').writeAsBytesSync(img.encodeIco(draw(32)));
   File('assets/tray_icon.png').writeAsBytesSync(img.encodePng(draw(32)));
   File('assets/icon.png').writeAsBytesSync(img.encodePng(draw(512)));
+  for (final (folder, size) in [('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('xxxhdpi', 192)]) {
+    File('android/app/src/main/res/mipmap-$folder/ic_launcher.png').writeAsBytesSync(img.encodePng(draw(size)));
+  }
   Directory('extension/icons').createSync(recursive: true);
   for (final size in [16, 32, 48, 128]) {
     File('extension/icons/icon$size.png').writeAsBytesSync(img.encodePng(draw(size)));

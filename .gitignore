@@ -49,3 +49,7 @@ app.*.map.json
 
 # Google sign-in keys, passed with --dart-define-from-file=google.json
 google.json
+
+# Android release signing, kept outside git (copy in E:\ACCESS)
+keys/
+android/key.properties

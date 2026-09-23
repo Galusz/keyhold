@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'crypto.dart';
 import 'models.dart';
@@ -52,28 +53,50 @@ class DriveSync {
   DateTime _accessUntil = DateTime(0);
   String? lastError;
 
-  static bool get available => _clientId.isNotEmpty && _clientSecret.isNotEmpty;
+  // On a phone Google's own account picker hands out the tokens; the app is
+  // recognised by its package name and signing certificate, so no keys ship in it.
+  static bool get available =>
+      Platform.isAndroid || (_clientId.isNotEmpty && _clientSecret.isNotEmpty);
 
-  bool get connected => store.backup.driveToken.isNotEmpty;
+  bool get connected =>
+      Platform.isAndroid ? email.isNotEmpty : store.backup.driveToken.isNotEmpty;
   String get email => store.backup.driveEmail;
   DateTime? get syncedAt => store.backup.driveSyncedAt;
 
-  String? get _refresh {
+  Future<String?> _readRefresh() async {
     final stored = store.backup.driveToken;
     if (stored.isEmpty) return null;
-    return utf8.decode(store.unprotect(base64.decode(stored)));
+    return utf8.decode(await store.unprotect(base64.decode(stored)));
   }
 
-  set _refresh(String? token) {
-    store.backup.driveToken =
-        token == null ? '' : base64.encode(store.protect(Uint8List.fromList(utf8.encode(token))));
+  Future<void> _writeRefresh(String? token) async {
+    store.backup.driveToken = token == null
+        ? ''
+        : base64.encode(await store.protect(Uint8List.fromList(utf8.encode(token))));
   }
+
+  static Future<void>? _googleReady;
+  static Future<void> _google() => _googleReady ??= GoogleSignIn.instance.initialize();
 
   // ---------- sign in ----------
 
+  Future<void> connect() async {
+    if (Platform.isAndroid) {
+      await _google();
+      final authz = await GoogleSignIn.instance.authorizationClient.authorizeScopes([_scope]);
+      _access = authz.accessToken;
+      _accessUntil = DateTime.now().add(const Duration(minutes: 50));
+    } else {
+      await _connectDesktop();
+    }
+    final about = await _json('GET', _api('/drive/v3/about', {'fields': 'user(emailAddress)'}));
+    store.backup.driveEmail = (about['user']?['emailAddress'] ?? '') as String;
+    store.backup.saveSettings();
+  }
+
   /// Opens Google sign-in in the browser and waits for the answer on a
   /// one-off local address, as Google asks desktop apps to do.
-  Future<void> connect() async {
+  Future<void> _connectDesktop() async {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     final redirect = 'http://127.0.0.1:${server.port}';
     final verifier = _random(32);
@@ -126,18 +149,22 @@ class DriveSync {
     });
     final refresh = tokens['refresh_token'] as String?;
     if (refresh == null) throw DriveError('Google did not allow offline access');
-    _refresh = refresh;
+    await _writeRefresh(refresh);
     _setAccess(tokens);
-
-    final about = await _json('GET', _api('/drive/v3/about', {'fields': 'user(emailAddress)'}));
-    store.backup.driveEmail = (about['user']?['emailAddress'] ?? '') as String;
-    store.backup.saveSettings();
   }
 
   Future<void> disconnect() async {
-    final refresh = _refresh;
-    _refresh = null;
+    final refresh = await _readRefresh();
+    await _writeRefresh(null);
     _access = null;
+    if (Platform.isAndroid) {
+      try {
+        await _google();
+        await GoogleSignIn.instance.disconnect();
+      } catch (_) {
+        // nothing to revoke
+      }
+    }
     store.backup
       ..driveEmail = ''
       ..driveSyncedAt = null
@@ -306,6 +333,10 @@ class DriveSync {
     var result = await _send(method, uri,
         headers: {...headers, 'authorization': 'Bearer ${await _token()}'}, body: body);
     if (result.$1 == 401) {
+      if (Platform.isAndroid && _access != null) {
+        await GoogleSignIn.instance.authorizationClient
+            .clearAuthorizationToken(accessToken: _access!);
+      }
       _access = null;
       result = await _send(method, uri,
           headers: {...headers, 'authorization': 'Bearer ${await _token()}'}, body: body);
@@ -315,7 +346,16 @@ class DriveSync {
 
   Future<String> _token() async {
     if (_access != null && DateTime.now().isBefore(_accessUntil)) return _access!;
-    final refresh = _refresh;
+    if (Platform.isAndroid) {
+      await _google();
+      final authz =
+          await GoogleSignIn.instance.authorizationClient.authorizationForScopes([_scope]);
+      if (authz == null) throw DriveError('Google Drive needs you to sign in again');
+      _access = authz.accessToken;
+      _accessUntil = DateTime.now().add(const Duration(minutes: 50));
+      return _access!;
+    }
+    final refresh = await _readRefresh();
     if (refresh == null) throw DriveError('Google Drive is not connected');
     try {
       _setAccess(await _tokenRequest({'refresh_token': refresh, 'grant_type': 'refresh_token'}));
