@@ -1,21 +1,14 @@
+const api = globalThis.browser ?? chrome;
 const BRIDGE = 'http://127.0.0.1:19919';
 
-async function token() {
-  const stored = await chrome.storage.local.get('token');
-  return stored.token || '';
-}
-
 async function call(path, body) {
-  const value = await token();
-  if (!value) return { error: 'no token' };
+  const { token } = await api.storage.local.get('token');
+  if (!token) return { error: 'no token' };
 
   try {
     const response = await fetch(BRIDGE + path, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-keyhold-token': value,
-      },
+      headers: { 'content-type': 'application/json', 'x-keyhold-token': token },
       body: JSON.stringify(body || {}),
     });
     if (!response.ok) {
@@ -27,22 +20,15 @@ async function call(path, body) {
   }
 }
 
-chrome.runtime.onMessage.addListener((message, sender, reply) => {
-  if (message.type === 'lookup') {
-    call('/lookup', { url: message.url }).then(reply);
-    return true;
-  }
-  if (message.type === 'fill') {
-    call('/fill', { id: message.id }).then(reply);
-    return true;
-  }
-  if (message.type === 'save') {
-    call('/save', {
-      url: message.url,
-      username: message.username,
-      password: message.password,
-    }).then(reply);
-    return true;
-  }
-  return false;
+api.runtime.onMessage.addListener((message, sender, reply) => {
+  const routes = {
+    lookup: () => call('/lookup', { url: message.url }),
+    fill: () => call('/fill', { id: message.id }),
+    save: () =>
+      call('/save', { url: message.url, username: message.username, password: message.password }),
+  };
+  const route = routes[message.type];
+  if (!route) return false;
+  route().then(reply);
+  return true;
 });
