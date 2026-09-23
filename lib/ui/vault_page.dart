@@ -85,12 +85,13 @@ class _VaultPageState extends State<VaultPage> {
 
   /// Stores credentials the extension captured on a login form.
   Future<String> _saveFromBrowser(
-      String url, String username, String password) async {
+      String url, String username, String password, bool update) async {
     if (password.isEmpty) return 'ignored';
 
     final existing = _findLogin(_vault.visible, url, '', username);
     if (existing != null) {
       if (existing.password == password) return 'unchanged';
+      if (!update) return 'changed';
       existing.password = password;
       _vault.put(existing);
       await _persist();

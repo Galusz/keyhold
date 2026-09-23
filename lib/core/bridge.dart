@@ -22,8 +22,10 @@ class BrowserBridge {
   final int port;
 
   /// Called when the extension sends credentials captured on a login form.
-  final Future<String> Function(String url, String username, String password)
-      onSave;
+  /// A changed password is only written when [update] is set, after the
+  /// user agreed in the browser.
+  final Future<String> Function(
+      String url, String username, String password, bool update) onSave;
 
   HttpServer? _server;
 
@@ -77,11 +79,14 @@ class BrowserBridge {
           await _json(response, HttpStatus.ok, _lookup(payload['url'] as String? ?? ''));
         case '/fill':
           await _json(response, HttpStatus.ok, await _fill(payload['id'] as String? ?? ''));
+        case '/code':
+          await _json(response, HttpStatus.ok, await _code(payload['id'] as String? ?? ''));
         case '/save':
           final outcome = await onSave(
             payload['url'] as String? ?? '',
             payload['username'] as String? ?? '',
             payload['password'] as String? ?? '',
+            payload['update'] == true,
           );
           await _json(response, HttpStatus.ok, {'result': outcome});
         default:
@@ -115,6 +120,7 @@ class BrowserBridge {
                 'id': e.id,
                 'title': e.title,
                 'username': e.username,
+                'group': e.group,
                 'hasCode': e.totpSecret != null && e.totpSecret!.isNotEmpty,
               })
           .toList(),
@@ -131,6 +137,15 @@ class BrowserBridge {
       'password': entry.password,
       'code': secret == null || secret.isEmpty ? null : await totpCode(secret),
     };
+  }
+
+  Future<Map<String, dynamic>> _code(String id) async {
+    final entry = vault().entries[id];
+    final secret = entry?.totpSecret;
+    if (entry == null || entry.deleted || secret == null || secret.isEmpty) {
+      return {'error': 'not found'};
+    }
+    return {'code': await totpCode(secret), 'left': secondsLeft()};
   }
 
   String _hostOf(String url) {
