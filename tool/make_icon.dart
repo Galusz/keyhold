@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:image/image.dart' as img;
 
@@ -87,6 +88,10 @@ void main() {
   for (final size in [16, 32, 48, 128]) {
     File('extension/icons/icon$size.png').writeAsBytesSync(img.encodePng(draw(size)));
   }
+  // Toolbar stop sign: saving is switched off on this site.
+  for (final size in [16, 32]) {
+    File('extension/icons/stop$size.png').writeAsBytesSync(img.encodePng(drawStop(size)));
+  }
   // Toolbar lock for a site with a login that still needs confirming.
   for (final size in [16, 32]) {
     File('extension/icons/pending$size.png')
@@ -94,3 +99,27 @@ void main() {
   }
   stdout.writeln('icons written');
 }
+
+/// A red octagon with a white bar — reads as "stop" even at 16 px.
+img.Image drawStop(int size) {
+  final canvas = img.Image(width: size, height: size, numChannels: 4);
+  img.fill(canvas, color: img.ColorRgba8(0, 0, 0, 0));
+  final c = (size - 1) / 2;
+  final r = size / 2;
+  final corners = [
+    for (var i = 0; i < 8; i++)
+      img.Point(c + r * _cos(22.5 + 45 * i), c + r * _sin(22.5 + 45 * i)),
+  ];
+  img.fillPolygon(canvas, vertices: corners, color: img.ColorRgba8(0xD3, 0x2F, 0x2F, 255));
+  final bar = (size * 0.16).round().clamp(2, size);
+  img.fillRect(canvas,
+      x1: (size * 0.22).round(),
+      y1: (size / 2 - bar / 2).round(),
+      x2: (size * 0.78).round(),
+      y2: (size / 2 + bar / 2).round() - 1,
+      color: img.ColorRgba8(255, 255, 255, 255));
+  return canvas;
+}
+
+double _cos(double deg) => math.cos(deg * math.pi / 180);
+double _sin(double deg) => math.sin(deg * math.pi / 180);

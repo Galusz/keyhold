@@ -3,6 +3,7 @@ const BRIDGE = 'http://127.0.0.1:19919';
 const session = api.storage.session;
 const NOTICE_TTL = 2 * 60 * 1000;
 const USER_TTL = 10 * 60 * 1000;
+const ATTEMPT_TTL = 90 * 1000;
 
 async function call(path, body) {
   const { token } = await api.storage.local.get('token');
@@ -54,20 +55,73 @@ async function save(message, sender) {
     update: false,
   });
 
-  if (tabId != null) refreshIcon(tabId, sender.tab.url);
-  if (tabId != null && (result.result === 'created' || result.result === 'changed')) {
+  if (tabId == null) return result;
+  refreshIcon(tabId, sender.tab.url);
+
+  // A new login is judged by what the page does next (see outcome()).
+  if (result.result === 'created') {
     await session.set({
-      [`notice:${tabId}`]: {
-        result: result.result,
+      [`attempt:${tabId}`]: {
+        id: result.id,
         username,
         host: new URL(sender.url).hostname,
-        url: sender.url,
-        password: message.password,
+        frameId: sender.frameId,
         at: Date.now(),
       },
     });
-    api.tabs.sendMessage(tabId, { type: 'notice' }, { frameId: 0 }).catch(() => {});
   }
+  if (result.result === 'changed') {
+    await notify(tabId, {
+      result: 'changed',
+      username,
+      host: new URL(sender.url).hostname,
+      url: sender.url,
+      password: message.password,
+    });
+  }
+  return result;
+}
+
+async function notify(tabId, notice) {
+  await session.set({ [`notice:${tabId}`]: { ...notice, at: Date.now() } });
+  api.tabs.sendMessage(tabId, { type: 'notice' }, { frameId: 0 }).catch(() => {});
+}
+
+/// After a new login was sent: a password field again on the same site means
+/// it failed, no password field means it worked, anything else stays open.
+async function outcome(message, sender) {
+  const tabId = sender.tab?.id;
+  const key = `attempt:${tabId}`;
+  const attempt = await read(key);
+  if (!attempt || Date.now() - attempt.at > ATTEMPT_TTL) return null;
+  if (sender.frameId !== attempt.frameId) return null;
+
+  const sameSite = new URL(sender.url).hostname === attempt.host;
+  let verdict = 'unconfirmed';
+  if (message.passwordField === false) verdict = 'saved';
+  else if (message.passwordField === true && sameSite) verdict = 'failed';
+  else if (!message.final) return null;
+
+  await session.remove(key);
+  if (verdict !== 'unconfirmed') {
+    await call('/review', { id: attempt.id, keep: verdict === 'saved' });
+  }
+  refreshIcon(tabId, sender.tab.url);
+  await notify(tabId, { result: verdict, username: attempt.username, host: attempt.host, id: attempt.id });
+  return verdict;
+}
+
+async function never(message, sender) {
+  const url = sender.tab ? sender.tab.url : message.url;
+  if (sender.tab) {
+    // From the bar under a login that was just saved: that one goes too.
+    const notice = await read(`notice:${sender.tab.id}`);
+    if (notice?.id) await call('/review', { id: notice.id, keep: false });
+    await session.remove(`notice:${sender.tab.id}`);
+  }
+  const result = await call('/never', { url, never: message.on });
+  const [tab] = sender.tab ? [sender.tab] : await api.tabs.query({ active: true, currentWindow: true });
+  if (tab) refreshIcon(tab.id, tab.url);
   return result;
 }
 
@@ -80,8 +134,8 @@ async function pending(sender) {
     await session.remove(key);
     return null;
   }
-  // A changed password stays until the user answers.
-  if (notice.result === 'created') await session.remove(key);
+  // A changed password or an unconfirmed login stays until the user answers.
+  if (notice.result === 'saved' || notice.result === 'failed') await session.remove(key);
   return { result: notice.result, username: notice.username, host: notice.host };
 }
 
@@ -99,13 +153,14 @@ async function update(sender) {
 }
 
 // Orange lock: this site has a login the extension saved but nobody confirmed.
+// Red stop: saving is off here. Orange: a login saved here still needs confirming.
 async function refreshIcon(tabId, url) {
-  let pending = false;
+  let name = 'icon';
   if (url && /^https?:/.test(url)) {
     const result = await call('/lookup', { url });
-    pending = (result.entries || []).some((e) => e.pending);
+    if (result.never) name = 'stop';
+    else if ((result.entries || []).some((e) => e.pending)) name = 'pending';
   }
-  const name = pending ? 'pending' : 'icon';
   api.action
     .setIcon({ tabId, path: { 16: `icons/${name}16.png`, 32: `icons/${name}32.png` } })
     .catch(() => {});
@@ -117,6 +172,17 @@ api.tabs.onUpdated.addListener((tabId, change, tab) => {
 api.tabs.onActivated.addListener(({ tabId }) =>
   api.tabs.get(tabId).then((tab) => refreshIcon(tabId, tab.url), () => {})
 );
+
+// ✓ / ✕ on the bar under a login the extension could not judge.
+async function reviewFromBar(sender, message) {
+  const key = `notice:${sender.tab.id}`;
+  const notice = await read(key);
+  if (!notice?.id) return { error: 'nothing to review' };
+  await session.remove(key);
+  const result = await call('/review', { id: notice.id, keep: message.keep });
+  refreshIcon(sender.tab.id, sender.tab.url);
+  return result;
+}
 
 async function review(message) {
   const result = await call('/review', { id: message.id, keep: message.keep });
@@ -137,7 +203,9 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
     pending: () => pending(sender),
     update: () => update(sender),
     dismiss: () => session.remove(`notice:${sender.tab?.id}`),
-    review: () => (sender.tab ? { error: 'denied' } : review(message)),
+    review: () => (sender.tab ? reviewFromBar(sender, message) : review(message)),
+    outcome: () => outcome(message, sender),
+    never: () => never(message, sender),
   };
   const route = routes[message.type];
   if (!route) return false;

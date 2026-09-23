@@ -363,7 +363,25 @@ function capture(scope) {
   if (key === lastSent) return;
   lastSent = key;
   api.runtime.sendMessage({ type: 'save', username, password }).catch(() => {});
+  watchOutcome(passwords[passwords.length - 1]);
 }
+
+const hasPasswordField = () => deepInputs().some((i) => i.type === 'password' && shown(i));
+
+// Pages that log in without reloading: after a moment, a vanished password
+// field means it worked, an emptied one means it failed.
+function watchOutcome(field) {
+  setTimeout(() => {
+    const gone = !shown(field);
+    const verdict = gone ? false : field.value === '' ? true : undefined;
+    api.runtime.sendMessage({ type: 'outcome', passwordField: verdict, final: true }).catch(() => {});
+  }, 4000);
+}
+
+// Pages that reload after logging in report what they show once they settle.
+setTimeout(() => {
+  api.runtime.sendMessage({ type: 'outcome', passwordField: hasPasswordField() }).catch(() => {});
+}, 1500);
 
 document.addEventListener('submit', (e) => capture(e.target), true);
 
@@ -422,9 +440,54 @@ async function showNotice() {
   if (!notice) return;
   const who = notice.username || 'this login';
 
-  if (notice.result === 'created') {
-    const host = bar((box) => (box.textContent = `Saved ${who} to Keyhold`));
-    setTimeout(() => host.remove(), 4000);
+  const button = (label, title, plain, onClick) => {
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.title = title;
+    if (plain) b.className = 'plain';
+    b.onclick = (e) => e.isTrusted && onClick();
+    return b;
+  };
+  const neverHere = (close, text) =>
+    button('⛔ Never here', 'Never save logins on this site', true, async () => {
+      await api.runtime.sendMessage({ type: 'never', on: true });
+      text.textContent = `Keyhold will not save logins on ${notice.host}`;
+      setTimeout(close, 2500);
+    });
+
+  if (notice.result === 'failed') {
+    const host = bar((box) => (box.textContent = 'That login did not work — Keyhold did not keep it'));
+    setTimeout(() => host.remove(), 5000);
+    return;
+  }
+
+  if (notice.result === 'saved') {
+    const host = bar((box, close) => {
+      const text = document.createElement('span');
+      text.textContent = `Saved ${who} to Keyhold`;
+      box.append(text, neverHere(close, text));
+    });
+    setTimeout(() => host.remove(), 6000);
+    return;
+  }
+
+  if (notice.result === 'unconfirmed') {
+    bar((box, close) => {
+      const text = document.createElement('span');
+      text.textContent = `Saved ${who} — did this login work?`;
+      const answer = (keep) => async () => {
+        await api.runtime.sendMessage({ type: 'review', keep });
+        text.textContent = keep ? 'Kept in Keyhold' : 'Removed from Keyhold';
+        box.querySelectorAll('button').forEach((b) => b.remove());
+        setTimeout(close, 2000);
+      };
+      box.append(
+        text,
+        button('✓', 'Yes — keep it', false, answer(true)),
+        button('✕', 'No — remove it', true, answer(false)),
+        neverHere(close, text)
+      );
+    });
     return;
   }
 

@@ -194,6 +194,32 @@ async function load() {
     return;
   }
   render(result.entries || [], tab);
+  neverSwitch(result.never === true, tab);
+}
+
+// Stop sign: switches saving off (or back on) for the site in this tab.
+function neverSwitch(never, tab) {
+  const host = new URL(tab.url).hostname;
+  const row = document.createElement('div');
+  row.className = never ? 'never on' : 'never';
+  const text = document.createElement('span');
+  text.textContent = never ? `⛔ Logins are not saved on ${host}` : '⛔ Never save logins on this site';
+  row.append(text);
+  if (never) {
+    const allow = document.createElement('button');
+    allow.textContent = 'Allow';
+    allow.onclick = async () => {
+      await api.runtime.sendMessage({ type: 'never', on: false, url: tab.url });
+      load();
+    };
+    row.append(allow);
+  } else {
+    row.onclick = async () => {
+      await api.runtime.sendMessage({ type: 'never', on: true, url: tab.url });
+      load();
+    };
+  }
+  content.append(row);
 }
 
 load();

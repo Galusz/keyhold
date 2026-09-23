@@ -123,7 +123,7 @@ class _VaultPageState extends State<VaultPage> {
       return 'updated';
     }
 
-    _vault.put(VaultEntry(
+    final created = VaultEntry(
       id: UniqueKey().toString(),
       title: _hostOf(url),
       username: username,
@@ -131,9 +131,10 @@ class _VaultPageState extends State<VaultPage> {
       url: url,
       group: 'Web',
       pending: true,
-    ));
+    );
+    _vault.put(created);
     await _persist();
-    return 'created';
+    return 'created:${created.id}';
   }
 
   Future<String> _reviewFromBrowser(String id, bool keep) async {
@@ -204,7 +205,13 @@ class _VaultPageState extends State<VaultPage> {
       token: _store.ensureBridgeToken(),
       onSave: _saveFromBrowser,
       onReview: _reviewFromBrowser,
-    );
+      neverSave: () => _store.backup.neverSave,
+    )..onNever = (host, never) {
+        final list = _store.backup.neverSave;
+        list.remove(host);
+        if (never) list.add(host);
+        _store.backup.saveSettings();
+      };
     try {
       await bridge.start();
       _bridge = bridge;

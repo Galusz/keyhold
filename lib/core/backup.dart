@@ -34,6 +34,9 @@ class BackupService {
   String bridgeToken = '';
   List<String>? watched;
 
+  /// Sites where the browser extension never saves logins.
+  List<String> neverSave = [];
+
   /// Google Drive sync: the refresh token is kept DPAPI-protected, base64.
   String driveToken = '';
   String driveEmail = '';
@@ -52,6 +55,7 @@ class BackupService {
 
       bridgeToken = (raw['bridgeToken'] ?? '') as String;
       watched = (raw['watched'] as List<dynamic>?)?.cast<String>();
+      neverSave = (raw['neverSave'] as List<dynamic>?)?.cast<String>() ?? [];
       driveToken = (raw['driveToken'] ?? '') as String;
       driveEmail = (raw['driveEmail'] ?? '') as String;
       driveSyncedAt = DateTime.tryParse((raw['driveSyncedAt'] ?? '') as String);
@@ -73,6 +77,7 @@ class BackupService {
       'remote': remote.toJson(),
       'bridgeToken': bridgeToken,
       if (watched != null) 'watched': watched,
+      if (neverSave.isNotEmpty) 'neverSave': neverSave,
       if (driveToken.isNotEmpty) 'driveToken': driveToken,
       if (driveEmail.isNotEmpty) 'driveEmail': driveEmail,
       if (driveSyncedAt != null) 'driveSyncedAt': driveSyncedAt!.toIso8601String(),

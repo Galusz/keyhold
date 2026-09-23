@@ -15,6 +15,7 @@ class BrowserBridge {
     required this.token,
     required this.onSave,
     required this.onReview,
+    required this.neverSave,
     this.port = 19919,
   });
 
@@ -30,6 +31,10 @@ class BrowserBridge {
 
   /// Keeps ([keep]) or removes an entry the extension saved on its own.
   final Future<String> Function(String id, bool keep) onReview;
+
+  /// The sites where saving is switched off; changes are saved by the owner.
+  final List<String> Function() neverSave;
+  void Function(String host, bool never)? onNever;
 
   HttpServer? _server;
 
@@ -85,6 +90,10 @@ class BrowserBridge {
           await _json(response, HttpStatus.ok, await _fill(payload['id'] as String? ?? ''));
         case '/code':
           await _json(response, HttpStatus.ok, await _code(payload['id'] as String? ?? ''));
+        case '/never':
+          final host = _hostOf(payload['url'] as String? ?? '');
+          if (host.isNotEmpty) onNever?.call(host, payload['never'] == true);
+          await _json(response, HttpStatus.ok, {'never': neverSave().contains(host)});
         case '/review':
           final outcome = await onReview(
             payload['id'] as String? ?? '',
@@ -92,13 +101,23 @@ class BrowserBridge {
           );
           await _json(response, HttpStatus.ok, {'result': outcome});
         case '/save':
+          if (neverSave().contains(_hostOf(payload['url'] as String? ?? ''))) {
+            await _json(response, HttpStatus.ok, {'result': 'blocked'});
+            break;
+          }
           final outcome = await onSave(
             payload['url'] as String? ?? '',
             payload['username'] as String? ?? '',
             payload['password'] as String? ?? '',
             payload['update'] == true,
           );
-          await _json(response, HttpStatus.ok, {'result': outcome});
+          // "created:<id>" carries the new entry, so the extension can confirm
+          // or remove it once it sees whether the login worked.
+          final parts = outcome.split(':');
+          await _json(response, HttpStatus.ok, {
+            'result': parts.first,
+            if (parts.length > 1) 'id': parts.sublist(1).join(':'),
+          });
         default:
           await _json(response, HttpStatus.notFound, {'error': 'unknown'});
       }
@@ -125,6 +144,7 @@ class BrowserBridge {
       ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
     return {
+      'never': neverSave().contains(host),
       'entries': matches
           .map((e) => {
                 'id': e.id,
