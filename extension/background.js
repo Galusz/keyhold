@@ -136,7 +136,7 @@ async function never(message) {
 
 // ---------- toolbar icon ----------
 
-// Red lock: a login just failed here. Red stop: saving is off on this site.
+// Red lock: a login just failed here. Struck-through lock: saving is off here.
 // Blinking orange: Keyhold holds a login that waits for ✓ / ✕.
 const stopTabs = new Set();
 let lit = false;
