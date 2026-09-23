@@ -24,6 +24,9 @@ class BrowserBridge {
   /// How long a caught login waits for the user's answer.
   static const offerTime = Duration(minutes: 2);
 
+  /// A login the page refused stays shown this long, in case it did work.
+  static const failedTime = Duration(seconds: 30);
+
   final Vault Function() vault;
   final String token;
   final int port;
@@ -120,10 +123,20 @@ class BrowserBridge {
                       'host': o.value.host,
                       'username': o.value.username,
                       'changed': o.value.changed,
-                      'left': offerTime.inSeconds - now.difference(o.value.at).inSeconds,
+                      'failed': o.value.failed,
+                      'left': o.value.until.difference(now).inSeconds,
                     })
                 .toList(),
           });
+        case '/fail':
+          final id = payload['id'] as String? ?? '';
+          final offer = _offers[id];
+          offer?.expiry.cancel();
+          offer
+            ?..failed = true
+            ..until = DateTime.now().add(failedTime)
+            ..expiry = Timer(failedTime, () => _offers.remove(id));
+          await _json(response, HttpStatus.ok, {'result': offer == null ? 'missing' : 'failed'});
         case '/review':
           final offer = _offers.remove(payload['id'] as String? ?? '');
           offer?.expiry.cancel();
@@ -164,6 +177,7 @@ class BrowserBridge {
       username: username,
       password: password,
       changed: state == 'changed',
+      until: DateTime.now().add(offerTime),
       expiry: Timer(offerTime, () => _offers.remove(id)),
     );
     return {'result': 'offered', 'id': id, 'autoSave': autoSave()};
@@ -259,6 +273,7 @@ class _Offer {
     required this.username,
     required this.password,
     required this.changed,
+    required this.until,
     required this.expiry,
   });
 
@@ -269,6 +284,9 @@ class _Offer {
 
   /// A new password for a login the vault already has.
   final bool changed;
-  final Timer expiry;
-  final at = DateTime.now();
+
+  /// The page refused it.
+  bool failed = false;
+  DateTime until;
+  Timer expiry;
 }

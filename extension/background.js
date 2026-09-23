@@ -3,7 +3,7 @@ const BRIDGE = 'http://127.0.0.1:19919';
 const session = api.storage.session;
 const USER_TTL = 10 * 60 * 1000;
 const VERDICT_WAIT = 8 * 1000;
-const FAILED_SHOW = 10 * 1000;
+const FAILED_SHOW = 30 * 1000;
 
 async function call(path, body) {
   const { token } = await api.storage.local.get('token');
@@ -90,7 +90,7 @@ async function decide(tabId, id, verdict) {
   await session.remove(key);
 
   if (verdict === 'failed') {
-    await call('/review', { id, keep: false });
+    await call('/fail', { id });
     await session.set({ [`failed:${tabId}`]: Date.now() + FAILED_SHOW });
     paint(tabId);
     setTimeout(() => session.remove(`failed:${tabId}`).then(() => paint(tabId)), FAILED_SHOW);
@@ -104,6 +104,7 @@ async function decide(tabId, id, verdict) {
 // ---------- logins waiting for ✓ / ✕ ----------
 
 // Mirrors what Keyhold holds, minus logins whose outcome is still being watched.
+// Failed ones show red in the popup but do not make the lock blink.
 async function syncOffers() {
   const result = await call('/offers');
   const all = await session.get(null);
@@ -113,7 +114,8 @@ async function syncOffers() {
       .map((k) => all[k].id)
   );
   const offers = (result.offers || []).filter((o) => !judging.has(o.id));
-  await session.set({ offers: offers.map((o) => Date.now() + o.left * 1000) });
+  const waiting = offers.filter((o) => !o.failed);
+  await session.set({ offers: waiting.map((o) => Date.now() + o.left * 1000) });
   blink();
   return offers;
 }

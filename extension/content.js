@@ -42,8 +42,8 @@ function deepInputs(root = document, out = []) {
   return out;
 }
 
-const inputsIn = (scope) => (scope === document ? deepInputs() : [...scope.querySelectorAll('input')]);
 const pathOf = (e) => (e.composedPath ? e.composedPath() : [e.target]);
+const formOf = (e) => pathOf(e).find((n) => n instanceof HTMLFormElement) || document;
 
 function kindOf(input) {
   const type = (input.type || 'text').toLowerCase();
@@ -58,7 +58,7 @@ function kindOf(input) {
 }
 
 function usernameFieldFor(passwordField) {
-  const all = inputsIn(passwordField.form || document);
+  const all = deepInputs(passwordField.form || document);
   const candidates = all.filter((input) => {
     if (input === passwordField || !shown(input)) return false;
     return ['text', 'email', 'tel'].includes((input.type || 'text').toLowerCase()) && kindOf(input) !== 'code';
@@ -80,7 +80,7 @@ function setValue(input, value) {
 }
 
 function fillLogin(field, data) {
-  const all = inputsIn(field.form || document);
+  const all = deepInputs(field.form || document);
   const isPassword = field.type === 'password';
   const passwords = all.filter((i) => i.type === 'password' && shown(i));
   const password = isPassword
@@ -344,7 +344,7 @@ document.addEventListener(
 let lastSent = '';
 
 function capture(scope) {
-  const inputs = inputsIn(scope);
+  const inputs = deepInputs(scope);
   const passwords = inputs.filter((p) => p.type === 'password' && p.value);
 
   if (passwords.length === 0) {
@@ -364,17 +364,34 @@ function capture(scope) {
   if (key === lastSent) return;
   lastSent = key;
   api.runtime.sendMessage({ type: 'save', username, password }).catch(() => {});
-  watchOutcome(passwords[passwords.length - 1]);
+  watchOutcome(passwords[passwords.length - 1], refusals());
 }
 
 const hasPasswordField = () => deepInputs().some((i) => i.type === 'password' && shown(i));
 
+// Words a site shows when it refuses a login, counted inside shadow roots too.
+const REFUSED = /invalid|incorrect|wrong|failed|not match|try again|błędn|nieprawidłow|niepoprawn|nie udało|spróbuj ponownie/gi;
+
+function refusals() {
+  let text = document.body ? document.body.innerText : '';
+  const walk = (root) => {
+    for (const el of root.querySelectorAll('*')) {
+      if (!el.shadowRoot) continue;
+      text += ` ${el.shadowRoot.textContent}`;
+      walk(el.shadowRoot);
+    }
+  };
+  walk(document);
+  return (text.match(REFUSED) || []).length;
+}
+
 // Pages that log in without reloading: after a moment, a vanished password
-// field means it worked, an emptied one means it failed.
-function watchOutcome(field) {
+// field means it worked; an emptied one or a new error message means it failed.
+function watchOutcome(field, before) {
   setTimeout(() => {
-    const gone = !shown(field);
-    const verdict = gone ? false : field.value === '' ? true : undefined;
+    let verdict;
+    if (!shown(field)) verdict = false;
+    else if (field.value === '' || refusals() > before) verdict = true;
     api.runtime.sendMessage({ type: 'outcome', passwordField: verdict, final: true }).catch(() => {});
   }, 4000);
 }
@@ -392,7 +409,7 @@ document.addEventListener(
     const input = pathOf(e)[0];
     if (e.key !== 'Enter' || !(input instanceof HTMLInputElement)) return;
     if (menu && menu.index >= 0) return;
-    capture(input.form || document);
+    capture(input.form || formOf(e));
   },
   true
 );
@@ -402,12 +419,19 @@ document.addEventListener(
   (e) => {
     if (!e.isTrusted) return;
     const button = pathOf(e).find(
-      (n) => n instanceof Element && n.matches('button, input[type="submit"], [role="button"]')
+      (n) =>
+        n instanceof Element &&
+        (n.matches('button, input[type="submit"], [role="button"]') || n.tagName.endsWith('-BUTTON'))
     );
     if (!button) return;
-    const words = `${button.textContent} ${button.value || ''} ${button.getAttribute('aria-label') || ''}`.toLowerCase();
-    if (button.type !== 'submit' && !SUBMIT_WORDS.test(words)) return;
-    capture(button.form || button.closest('form') || document);
+    // A button inside a component (Home Assistant's "Log in") carries no text
+    // itself; the words sit on the component around it.
+    let words = '';
+    for (let n = button; n && !words.trim(); n = n.getRootNode().host) {
+      words = `${n.textContent} ${n.value || ''} ${n.getAttribute('aria-label') || ''}`;
+    }
+    if (button.type !== 'submit' && !SUBMIT_WORDS.test(words.toLowerCase())) return;
+    capture(button.form || formOf(e));
   },
   true
 );

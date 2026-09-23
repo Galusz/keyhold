@@ -96,7 +96,7 @@ function pairingScreen() {
 function renderOffers(offers) {
   for (const offer of offers) {
     const row = document.createElement('div');
-    row.className = 'entry pending';
+    row.className = offer.failed ? 'entry failed' : 'entry pending';
 
     const box = document.createElement('div');
     const title = document.createElement('div');
@@ -107,13 +107,17 @@ function renderOffers(offers) {
     user.textContent = offer.username;
     const note = document.createElement('div');
     note.className = 'note';
-    note.textContent = offer.changed ? 'Update the password in Keyhold?' : 'Save this login in Keyhold?';
+    note.textContent = offer.failed
+      ? 'This login did not work'
+      : offer.changed
+        ? 'Update the password in Keyhold?'
+        : 'Save this login in Keyhold?';
     box.append(title, user, note);
 
     const review = document.createElement('div');
     review.className = 'review';
     for (const [label, keep, cls, tip] of [
-      ['✓', true, 'yes', offer.changed ? 'Update' : 'Save'],
+      ['✓', true, 'yes', offer.failed ? 'Save anyway' : offer.changed ? 'Update' : 'Save'],
       ['✕', false, 'no', 'Forget it'],
     ]) {
       const b = document.createElement('button');

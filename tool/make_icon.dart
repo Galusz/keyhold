@@ -13,7 +13,18 @@ img.ColorRgba8 rgba(int argb) => img.ColorRgba8(
       (argb >> 24) & 0xFF,
     );
 
-img.Image draw(int size, {int color = accent}) {
+// Drawn large and scaled down smoothly, so small icons stay centred instead of
+// picking up rounding from a 256-unit grid.
+const master = 1024;
+
+img.Image _smaller(img.Image big, int size) =>
+    img.copyResize(big, width: size, height: size, interpolation: img.Interpolation.average);
+
+img.Image draw(int size, {int color = accent}) => _smaller(_lock(master, color), size);
+
+img.Image drawStop(int size) => _smaller(_stop(master), size);
+
+img.Image _lock(int size, int color) {
   final s = size / 256.0;
   final canvas = img.Image(width: size, height: size, numChannels: 4);
   img.fill(canvas, color: img.ColorRgba8(0, 0, 0, 0));
@@ -104,7 +115,7 @@ void main() {
 }
 
 /// A red octagon with a white bar — reads as "stop" even at 16 px.
-img.Image drawStop(int size) {
+img.Image _stop(int size) {
   final canvas = img.Image(width: size, height: size, numChannels: 4);
   img.fill(canvas, color: img.ColorRgba8(0, 0, 0, 0));
   final c = (size - 1) / 2;
@@ -115,11 +126,13 @@ img.Image drawStop(int size) {
   ];
   img.fillPolygon(canvas, vertices: corners, color: img.ColorRgba8(0xD3, 0x2F, 0x2F, 255));
   final bar = (size * 0.16).round().clamp(2, size);
+  final left = (size * 0.22).round();
+  final top = (size / 2 - bar / 2).round();
   img.fillRect(canvas,
-      x1: (size * 0.22).round(),
-      y1: (size / 2 - bar / 2).round(),
-      x2: (size * 0.78).round(),
-      y2: (size / 2 + bar / 2).round() - 1,
+      x1: left,
+      y1: top,
+      x2: size - 1 - left,
+      y2: size - 1 - top,
       color: img.ColorRgba8(255, 255, 255, 255));
   return canvas;
 }
