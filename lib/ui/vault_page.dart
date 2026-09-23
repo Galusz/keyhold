@@ -11,6 +11,7 @@ import '../core/models.dart';
 import '../core/autotype.dart';
 import '../core/bridge.dart';
 import '../core/drive.dart';
+import '../core/favicons.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../core/watch.dart';
@@ -86,6 +87,7 @@ class _VaultPageState extends State<VaultPage> {
     }
     _vault = await _store.load();
     if (_autoGroup()) await _store.save(_vault);
+    _store.icons.fetchAll(_vault.visible);
     setState(() => _loading = false);
     await _startBridge();
     await _startWatching();
@@ -180,6 +182,7 @@ class _VaultPageState extends State<VaultPage> {
       storeLogin: _storeLogin,
       neverSave: () => _store.backup.neverSave,
       autoSave: () => _store.backup.autoSave,
+      iconOf: _store.icons.bytesOf,
     )
       ..onNever = (host, never) {
         final list = _store.backup.neverSave;
@@ -1126,10 +1129,10 @@ class _VaultPageState extends State<VaultPage> {
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: () => _toggle(e),
-          child: CircleAvatar(
-            child: selected
-                ? const Icon(Icons.check)
-                : Text(e.title.isEmpty ? '?' : e.title.characters.first.toUpperCase()),
+          child: SiteAvatar(
+            entry: e,
+            icons: _store.icons,
+            child: selected ? const Icon(Icons.check) : null,
           ),
         ),
       ),
@@ -1191,6 +1194,40 @@ class _VaultPageState extends State<VaultPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The site's own icon when Keyhold has one, otherwise its first letter.
+class SiteAvatar extends StatelessWidget {
+  const SiteAvatar({super.key, required this.entry, required this.icons, this.child});
+
+  final VaultEntry entry;
+  final Favicons icons;
+
+  /// Shown instead of either, such as the tick of a selected row.
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (child != null) return CircleAvatar(child: child);
+    return ValueListenableBuilder<int>(
+      valueListenable: icons.changed,
+      builder: (context, _, _) {
+        final icon = icons.of(Favicons.addressOf(entry));
+        if (icon == null) {
+          return CircleAvatar(
+            child: Text(entry.title.isEmpty ? '?' : entry.title.characters.first.toUpperCase()),
+          );
+        }
+        return CircleAvatar(
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(7),
+            child: Image(image: icon, filterQuality: FilterQuality.medium),
+          ),
+        );
+      },
     );
   }
 }

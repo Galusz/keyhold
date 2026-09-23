@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'models.dart';
 import 'totp.dart';
@@ -18,6 +19,7 @@ class BrowserBridge {
     required this.storeLogin,
     required this.neverSave,
     required this.autoSave,
+    required this.iconOf,
     this.port = 19919,
   });
 
@@ -43,6 +45,9 @@ class BrowserBridge {
 
   final bool Function() autoSave;
   void Function(bool on)? onAutoSave;
+
+  /// PNG of a site's icon when Keyhold already has one.
+  final Uint8List? Function(String address) iconOf;
 
   /// Caught logins stay in memory only — nothing reaches the vault, the disk
   /// or Drive until the user keeps them — and are forgotten after [offerTime].
@@ -125,6 +130,7 @@ class BrowserBridge {
                       'changed': o.value.changed,
                       'failed': o.value.failed,
                       'left': o.value.until.difference(now).inSeconds,
+                      'icon': _icon(o.value.url),
                     })
                 .toList(),
           });
@@ -222,10 +228,16 @@ class BrowserBridge {
                 'title': e.title,
                 'username': e.username,
                 'group': e.group,
+                'icon': _icon(e.url),
                 'hasCode': e.totpSecret != null && e.totpSecret!.isNotEmpty,
               })
           .toList(),
     };
+  }
+
+  String? _icon(String url) {
+    final png = iconOf(url);
+    return png == null ? null : 'data:image/png;base64,${base64Encode(png)}';
   }
 
   Future<Map<String, dynamic>> _fill(String id) async {

@@ -169,6 +169,10 @@ const STYLE = `
   .row.active, .row:hover { background: #1FCFB4; color: #0C1714; }
   .row.active .sub, .row:hover .sub, .row.active .group, .row:hover .group { color: #0C1714; }
   .text { flex: 1; min-width: 0; }
+  .site { flex: none; width: 24px; height: 24px; border-radius: 50%; background: #fff; display: flex;
+    align-items: center; justify-content: center; overflow: hidden; }
+  .site img { width: 17px; height: 17px; }
+  .site.letter { background: #2C4740; color: #9FE1CB; font-weight: 600; font-size: 12px; }
   .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sub { color: #9FB8B0; font-size: 12.5px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .group { color: #7F9A92; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
@@ -212,6 +216,27 @@ async function openMenu(field) {
   const rows = items.map((entry, i) => {
     const row = document.createElement('div');
     row.className = 'row';
+    const site = document.createElement('div');
+    site.className = 'site';
+    const letter = () => {
+      site.className = 'site letter';
+      site.textContent = (entry.title || '?').charAt(0).toUpperCase();
+    };
+    if (entry.icon) {
+      // A page's own rules may forbid data: images; then the letter stays.
+      const image = document.createElement('img');
+      image.src = entry.icon;
+      image.alt = '';
+      image.onerror = () => {
+        image.remove();
+        letter();
+      };
+      site.append(image);
+    } else {
+      letter();
+    }
+    row.append(site);
+
     const text = document.createElement('div');
     text.className = 'text';
     const title = document.createElement('div');

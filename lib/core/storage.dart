@@ -8,6 +8,7 @@ import 'package:win32/win32.dart';
 
 import 'backup.dart';
 import 'crypto.dart';
+import 'favicons.dart';
 import 'models.dart';
 
 class VaultStore {
@@ -16,6 +17,7 @@ class VaultStore {
   late final File _keyFile;
   Uint8List? _key;
   late final BackupService backup;
+  late final Favicons icons;
 
   /// Returns false when the vault is locked by a password this machine does not know yet.
   Future<bool> init() async {
@@ -24,6 +26,7 @@ class VaultStore {
     if (!_dir.existsSync()) _dir.createSync(recursive: true);
     _vaultFile = File('${_dir.path}${Platform.pathSeparator}vault.khd');
     _keyFile = File('${_dir.path}${Platform.pathSeparator}key.bin');
+    icons = Favicons(Directory('${_dir.path}${Platform.pathSeparator}icons'));
     backup = BackupService(
       File('${_dir.path}${Platform.pathSeparator}settings.json'),
     )..loadSettings();

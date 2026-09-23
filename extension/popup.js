@@ -97,6 +97,7 @@ function renderOffers(offers) {
   for (const offer of offers) {
     const row = document.createElement('div');
     row.className = offer.failed ? 'entry failed' : 'entry pending';
+    siteIcon(row, offer.icon, offer.host);
 
     const box = document.createElement('div');
     const title = document.createElement('div');
@@ -135,6 +136,29 @@ function renderOffers(offers) {
   }
 }
 
+// The site's icon from Keyhold, or its first letter.
+function siteIcon(row, icon, name) {
+  const box = document.createElement('div');
+  box.className = 'site';
+  const letter = () => {
+    box.classList.add('letter');
+    box.textContent = (name || '?').charAt(0).toUpperCase();
+  };
+  if (icon) {
+    const image = document.createElement('img');
+    image.src = icon;
+    image.alt = '';
+    image.onerror = () => {
+      image.remove();
+      letter();
+    };
+    box.append(image);
+  } else {
+    letter();
+  }
+  row.append(box);
+}
+
 function render(entries, tab) {
   if (entries.length === 0) {
     const hint = document.createElement('p');
@@ -147,6 +171,7 @@ function render(entries, tab) {
   for (const entry of entries) {
     const row = document.createElement('div');
     row.className = 'entry';
+    siteIcon(row, entry.icon, entry.title);
 
     const box = document.createElement('div');
     const title = document.createElement('div');

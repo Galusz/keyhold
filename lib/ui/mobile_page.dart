@@ -10,6 +10,7 @@ import '../core/totp.dart';
 import 'entry_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
+import 'vault_page.dart' show SiteAvatar;
 
 /// Keyhold on a phone: mostly an authenticator, with the same vault as the
 /// computer kept in step through the user's Google Drive.
@@ -66,6 +67,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       ));
     }
     _vault = await _store.load();
+    _store.icons.fetchAll(_vault.visible);
     _welcome = _vault.visible.isEmpty && !_drive.connected;
     setState(() => _loading = false);
     await _refreshCodes();
@@ -412,9 +414,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     return ListTile(
       onTap: () => code != null ? _copy('Code', code) : _details(e),
       onLongPress: () => _details(e),
-      leading: CircleAvatar(
-        child: Text(e.title.isEmpty ? '?' : e.title.characters.first.toUpperCase()),
-      ),
+      leading: SiteAvatar(entry: e, icons: _store.icons),
       title: Text(
         e.title.isEmpty ? '(no title)' : e.title,
         maxLines: 1,
