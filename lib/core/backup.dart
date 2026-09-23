@@ -32,6 +32,7 @@ class BackupService {
 
   RemoteConfig remote = RemoteConfig();
   String bridgeToken = '';
+  List<String>? watched;
   BackupStatus status = BackupStatus.empty();
 
   void loadSettings() {
@@ -45,6 +46,7 @@ class BackupService {
       if (remoteJson != null) remote = RemoteConfig.fromJson(remoteJson);
 
       bridgeToken = (raw['bridgeToken'] ?? '') as String;
+      watched = (raw['watched'] as List<dynamic>?)?.cast<String>();
 
       final at = raw['lastBackupAt'] as String?;
       status = BackupStatus(
@@ -62,6 +64,7 @@ class BackupService {
       'backupTargets': targets,
       'remote': remote.toJson(),
       'bridgeToken': bridgeToken,
+      if (watched != null) 'watched': watched,
       'lastBackupAt': status.at?.toIso8601String(),
       'lastBackupTargets': status.targets,
     }));

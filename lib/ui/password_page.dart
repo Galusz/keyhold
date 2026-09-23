@@ -94,7 +94,7 @@ class _PasswordPageState extends State<PasswordPage> {
               const SizedBox(height: 24),
               TextField(
                 controller: _first,
-                autofocus: true,
+                autofocus: widget.unlockMode,
                 obscureText: !_show,
                 onSubmitted: (_) => _submit(),
                 decoration: InputDecoration(

@@ -60,6 +60,12 @@ class VaultFile {
   int updatedAt;
   bool deleted;
 
+  /// Where the file lives on disk when it is picked up by a watched folder.
+  String? source;
+
+  /// SHA-256 of the content, so an unchanged file is not stored again.
+  String? hash;
+
   VaultFile({
     required this.id,
     required this.name,
@@ -67,6 +73,8 @@ class VaultFile {
     required this.size,
     int? updatedAt,
     this.deleted = false,
+    this.source,
+    this.hash,
   }) : updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
 
   Uint8List get bytes => base64Decode(data);
@@ -78,6 +86,8 @@ class VaultFile {
         'size': size,
         'updatedAt': updatedAt,
         if (deleted) 'deleted': true,
+        if (source != null) 'source': source,
+        if (hash != null) 'hash': hash,
       };
 
   factory VaultFile.fromJson(Map<String, dynamic> j) => VaultFile(
@@ -87,6 +97,8 @@ class VaultFile {
         size: (j['size'] ?? 0) as int,
         updatedAt: (j['updatedAt'] ?? 0) as int,
         deleted: (j['deleted'] ?? false) as bool,
+        source: j['source'] as String?,
+        hash: j['hash'] as String?,
       );
 }
 

@@ -1,0 +1,121 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:cryptography/cryptography.dart';
+
+import 'models.dart';
+
+const maxWatchedFileBytes = 25 * 1024 * 1024;
+
+class WatchResult {
+  WatchResult({
+    required this.added,
+    required this.updated,
+    required this.skipped,
+    required this.missing,
+  });
+
+  final int added;
+  final int updated;
+  final List<String> skipped;
+  final List<String> missing;
+
+  bool get changed => added + updated > 0;
+}
+
+Future<String> _sha256(List<int> bytes) async {
+  final digest = await Sha256().hash(bytes);
+  return digest.bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+}
+
+Iterable<File> _filesUnder(String path) sync* {
+  final type = FileSystemEntity.typeSync(path);
+  if (type == FileSystemEntityType.file) {
+    yield File(path);
+    return;
+  }
+  if (type != FileSystemEntityType.directory) return;
+  for (final entity in Directory(path).listSync(recursive: true, followLinks: false)) {
+    if (entity is File) yield entity;
+  }
+}
+
+/// Copies every watched file into the vault when its content changed.
+/// Files removed from disk stay in the vault on purpose — that is the backup.
+Future<WatchResult> scanWatched(Vault vault, List<String> watched) async {
+  var added = 0;
+  var updated = 0;
+  final skipped = <String>[];
+  final missing = <String>[];
+
+  final bySource = <String, VaultFile>{
+    for (final f in vault.files.values)
+      if (f.source != null && !f.deleted) f.source!: f,
+  };
+
+  for (final root in watched) {
+    if (FileSystemEntity.typeSync(root) == FileSystemEntityType.notFound) {
+      missing.add(root);
+      continue;
+    }
+
+    for (final file in _filesUnder(root)) {
+      final path = file.path;
+      final List<int> bytes;
+      try {
+        if (file.lengthSync() > maxWatchedFileBytes) {
+          skipped.add(path);
+          continue;
+        }
+        bytes = await file.readAsBytes();
+      } catch (_) {
+        skipped.add(path);
+        continue;
+      }
+
+      final hash = await _sha256(bytes);
+      final known = bySource[path];
+      if (known != null && known.hash == hash) continue;
+
+      if (known == null) {
+        vault.putFile(VaultFile(
+          id: 'w-${hash.substring(0, 12)}-${DateTime.now().microsecondsSinceEpoch}',
+          name: file.uri.pathSegments.last,
+          data: base64Encode(bytes),
+          size: bytes.length,
+          source: path,
+          hash: hash,
+        ));
+        added++;
+      } else {
+        known
+          ..data = base64Encode(bytes)
+          ..size = bytes.length
+          ..hash = hash;
+        vault.putFile(known);
+        updated++;
+      }
+    }
+  }
+
+  return WatchResult(added: added, updated: updated, skipped: skipped, missing: missing);
+}
+
+/// What is worth keeping by default, if it exists on this machine.
+List<String> defaultWatched() {
+  final home = Platform.environment['USERPROFILE'] ?? '';
+  final sep = Platform.pathSeparator;
+  final candidates = <String>[
+    if (home.isNotEmpty) '$home$sep.ssh',
+    if (home.isNotEmpty && Directory(home).existsSync())
+      ...Directory(home)
+          .listSync(followLinks: false)
+          .whereType<File>()
+          .where((f) => f.path.toLowerCase().endsWith('.kdbx'))
+          .map((f) => f.path),
+    r'E:\ACCESS\2fa',
+  ];
+  return candidates
+      .where((p) => FileSystemEntity.typeSync(p) != FileSystemEntityType.notFound)
+      .toList();
+}

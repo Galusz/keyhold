@@ -12,6 +12,7 @@ import '../core/autotype.dart';
 import '../core/bridge.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
+import '../core/watch.dart';
 import 'entry_page.dart';
 import 'extension_page.dart';
 import 'import_page.dart';
@@ -37,6 +38,10 @@ class _VaultPageState extends State<VaultPage> {
   bool _loading = true;
   EntryFilter _filter = EntryFilter.all;
   BrowserBridge? _bridge;
+  Timer? _watchTimer;
+  WatchResult? _lastScan;
+  DateTime? _lastScanAt;
+  bool _scanning = false;
   int _left = 30;
 
   @override
@@ -48,6 +53,7 @@ class _VaultPageState extends State<VaultPage> {
   @override
   void dispose() {
     _ticker?.cancel();
+    _watchTimer?.cancel();
     _bridge?.stop();
     _search.dispose();
     super.dispose();
@@ -69,6 +75,7 @@ class _VaultPageState extends State<VaultPage> {
     _vault = await _store.load();
     setState(() => _loading = false);
     await _startBridge();
+    await _startWatching();
     await _refreshCodes();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
   }
@@ -423,6 +430,153 @@ class _VaultPageState extends State<VaultPage> {
     );
   }
 
+  List<String> get _watched => _store.backup.watched ?? const [];
+
+  Future<void> _startWatching() async {
+    if (_store.backup.watched == null) {
+      _store.backup.watched = defaultWatched();
+      _store.backup.saveSettings();
+    }
+    await _scan();
+    _watchTimer = Timer.periodic(const Duration(minutes: 15), (_) => _scan());
+  }
+
+  Future<void> _scan() async {
+    if (_scanning) return;
+    _scanning = true;
+    try {
+      final result = await scanWatched(_vault, _watched);
+      if (result.changed) await _persist();
+      if (mounted) {
+        setState(() {
+          _lastScan = result;
+          _lastScanAt = DateTime.now();
+        });
+      }
+    } finally {
+      _scanning = false;
+    }
+  }
+
+  Future<void> _watch({required bool folder}) async {
+    final path = folder ? await getDirectoryPath() : (await openFile())?.path;
+    if (path == null || _watched.contains(path)) return;
+    _store.backup.watched = [..._watched, path];
+    _store.backup.saveSettings();
+    await _scan();
+  }
+
+  void _unwatch(String path) {
+    _store.backup.watched = _watched.where((p) => p != path).toList();
+    _store.backup.saveSettings();
+    setState(() {});
+  }
+
+  Widget _watchedPanel() {
+    final theme = Theme.of(context);
+    final scan = _lastScan;
+    final countFor = <String, int>{};
+    for (final f in _vault.visibleFiles) {
+      final src = f.source;
+      if (src == null) continue;
+      for (final root in _watched) {
+        if (src == root || src.startsWith('$root${Platform.pathSeparator}')) {
+          countFor[root] = (countFor[root] ?? 0) + 1;
+        }
+      }
+    }
+
+    String status;
+    if (_scanning) {
+      status = 'Checking…';
+    } else if (scan == null) {
+      status = 'Not checked yet';
+    } else {
+      final when = _ago(_lastScanAt!);
+      final parts = [
+        if (scan.added > 0) '${scan.added} new',
+        if (scan.updated > 0) '${scan.updated} changed',
+        if (scan.skipped.isNotEmpty) '${scan.skipped.length} skipped',
+      ];
+      status = 'Checked $when${parts.isEmpty ? ' — nothing changed' : ' — ${parts.join(', ')}'}';
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+      color: theme.colorScheme.primary.withValues(alpha: 0.06),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Watched — copied into the vault whenever they change, every 15 minutes',
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor)),
+          const SizedBox(height: 6),
+          if (_watched.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text('Nothing watched yet', style: theme.textTheme.bodyMedium),
+            ),
+          ..._watched.map((path) {
+            final missing = scan?.missing.contains(path) ?? false;
+            return Row(
+              children: [
+                Icon(
+                  missing
+                      ? Icons.error_outline
+                      : FileSystemEntity.isDirectorySync(path)
+                          ? Icons.folder_outlined
+                          : Icons.insert_drive_file_outlined,
+                  size: 18,
+                  color: missing ? theme.colorScheme.error : null,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    missing ? '$path — not found' : '$path  (${countFor[path] ?? 0})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: missing ? theme.colorScheme.error : null),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Stop watching',
+                  iconSize: 18,
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(Icons.close),
+                  onPressed: () => _unwatch(path),
+                ),
+              ],
+            );
+          }),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => _watch(folder: true),
+                icon: const Icon(Icons.create_new_folder_outlined, size: 18),
+                label: const Text('Watch folder'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _watch(folder: false),
+                icon: const Icon(Icons.note_add_outlined, size: 18),
+                label: const Text('Watch file'),
+              ),
+              TextButton.icon(
+                onPressed: _scanning ? null : _scan,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Check now'),
+              ),
+              Text(status, style: theme.textTheme.bodySmall),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   static const _maxFileBytes = 25 * 1024 * 1024;
 
   String _humanSize(int bytes) {
@@ -487,21 +641,35 @@ class _VaultPageState extends State<VaultPage> {
         .where((f) => q.isEmpty || f.name.toLowerCase().contains(q))
         .toList();
 
-    if (files.isEmpty) {
-      return const Center(
-        child: Text('No files yet — add recovery codes, keys or scans'),
-      );
-    }
+    final list = files.isEmpty
+        ? const Center(child: Text('No files yet — add recovery codes, keys or scans'))
+        : _filesList(files);
 
+    return Column(
+      children: [
+        _watchedPanel(),
+        const Divider(height: 1),
+        Expanded(child: list),
+      ],
+    );
+  }
+
+  Widget _filesList(List<VaultFile> files) {
     return ListView.separated(
       itemCount: files.length,
       separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, i) {
         final f = files[i];
         return ListTile(
-          leading: const Icon(Icons.insert_drive_file_outlined),
+          leading: Icon(f.source == null
+              ? Icons.insert_drive_file_outlined
+              : Icons.sync_outlined),
           title: Text(f.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-          subtitle: Text(_humanSize(f.size)),
+          subtitle: Text(
+            f.source == null ? _humanSize(f.size) : '${_humanSize(f.size)} · ${f.source}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
