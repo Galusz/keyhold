@@ -10,6 +10,7 @@ import 'package:window_manager/window_manager.dart';
 import '../core/models.dart';
 import '../core/autotype.dart';
 import '../core/bridge.dart';
+import '../core/drive.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../core/watch.dart';
@@ -42,6 +43,12 @@ class _VaultPageState extends State<VaultPage> {
   final _selected = <String>{};
   BrowserBridge? _bridge;
   Timer? _watchTimer;
+  late final _drive = DriveSync(_store);
+  Timer? _driveTimer;
+  Timer? _driveSoon;
+  bool _driveBusy = false;
+  bool _driveAgain = false;
+  bool _driveNeedsPassword = false;
   WatchResult? _lastScan;
   DateTime? _lastScanAt;
   bool _scanning = false;
@@ -57,6 +64,8 @@ class _VaultPageState extends State<VaultPage> {
   void dispose() {
     _ticker?.cancel();
     _watchTimer?.cancel();
+    _driveTimer?.cancel();
+    _driveSoon?.cancel();
     _bridge?.stop();
     _search.dispose();
     super.dispose();
@@ -80,6 +89,8 @@ class _VaultPageState extends State<VaultPage> {
     setState(() => _loading = false);
     await _startBridge();
     await _startWatching();
+    unawaited(_syncDrive());
+    _driveTimer = Timer.periodic(const Duration(minutes: 5), (_) => _syncDrive());
     await _refreshCodes();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
   }
@@ -239,6 +250,41 @@ class _VaultPageState extends State<VaultPage> {
     _codeWindow = -1;
     await _store.save(_vault);
     await _refreshCodes();
+    _driveSoon?.cancel();
+    _driveSoon = Timer(const Duration(seconds: 3), _syncDrive);
+  }
+
+  /// Pulls changes from other devices and pushes this one's. Edits made while
+  /// a sync runs are kept: the result is merged into the vault as it is now.
+  Future<SyncResult?> _syncDrive({String? password}) async {
+    if (!_drive.connected) return null;
+    if (_driveBusy) {
+      _driveAgain = true;
+      return null;
+    }
+    _driveBusy = true;
+    try {
+      final result = await _drive.sync(_vault, password: password);
+      _driveNeedsPassword = result.needsPassword;
+      final theirs = result.vault;
+      if (theirs != null) {
+        _vault = Vault.merge(_vault, theirs);
+        _revision++;
+        _codeWindow = -1;
+        await _store.save(_vault);
+        await _refreshCodes();
+      }
+      return result;
+    } on DriveError {
+      return null;
+    } finally {
+      _driveBusy = false;
+      if (mounted) setState(() {});
+      if (_driveAgain) {
+        _driveAgain = false;
+        unawaited(_syncDrive());
+      }
+    }
   }
 
   Future<void> _open(VaultEntry entry, {required bool isNew}) async {
@@ -570,7 +616,9 @@ class _VaultPageState extends State<VaultPage> {
             icon: const Icon(Icons.backup_outlined),
             onPressed: () async {
               await Navigator.of(context).push(
-                MaterialPageRoute<bool>(builder: (_) => BackupPage(store: _store)),
+                MaterialPageRoute<bool>(
+                  builder: (_) => BackupPage(store: _store, drive: _drive, onSync: _syncDrive),
+                ),
               );
               if (mounted) setState(() {});
             },
@@ -1003,6 +1051,17 @@ class _VaultPageState extends State<VaultPage> {
         ),
     };
 
+    final syncedAt = _drive.syncedAt;
+    final drive = !_drive.connected
+        ? null
+        : _driveNeedsPassword
+            ? 'Google Drive: open Backup and enter the master password'
+            : _drive.lastError != null
+                ? 'Google Drive: ${_drive.lastError}'
+                : syncedAt == null
+                    ? null
+                    : 'Google Drive: synced ${_ago(syncedAt)}';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -1020,6 +1079,20 @@ class _VaultPageState extends State<VaultPage> {
               style: theme.textTheme.bodySmall?.copyWith(color: color),
             ),
           ),
+          if (drive != null) ...[
+            Icon(
+              _drive.lastError != null || _driveNeedsPassword
+                  ? Icons.sync_problem
+                  : Icons.add_to_drive,
+              size: 18,
+              color: _drive.lastError != null || _driveNeedsPassword
+                  ? theme.colorScheme.error
+                  : theme.colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(drive, style: theme.textTheme.bodySmall),
+            const SizedBox(width: 16),
+          ],
           Text('$count items', style: theme.textTheme.bodySmall),
         ],
       ),

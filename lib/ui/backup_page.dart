@@ -3,13 +3,24 @@ import 'dart:io';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
+import '../core/drive.dart';
 import '../core/remote.dart';
 import '../core/storage.dart';
+import 'password_page.dart';
 
 class BackupPage extends StatefulWidget {
-  const BackupPage({super.key, required this.store});
+  const BackupPage({
+    super.key,
+    required this.store,
+    required this.drive,
+    required this.onSync,
+  });
 
   final VaultStore store;
+  final DriveSync drive;
+
+  /// Runs a sync through the vault screen, which owns the open vault.
+  final Future<SyncResult?> Function({String? password}) onSync;
 
   @override
   State<BackupPage> createState() => _BackupPageState();
@@ -26,6 +37,8 @@ class _BackupPageState extends State<BackupPage> {
   String? _message;
   bool _failed = false;
   bool _busy = false;
+  String? _driveMessage;
+  bool _driveBusy = false;
 
   @override
   void initState() {
@@ -130,6 +143,147 @@ class _BackupPageState extends State<BackupPage> {
     }
   }
 
+  Future<void> _drive(Future<void> Function() action) async {
+    setState(() {
+      _driveBusy = true;
+      _driveMessage = null;
+    });
+    try {
+      await action();
+    } on DriveError catch (e) {
+      _driveMessage = e.message;
+    } finally {
+      if (mounted) setState(() => _driveBusy = false);
+    }
+  }
+
+  Future<void> _syncDrive() async {
+    var result = await widget.onSync();
+    if (result != null && result.needsPassword) {
+      final password = await _askPassword();
+      if (password == null) {
+        _driveMessage = 'Google Drive already holds a Keyhold vault. '
+            'Its master password is needed to join it.';
+        return;
+      }
+      result = await widget.onSync(password: password);
+    }
+    _driveMessage = widget.drive.lastError ??
+        (result == null ? null : result.changedHere || result.uploaded ? 'Synced' : 'Already in sync');
+  }
+
+  Future<String?> _askPassword() {
+    final field = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Master password of the vault in Google Drive'),
+        content: SizedBox(
+          width: 380,
+          child: TextField(
+            controller: field,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Master password'),
+            onSubmitted: (v) => Navigator.pop(context, v),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, field.text),
+            child: const Text('Join'),
+          ),
+        ],
+      ),
+    ).whenComplete(field.dispose);
+  }
+
+  String _when(DateTime t) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    final now = DateTime.now();
+    final time = '${two(t.hour)}:${two(t.minute)}';
+    return t.year == now.year && t.month == now.month && t.day == now.day
+        ? time
+        : '${two(t.day)}.${two(t.month)} $time';
+  }
+
+  List<Widget> _driveSection(ThemeData theme) {
+    final drive = widget.drive;
+    final synced = drive.syncedAt;
+
+    return [
+      Text('Google Drive', style: theme.textTheme.titleMedium),
+      const SizedBox(height: 4),
+      Text(
+        'Keeps the encrypted vault in a "Keyhold" folder in your own Google Drive, '
+        'so your other devices stay in sync and a lost computer loses nothing. '
+        'Google cannot read it.',
+        style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+      ),
+      const SizedBox(height: 12),
+      if (!DriveSync.available)
+        const Text('Google Drive is not set up in this build.')
+      else if (!widget.store.hasPassword) ...[
+        const Text('Set a master password first — a new device needs it to open the vault.'),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            onPressed: () async {
+              await Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (_) => PasswordPage(store: widget.store, unlockMode: false),
+              ));
+              if (mounted) setState(() {});
+            },
+            icon: const Icon(Icons.lock_outline),
+            label: const Text('Set master password'),
+          ),
+        ),
+      ] else if (!drive.connected)
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FilledButton.icon(
+            onPressed: _driveBusy
+                ? null
+                : () => _drive(() async {
+                      await drive.connect();
+                      await _syncDrive();
+                    }),
+            icon: const Icon(Icons.add_to_drive),
+            label: const Text('Connect Google Drive'),
+          ),
+        )
+      else
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text('Connected as ${drive.email}'
+                '${synced == null ? '' : ' — last sync ${_when(synced)}'}'),
+            OutlinedButton.icon(
+              onPressed: _driveBusy ? null : () => _drive(_syncDrive),
+              icon: const Icon(Icons.sync),
+              label: const Text('Sync now'),
+            ),
+            TextButton(
+              onPressed: _driveBusy ? null : () => _drive(drive.disconnect),
+              child: const Text('Disconnect'),
+            ),
+          ],
+        ),
+      if (_driveBusy) ...[
+        const SizedBox(height: 12),
+        const LinearProgressIndicator(),
+      ],
+      if (_driveMessage != null) ...[
+        const SizedBox(height: 8),
+        Text(_driveMessage!),
+      ],
+      const Divider(height: 48),
+    ];
+  }
+
   void _save() {
     widget.store.backup
       ..targets = _folders
@@ -153,6 +307,7 @@ class _BackupPageState extends State<BackupPage> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
+          ..._driveSection(theme),
           Text('Folders on this computer', style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(

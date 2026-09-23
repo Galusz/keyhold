@@ -58,11 +58,11 @@ class VaultStore {
 
   Future<Uint8List?> _readStoredKey() async {
     if (!_keyFile.existsSync()) return null;
-    return _unprotect(_keyFile.readAsBytesSync());
+    return unprotect(_keyFile.readAsBytesSync());
   }
 
   Future<void> _storeKey(Uint8List key) async {
-    _keyFile.writeAsBytesSync(_protect(key));
+    _keyFile.writeAsBytesSync(protect(key));
   }
 
   String get vaultPath => _vaultFile.path;
@@ -74,27 +74,35 @@ class VaultStore {
 
   bool get hasPassword => _salt != null && _wrapped != null;
 
-  ({Uint8List header, Uint8List payload}) _split(Uint8List bytes) {
+  static ({Uint8List? salt, Uint8List? wrapped, Uint8List payload}) _parse(
+      Uint8List bytes) {
     final hasMagic = bytes.length > _magic.length &&
         List<int>.generate(_magic.length, (i) => bytes[i]).toString() ==
             _magic.toString();
-    if (!hasMagic) {
-      return (header: Uint8List(0), payload: bytes);
-    }
+    if (!hasMagic) return (salt: null, wrapped: null, payload: bytes);
+
     var offset = _magic.length;
     final flag = bytes[offset++];
+    Uint8List? salt;
+    Uint8List? wrapped;
     if (flag == 1) {
-      _salt = Uint8List.fromList(bytes.sublist(offset, offset + 16));
+      salt = Uint8List.fromList(bytes.sublist(offset, offset + 16));
       offset += 16;
       final length = (bytes[offset] << 8) | bytes[offset + 1];
       offset += 2;
-      _wrapped = Uint8List.fromList(bytes.sublist(offset, offset + length));
+      wrapped = Uint8List.fromList(bytes.sublist(offset, offset + length));
       offset += length;
     }
-    return (
-      header: Uint8List.fromList(bytes.sublist(0, offset)),
-      payload: Uint8List.fromList(bytes.sublist(offset)),
-    );
+    return (salt: salt, wrapped: wrapped, payload: Uint8List.fromList(bytes.sublist(offset)));
+  }
+
+  ({Uint8List payload}) _split(Uint8List bytes) {
+    final parts = _parse(bytes);
+    if (parts.salt != null) {
+      _salt = parts.salt;
+      _wrapped = parts.wrapped;
+    }
+    return (payload: parts.payload);
   }
 
   Uint8List _buildHeader() {
@@ -156,8 +164,36 @@ class VaultStore {
     await _write(await seal(_key!, vault.encode()));
   }
 
-  Uint8List _protect(Uint8List input) => _dpapi(input, protect: true);
-  Uint8List _unprotect(Uint8List input) => _dpapi(input, protect: false);
+  /// What the vault file holds for [vault], header included, without writing it.
+  Future<Uint8List> fileFor(Vault vault) async =>
+      Uint8List.fromList([..._buildHeader(), ...await seal(_key!, vault.encode())]);
+
+  /// Opens a vault file from another device that shares this vault's key.
+  Future<Vault> open(Uint8List bytes) async {
+    final payload = _parse(bytes).payload;
+    if (payload.isEmpty) return Vault();
+    return Vault.decode(await unseal(_key!, payload));
+  }
+
+  /// Takes over the key of a vault created on another device, unlocked
+  /// with its master password. The caller saves the merged vault afterwards.
+  Future<bool> adopt(Uint8List bytes, String password) async {
+    final parts = _parse(bytes);
+    if (parts.salt == null || parts.wrapped == null) return false;
+    try {
+      final dek = await unwrapKey(parts.wrapped!, password, parts.salt!);
+      await _storeKey(dek);
+      _key = dek;
+      _salt = parts.salt;
+      _wrapped = parts.wrapped;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Uint8List protect(Uint8List input) => _dpapi(input, protect: true);
+  Uint8List unprotect(Uint8List input) => _dpapi(input, protect: false);
 
   Uint8List _dpapi(Uint8List input, {required bool protect}) {
     if (!Platform.isWindows) return input;

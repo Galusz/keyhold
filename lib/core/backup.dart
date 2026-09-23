@@ -33,6 +33,11 @@ class BackupService {
   RemoteConfig remote = RemoteConfig();
   String bridgeToken = '';
   List<String>? watched;
+
+  /// Google Drive sync: the refresh token is kept DPAPI-protected, base64.
+  String driveToken = '';
+  String driveEmail = '';
+  DateTime? driveSyncedAt;
   BackupStatus status = BackupStatus.empty();
 
   void loadSettings() {
@@ -47,6 +52,9 @@ class BackupService {
 
       bridgeToken = (raw['bridgeToken'] ?? '') as String;
       watched = (raw['watched'] as List<dynamic>?)?.cast<String>();
+      driveToken = (raw['driveToken'] ?? '') as String;
+      driveEmail = (raw['driveEmail'] ?? '') as String;
+      driveSyncedAt = DateTime.tryParse((raw['driveSyncedAt'] ?? '') as String);
 
       final at = raw['lastBackupAt'] as String?;
       status = BackupStatus(
@@ -65,6 +73,9 @@ class BackupService {
       'remote': remote.toJson(),
       'bridgeToken': bridgeToken,
       if (watched != null) 'watched': watched,
+      if (driveToken.isNotEmpty) 'driveToken': driveToken,
+      if (driveEmail.isNotEmpty) 'driveEmail': driveEmail,
+      if (driveSyncedAt != null) 'driveSyncedAt': driveSyncedAt!.toIso8601String(),
       'lastBackupAt': status.at?.toIso8601String(),
       'lastBackupTargets': status.targets,
     }));
