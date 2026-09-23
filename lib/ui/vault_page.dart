@@ -17,6 +17,7 @@ import 'entry_page.dart';
 import 'extension_page.dart';
 import 'import_page.dart';
 import 'password_page.dart';
+import 'qr_page.dart';
 import 'backup_page.dart';
 
 enum EntryFilter { all, twoFactor, plain, files }
@@ -182,6 +183,29 @@ class _VaultPageState extends State<VaultPage> {
       _vault.put(entry);
     }
     await _persist();
+  }
+
+  Future<void> _scanQr() async {
+    final found = await Navigator.of(context).push(
+      MaterialPageRoute<List<QrImport>>(builder: (_) => QrPage(entries: _vault.visible)),
+    );
+    if (found == null || found.isEmpty) return;
+    for (final item in found) {
+      final target = item.target;
+      if (target != null) {
+        target.totpSecret = item.code.secret;
+        _vault.put(target);
+      } else {
+        _vault.put(VaultEntry(
+          id: UniqueKey().toString(),
+          title: item.code.issuer.isNotEmpty ? item.code.issuer : item.code.account,
+          username: item.code.account,
+          totpSecret: item.code.secret,
+        ));
+      }
+    }
+    await _persist();
+    _toast('${found.length} two-factor ${found.length == 1 ? 'code' : 'codes'} saved');
   }
 
   Future<void> _setPassword() async {
@@ -523,6 +547,11 @@ class _VaultPageState extends State<VaultPage> {
                 const SizedBox(width: 16),
               ]
             : [
+          IconButton(
+            tooltip: 'Add two-factor codes from a QR code',
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _scanQr,
+          ),
           IconButton(
             tooltip: 'Browser extension',
             icon: const Icon(Icons.extension_outlined),
