@@ -110,6 +110,7 @@ class _TrayShellState extends State<TrayShell> with WindowListener {
   }
 
   Future<void> _restore() async {
+    if (await windowManager.isMinimized()) await windowManager.restore();
     await windowManager.show();
     await windowManager.focus();
   }
