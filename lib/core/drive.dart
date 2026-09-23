@@ -202,6 +202,7 @@ class DriveSync {
   }
 
   Future<SyncResult> _sync(Vault local, String? password) async {
+    store.syncKeyWrap(local);
     final folder = await _folder();
     final remote = await _findFile(folder);
 
@@ -238,8 +239,9 @@ class DriveSync {
     );
   }
 
-  /// Whether [a] holds an entry or file that [b] lacks or has older.
+  /// Whether [a] holds an entry, a file or a password change that [b] lacks or has older.
   bool _hasNewer(Vault a, Vault b) {
+    if ((a.keyWrap?.changedAt ?? 0) > (b.keyWrap?.changedAt ?? 0)) return true;
     for (final e in a.entries.values) {
       final other = b.entries[e.id];
       if (other == null || e.updatedAt > other.updatedAt) return true;

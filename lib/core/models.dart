@@ -106,13 +106,37 @@ class VaultFile {
       );
 }
 
+/// The vault key sealed with the master password, as it stands in the file
+/// header. It also travels inside the vault, so every device learns about a
+/// password change and none of them brings an older one back.
+class KeyWrap {
+  KeyWrap({required this.salt, required this.wrapped, required this.changedAt});
+
+  final Uint8List salt;
+  final Uint8List wrapped;
+  final int changedAt;
+
+  Map<String, dynamic> toJson() => {
+        'salt': base64Encode(salt),
+        'wrapped': base64Encode(wrapped),
+        'changedAt': changedAt,
+      };
+
+  factory KeyWrap.fromJson(Map<String, dynamic> j) => KeyWrap(
+        salt: base64Decode(j['salt'] as String),
+        wrapped: base64Decode(j['wrapped'] as String),
+        changedAt: (j['changedAt'] ?? 0) as int,
+      );
+}
+
 class Vault {
   static const int formatVersion = 1;
 
   final Map<String, VaultEntry> entries;
   final Map<String, VaultFile> files;
+  KeyWrap? keyWrap;
 
-  Vault({Map<String, VaultEntry>? entries, Map<String, VaultFile>? files})
+  Vault({Map<String, VaultEntry>? entries, Map<String, VaultFile>? files, this.keyWrap})
       : entries = entries ?? {},
         files = files ?? {};
 
@@ -170,6 +194,7 @@ class Vault {
         'version': formatVersion,
         'entries': entries.values.map((e) => e.toJson()).toList(),
         'files': files.values.map((f) => f.toJson()).toList(),
+        if (keyWrap != null) 'keyWrap': keyWrap!.toJson(),
       });
 
   factory Vault.decode(String source) {
@@ -187,7 +212,12 @@ class Vault {
       fileMap[f.id] = f;
     }
 
-    return Vault(entries: entryMap, files: fileMap);
+    final wrap = root['keyWrap'] as Map<String, dynamic>?;
+    return Vault(
+      entries: entryMap,
+      files: fileMap,
+      keyWrap: wrap == null ? null : KeyWrap.fromJson(wrap),
+    );
   }
 
   static Vault merge(Vault local, Vault remote) {
@@ -203,6 +233,11 @@ class Vault {
       if (mine == null || f.updatedAt > mine.updatedAt) fileMap[f.id] = f;
     }
 
-    return Vault(entries: entryMap, files: fileMap);
+    // The latest password change wins, like any other edit.
+    final mine = local.keyWrap;
+    final theirs = remote.keyWrap;
+    final wrap = theirs != null && (mine == null || theirs.changedAt > mine.changedAt) ? theirs : mine;
+
+    return Vault(entries: entryMap, files: fileMap, keyWrap: wrap);
   }
 }

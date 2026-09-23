@@ -659,9 +659,11 @@ class _SettingsState extends State<_Settings> {
             alignment: Alignment.centerLeft,
             child: OutlinedButton.icon(
               onPressed: () async {
-                await Navigator.of(context).push(MaterialPageRoute<bool>(
+                final changed = await Navigator.of(context).push(MaterialPageRoute<bool>(
                   builder: (_) => PasswordPage(store: widget.store, unlockMode: false),
                 ));
+                // Sends the new password to the other devices right away.
+                if (changed == true) await widget.onSync();
                 if (mounted) setState(() {});
               },
               icon: const Icon(Icons.lock_outline),

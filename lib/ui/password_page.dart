@@ -13,6 +13,7 @@ class PasswordPage extends StatefulWidget {
 }
 
 class _PasswordPageState extends State<PasswordPage> {
+  final _current = TextEditingController();
   final _first = TextEditingController();
   final _second = TextEditingController();
   String? _error;
@@ -21,6 +22,7 @@ class _PasswordPageState extends State<PasswordPage> {
 
   @override
   void dispose() {
+    _current.dispose();
     _first.dispose();
     _second.dispose();
     super.dispose();
@@ -57,6 +59,11 @@ class _PasswordPageState extends State<PasswordPage> {
           return;
         }
       } else {
+        // A change reaches every device, so it takes the password in use now.
+        if (!await widget.store.checkPassword(_current.text)) {
+          setState(() => _error = 'The current master password is wrong');
+          return;
+        }
         await widget.store.setPassword(password);
       }
       if (mounted) Navigator.of(context).pop(true);
@@ -92,6 +99,17 @@ class _PasswordPageState extends State<PasswordPage> {
                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
               ),
               const SizedBox(height: 24),
+              if (!unlock && widget.store.hasPassword) ...[
+                TextField(
+                  controller: _current,
+                  obscureText: !_show,
+                  decoration: const InputDecoration(
+                    labelText: 'Current master password',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               TextField(
                 controller: _first,
                 autofocus: widget.unlockMode,

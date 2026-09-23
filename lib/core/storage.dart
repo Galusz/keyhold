@@ -71,6 +71,7 @@ class VaultStore {
 
   Uint8List? _salt;
   Uint8List? _wrapped;
+  int _wrapChangedAt = 0;
 
   bool get hasPassword => _salt != null && _wrapped != null;
 
@@ -117,13 +118,37 @@ class VaultStore {
     ]);
   }
 
+  /// Whether [password] opens this vault's key.
+  Future<bool> checkPassword(String password) async {
+    if (!hasPassword) return true;
+    try {
+      await unwrapKey(_wrapped!, password, _salt!);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> setPassword(String password) async {
+    // Read first: loading takes the header from disk.
+    final vault = await load();
     final salt = randomBytes(16);
     _wrapped = await wrapKey(_key!, password, salt);
     _salt = salt;
-    if (_vaultFile.existsSync()) {
-      final parts = _split(await _vaultFile.readAsBytes());
-      await _write(parts.payload);
+    _wrapChangedAt = DateTime.now().millisecondsSinceEpoch;
+    await save(vault);
+  }
+
+  /// Brings the header and [vault] to whichever password change is newer.
+  void syncKeyWrap(Vault vault) {
+    final w = vault.keyWrap;
+    if (w != null && w.changedAt > _wrapChangedAt) {
+      _salt = w.salt;
+      _wrapped = w.wrapped;
+      _wrapChangedAt = w.changedAt;
+    }
+    if (hasPassword) {
+      vault.keyWrap = KeyWrap(salt: _salt!, wrapped: _wrapped!, changedAt: _wrapChangedAt);
     }
   }
 
@@ -156,17 +181,22 @@ class VaultStore {
     if (bytes.isEmpty) return Vault();
     final parts = _split(bytes);
     if (parts.payload.isEmpty) return Vault();
-    final json = await unseal(_key!, parts.payload);
-    return Vault.decode(json);
+    final vault = Vault.decode(await unseal(_key!, parts.payload));
+    final w = vault.keyWrap;
+    if (w != null && w.changedAt > _wrapChangedAt) _wrapChangedAt = w.changedAt;
+    return vault;
   }
 
   Future<void> save(Vault vault) async {
+    syncKeyWrap(vault);
     await _write(await seal(_key!, vault.encode()));
   }
 
   /// What the vault file holds for [vault], header included, without writing it.
-  Future<Uint8List> fileFor(Vault vault) async =>
-      Uint8List.fromList([..._buildHeader(), ...await seal(_key!, vault.encode())]);
+  Future<Uint8List> fileFor(Vault vault) async {
+    syncKeyWrap(vault);
+    return Uint8List.fromList([..._buildHeader(), ...await seal(_key!, vault.encode())]);
+  }
 
   /// Opens a vault file from another device that shares this vault's key.
   Future<Vault> open(Uint8List bytes) async {

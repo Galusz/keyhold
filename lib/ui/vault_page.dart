@@ -220,11 +220,13 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Future<void> _setPassword() async {
-    await Navigator.of(context).push(
+    final changed = await Navigator.of(context).push(
       MaterialPageRoute<bool>(
         builder: (_) => PasswordPage(store: _store, unlockMode: false),
       ),
     );
+    // Sends the new password to the other devices right away.
+    if (changed == true) await _persist();
     if (mounted) setState(() {});
   }
 
