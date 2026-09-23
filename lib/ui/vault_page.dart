@@ -1220,11 +1220,10 @@ class SiteAvatar extends StatelessWidget {
             child: Text(entry.title.isEmpty ? '?' : entry.title.characters.first.toUpperCase()),
           );
         }
-        return CircleAvatar(
-          backgroundColor: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(7),
-            child: Image(image: icon, filterQuality: FilterQuality.medium),
+        return SizedBox.square(
+          dimension: 40,
+          child: Center(
+            child: Image(image: icon, width: 32, height: 32, filterQuality: FilterQuality.medium),
           ),
         );
       },

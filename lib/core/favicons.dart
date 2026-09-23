@@ -28,6 +28,7 @@ class Favicons {
   final changed = ValueNotifier<int>(0);
 
   final _images = <String, MemoryImage?>{};
+  final _pngs = <String, Uint8List>{};
   final _queue = <(String, String)>[];
   final _busy = <String>{};
   var _running = 0;
@@ -39,10 +40,8 @@ class Favicons {
     if (key.isEmpty) return null;
     if (_images.containsKey(key)) return _images[key];
 
-    final file = _file(key, 'png');
-    if (file.existsSync()) {
-      return _images[key] = MemoryImage(file.readAsBytesSync());
-    }
+    final png = _png(key);
+    if (png != null) return _images[key] = MemoryImage(png);
     final none = _file(key, 'none');
     if (none.existsSync() && DateTime.now().difference(none.lastModifiedSync()) < _retryAfter) {
       return _images[key] = null;
@@ -68,9 +67,43 @@ class Favicons {
   /// PNG bytes of an icon already on disk, for the browser extension.
   Uint8List? bytesOf(String address) {
     final key = keyOf(address);
-    if (key.isEmpty) return null;
+    return key.isEmpty ? null : _png(key);
+  }
+
+  Uint8List? _png(String key) {
+    final known = _pngs[key];
+    if (known != null) return known;
     final file = _file(key, 'png');
-    return file.existsSync() ? file.readAsBytesSync() : null;
+    if (!file.existsSync()) return null;
+    return _pngs[key] = _onDark(file.readAsBytesSync());
+  }
+
+  /// Icons are shown without a background; a dark glyph on a clear one would
+  /// vanish on the dark theme, so only that kind gets a light tile behind it.
+  Uint8List _onDark(Uint8List png) {
+    final icon = img.decodePng(png);
+    if (icon == null) return png;
+    var clear = 0;
+    var seen = 0;
+    var light = 0.0;
+    for (final p in icon) {
+      if (p.a < 32) {
+        clear++;
+      } else if (p.a > 128) {
+        seen++;
+        light += (0.299 * p.r + 0.587 * p.g + 0.114 * p.b) / 255;
+      }
+    }
+    final total = icon.width * icon.height;
+    if (seen == 0 || clear < total * 0.15 || light / seen > 0.3) return png;
+
+    final tile = img.Image(width: _size, height: _size, numChannels: 4);
+    img.fill(tile, color: img.ColorRgba8(0, 0, 0, 0));
+    img.fillRect(tile,
+        x1: 0, y1: 0, x2: _size - 1, y2: _size - 1, radius: 14, color: img.ColorRgba8(0xE8, 0xF5, 0xF1, 255));
+    final inner = img.copyResize(icon, width: 44, height: 44, interpolation: img.Interpolation.average);
+    img.compositeImage(tile, inner, dstX: 10, dstY: 10);
+    return img.encodePng(tile);
   }
 
   /// "ha.zkv.pl", "192.168.68.15:2283" — one icon per site, whatever the path.
@@ -118,7 +151,8 @@ class Favicons {
     _file(key, 'png').writeAsBytesSync(png);
     final none = _file(key, 'none');
     if (none.existsSync()) none.deleteSync();
-    _images[key] = MemoryImage(png);
+    _pngs.remove(key);
+    _images[key] = MemoryImage(_png(key)!);
     changed.value++;
   }
 

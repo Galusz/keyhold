@@ -169,9 +169,9 @@ const STYLE = `
   .row.active, .row:hover { background: #1FCFB4; color: #0C1714; }
   .row.active .sub, .row:hover .sub, .row.active .group, .row:hover .group { color: #0C1714; }
   .text { flex: 1; min-width: 0; }
-  .site { flex: none; width: 24px; height: 24px; border-radius: 50%; background: #fff; display: flex;
+  .site { flex: none; width: 24px; height: 24px; border-radius: 50%; display: flex;
     align-items: center; justify-content: center; overflow: hidden; }
-  .site img { width: 17px; height: 17px; }
+  .site img { width: 22px; height: 22px; }
   .site.letter { background: #2C4740; color: #9FE1CB; font-weight: 600; font-size: 12px; }
   .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sub { color: #9FB8B0; font-size: 12.5px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
