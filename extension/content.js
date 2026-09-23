@@ -20,7 +20,30 @@ const describe = (el) =>
   `${el.name} ${el.id} ${el.autocomplete} ${el.placeholder} ${el.getAttribute('aria-label') || ''}`.toLowerCase();
 
 const shown = (el) =>
-  el.isConnected && !el.disabled && el.offsetParent !== null && el.getBoundingClientRect().width > 20;
+  el.isConnected && !el.disabled && el.getClientRects().length > 0 && el.getBoundingClientRect().width > 20;
+
+// Component-based pages (Home Assistant and many others) keep their login
+// fields inside shadow roots, which plain querySelectorAll never reaches.
+const watchedRoots = new WeakSet();
+let rescan = () => {};
+
+function deepInputs(root = document, out = []) {
+  for (const el of root.querySelectorAll('*')) {
+    if (el.tagName === 'INPUT') out.push(el);
+    const inner = el.shadowRoot;
+    if (inner) {
+      if (!watchedRoots.has(inner)) {
+        watchedRoots.add(inner);
+        new MutationObserver(() => rescan()).observe(inner, { childList: true, subtree: true });
+      }
+      deepInputs(inner, out);
+    }
+  }
+  return out;
+}
+
+const inputsIn = (scope) => (scope === document ? deepInputs() : [...scope.querySelectorAll('input')]);
+const pathOf = (e) => (e.composedPath ? e.composedPath() : [e.target]);
 
 function kindOf(input) {
   const type = (input.type || 'text').toLowerCase();
@@ -35,13 +58,16 @@ function kindOf(input) {
 }
 
 function usernameFieldFor(passwordField) {
-  const form = passwordField.form || document;
-  const candidates = [...form.querySelectorAll('input')].filter((input) => {
+  const all = inputsIn(passwordField.form || document);
+  const candidates = all.filter((input) => {
     if (input === passwordField || !shown(input)) return false;
     return ['text', 'email', 'tel'].includes((input.type || 'text').toLowerCase()) && kindOf(input) !== 'code';
   });
-  const named = candidates.filter((input) => USER_WORDS.test(describe(input)) || input.type === 'email');
-  return named.pop() || candidates.pop() || null;
+  // The username field comes before the password one.
+  const before = candidates.filter((input) => all.indexOf(input) < all.indexOf(passwordField));
+  const pool = before.length ? before : candidates;
+  const named = pool.filter((input) => USER_WORDS.test(describe(input)) || input.type === 'email');
+  return named.pop() || pool.pop() || null;
 }
 
 function setValue(input, value) {
@@ -54,9 +80,12 @@ function setValue(input, value) {
 }
 
 function fillLogin(field, data) {
-  const scope = field.form || document;
+  const all = inputsIn(field.form || document);
   const isPassword = field.type === 'password';
-  const password = isPassword ? field : [...scope.querySelectorAll('input[type="password"]')].find(shown);
+  const passwords = all.filter((i) => i.type === 'password' && shown(i));
+  const password = isPassword
+    ? field
+    : passwords.find((p) => all.indexOf(p) > all.indexOf(field)) || passwords[0];
   const user = isPassword ? usernameFieldFor(field) : field;
   if (data.username) setValue(user, data.username);
   if (data.password) setValue(password, data.password);
@@ -91,7 +120,7 @@ const entries = () =>
 const kinds = new WeakMap();
 
 async function scan() {
-  const found = [...document.querySelectorAll('input')].filter((i) => !kinds.has(i) && shown(i) && kindOf(i));
+  const found = deepInputs().filter((i) => !kinds.has(i) && shown(i) && kindOf(i));
   if (found.length === 0) return;
 
   const list = await entries();
@@ -102,10 +131,18 @@ async function scan() {
     const kind = kindOf(input);
     if (kind === 'code' && !withCode) continue;
     kinds.set(input, kind);
-    input.style.setProperty('background-image', `url("${ICON}")`, 'important');
-    input.style.setProperty('background-repeat', 'no-repeat', 'important');
-    input.style.setProperty('background-position', 'right 8px center', 'important');
-    input.style.setProperty('background-size', '18px 18px', 'important');
+    // Password fields usually carry the page's own "show password" eye there.
+    if (input.type !== 'password') {
+      input.style.setProperty('background-image', `url("${ICON}")`, 'important');
+      input.style.setProperty('background-repeat', 'no-repeat', 'important');
+      input.style.setProperty('background-position', 'right 8px center', 'important');
+      input.style.setProperty('background-size', '18px 18px', 'important');
+      // A hand over the icon, so it reads as something to click.
+      input.addEventListener('mousemove', (e) => {
+        const onIcon = e.clientX > input.getBoundingClientRect().right - 34;
+        input.style.cursor = onIcon ? 'pointer' : '';
+      });
+    }
     input.addEventListener('mousedown', (e) => e.isTrusted && openMenu(input));
     input.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown' && !menu) openMenu(input);
@@ -114,10 +151,11 @@ async function scan() {
 }
 
 let scanTimer = 0;
-new MutationObserver(() => {
+rescan = () => {
   clearTimeout(scanTimer);
   scanTimer = setTimeout(scan, 400);
-}).observe(document.documentElement, { childList: true, subtree: true });
+};
+new MutationObserver(() => rescan()).observe(document.documentElement, { childList: true, subtree: true });
 scan();
 
 // ---------- dropdown ----------
@@ -293,7 +331,8 @@ async function pick(index) {
 document.addEventListener(
   'mousedown',
   (e) => {
-    if (menu && e.target !== menu.field && e.target !== menu.host) closeMenu();
+    const path = pathOf(e);
+    if (menu && !path.includes(menu.field) && !path.includes(menu.host)) closeMenu();
   },
   true
 );
@@ -303,10 +342,11 @@ document.addEventListener(
 let lastSent = '';
 
 function capture(scope) {
-  const passwords = [...scope.querySelectorAll('input[type="password"]')].filter((p) => p.value);
+  const inputs = inputsIn(scope);
+  const passwords = inputs.filter((p) => p.type === 'password' && p.value);
 
   if (passwords.length === 0) {
-    const user = [...scope.querySelectorAll('input')].find(
+    const user = inputs.find(
       (i) => i.type !== 'password' && kindOf(i) === 'login' && i.value.trim() && shown(i)
     );
     if (user) api.runtime.sendMessage({ type: 'user', username: user.value.trim() });
@@ -329,9 +369,10 @@ document.addEventListener('submit', (e) => capture(e.target), true);
 document.addEventListener(
   'keydown',
   (e) => {
-    if (e.key !== 'Enter' || !(e.target instanceof HTMLInputElement)) return;
+    const input = pathOf(e)[0];
+    if (e.key !== 'Enter' || !(input instanceof HTMLInputElement)) return;
     if (menu && menu.index >= 0) return;
-    capture(e.target.form || document);
+    capture(input.form || document);
   },
   true
 );
@@ -340,7 +381,9 @@ document.addEventListener(
   'click',
   (e) => {
     if (!e.isTrusted) return;
-    const button = e.target.closest?.('button, input[type="submit"], [role="button"]');
+    const button = pathOf(e).find(
+      (n) => n instanceof Element && n.matches('button, input[type="submit"], [role="button"]')
+    );
     if (!button) return;
     const words = `${button.textContent} ${button.value || ''} ${button.getAttribute('aria-label') || ''}`.toLowerCase();
     if (button.type !== 'submit' && !SUBMIT_WORDS.test(words)) return;

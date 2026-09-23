@@ -4,7 +4,15 @@ const content = document.getElementById('content');
 
 // Runs inside the page, so it must not reference anything outside itself.
 function fillPage(data) {
-  const visible = (el) => el && el.offsetParent !== null && !el.disabled;
+  const visible = (el) => el && !el.disabled && el.getClientRects().length > 0;
+  // Includes fields inside shadow roots (Home Assistant and other component pages).
+  const deep = (root, out = []) => {
+    for (const el of root.querySelectorAll('*')) {
+      if (el.tagName === 'INPUT') out.push(el);
+      if (el.shadowRoot) deep(el.shadowRoot, out);
+    }
+    return out;
+  };
   const describe = (el) =>
     `${el.name} ${el.id} ${el.autocomplete} ${el.placeholder} ${el.getAttribute('aria-label') || ''}`.toLowerCase();
   const setValue = (input, value) => {
@@ -17,7 +25,7 @@ function fillPage(data) {
     return true;
   };
 
-  const inputs = [...document.querySelectorAll('input')].filter(visible);
+  const inputs = deep(document).filter(visible);
   const password = inputs.find((i) => i.type === 'password');
   const code = inputs.find(
     (i) =>
