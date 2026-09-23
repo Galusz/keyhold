@@ -37,6 +37,9 @@ class BackupService {
   /// Sites where the browser extension never saves logins.
   List<String> neverSave = [];
 
+  /// A login that clearly worked is saved without asking in the browser.
+  bool autoSave = false;
+
   /// Google Drive sync: the refresh token is kept DPAPI-protected, base64.
   String driveToken = '';
   String driveEmail = '';
@@ -56,6 +59,7 @@ class BackupService {
       bridgeToken = (raw['bridgeToken'] ?? '') as String;
       watched = (raw['watched'] as List<dynamic>?)?.cast<String>();
       neverSave = (raw['neverSave'] as List<dynamic>?)?.cast<String>() ?? [];
+      autoSave = (raw['autoSave'] ?? false) as bool;
       driveToken = (raw['driveToken'] ?? '') as String;
       driveEmail = (raw['driveEmail'] ?? '') as String;
       driveSyncedAt = DateTime.tryParse((raw['driveSyncedAt'] ?? '') as String);
@@ -78,6 +82,7 @@ class BackupService {
       'bridgeToken': bridgeToken,
       if (watched != null) 'watched': watched,
       if (neverSave.isNotEmpty) 'neverSave': neverSave,
+      if (autoSave) 'autoSave': true,
       if (driveToken.isNotEmpty) 'driveToken': driveToken,
       if (driveEmail.isNotEmpty) 'driveEmail': driveEmail,
       if (driveSyncedAt != null) 'driveSyncedAt': driveSyncedAt!.toIso8601String(),

@@ -92,10 +92,13 @@ void main() {
   for (final size in [16, 32]) {
     File('extension/icons/stop$size.png').writeAsBytesSync(img.encodePng(drawStop(size)));
   }
-  // Toolbar lock for a site with a login that still needs confirming.
+  // Toolbar lock, blinking orange: a caught login waits for ✓ / ✕.
+  // Red for a few seconds: the login just tried did not work.
   for (final size in [16, 32]) {
     File('extension/icons/pending$size.png')
         .writeAsBytesSync(img.encodePng(draw(size, color: 0xFFF29A2E)));
+    File('extension/icons/failed$size.png')
+        .writeAsBytesSync(img.encodePng(draw(size, color: 0xFFE53935)));
   }
   stdout.writeln('icons written');
 }

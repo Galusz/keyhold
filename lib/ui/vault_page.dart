@@ -23,9 +23,6 @@ import 'backup_page.dart';
 
 enum EntryFilter { all, twoFactor, plain, files }
 
-/// Logins the browser extension saved on its own and nobody has checked yet.
-const kPending = Color(0xFFF29A2E);
-
 class VaultPage extends StatefulWidget {
   const VaultPage({super.key});
 
@@ -98,56 +95,32 @@ class _VaultPageState extends State<VaultPage> {
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
   }
 
-  /// Stores credentials the extension captured on a login form.
-  Future<String> _saveFromBrowser(
-      String url, String username, String password, bool update) async {
-    if (password.isEmpty) return 'ignored';
+  /// How a login caught in the browser relates to what the vault holds.
+  String _loginState(String url, String username, String password) {
+    final existing = _findLogin(_vault.visible, url, '', username);
+    if (existing == null) return 'new';
+    return existing.password == password ? 'same' : 'changed';
+  }
 
+  /// Writes a login the user confirmed in the browser.
+  Future<String> _storeLogin(String url, String username, String password) async {
     final existing = _findLogin(_vault.visible, url, '', username);
     if (existing != null) {
-      if (existing.password == password) {
-        // The same login twice: it works, so it no longer needs checking.
-        if (existing.pending) {
-          existing.pending = false;
-          _vault.put(existing);
-          await _persist();
-        }
-        return 'unchanged';
-      }
-      if (!update) return 'changed';
-      existing
-        ..password = password
-        ..pending = false;
+      existing.password = password;
       _vault.put(existing);
       await _persist();
       return 'updated';
     }
-
-    final created = VaultEntry(
+    _vault.put(VaultEntry(
       id: UniqueKey().toString(),
       title: _hostOf(url),
       username: username,
       password: password,
       url: url,
       group: 'Web',
-      pending: true,
-    );
-    _vault.put(created);
+    ));
     await _persist();
-    return 'created:${created.id}';
-  }
-
-  Future<String> _reviewFromBrowser(String id, bool keep) async {
-    final entry = _vault.entries[id];
-    if (entry == null || entry.deleted) return 'missing';
-    if (keep) {
-      entry.pending = false;
-      _vault.put(entry);
-    } else {
-      _vault.remove(entry.id);
-    }
-    await _persist();
-    return keep ? 'kept' : 'removed';
+    return 'saved';
   }
 
   /// The same login already in the vault: same site (or same title when there
@@ -203,13 +176,19 @@ class _VaultPageState extends State<VaultPage> {
     final bridge = BrowserBridge(
       vault: () => _vault,
       token: _store.ensureBridgeToken(),
-      onSave: _saveFromBrowser,
-      onReview: _reviewFromBrowser,
+      loginState: _loginState,
+      storeLogin: _storeLogin,
       neverSave: () => _store.backup.neverSave,
-    )..onNever = (host, never) {
+      autoSave: () => _store.backup.autoSave,
+    )
+      ..onNever = (host, never) {
         final list = _store.backup.neverSave;
         list.remove(host);
         if (never) list.add(host);
+        _store.backup.saveSettings();
+      }
+      ..onAutoSave = (on) {
+        _store.backup.autoSave = on;
         _store.backup.saveSettings();
       };
     try {
@@ -1156,22 +1135,15 @@ class _VaultPageState extends State<VaultPage> {
       ),
       title: Text(
         e.title.isEmpty ? '(no title)' : e.title,
-        style: e.pending ? const TextStyle(color: kPending) : null,
       ),
       subtitle: Text(
-        e.pending ? '${e.username} · saved by the browser, not confirmed yet' : e.username,
+        e.username,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (e.pending)
-            IconButton(
-              tooltip: 'Confirm — this login works',
-              icon: const Icon(Icons.check_circle_outline, color: kPending),
-              onPressed: () => _reviewFromBrowser(e.id, true),
-            ),
           if (code != null) ...[
             InkWell(
               onTap: () => _copy('Code', code),

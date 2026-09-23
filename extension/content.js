@@ -1,5 +1,5 @@
-// Shows Keyhold logins and two-factor codes right under the field, and saves
-// logins as soon as a form with a password is sent.
+// Shows Keyhold logins and two-factor codes right under the field, and hands
+// logins to Keyhold as soon as a form with a password is sent.
 const api = globalThis.browser ?? chrome;
 
 const ICON =
@@ -172,7 +172,6 @@ const STYLE = `
   .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sub { color: #9FB8B0; font-size: 12.5px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .group { color: #7F9A92; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-  .group.pending, .row:not(.active):not(:hover) .title.pending { color: #F29A2E; }
   .code { font: 600 18px ui-monospace, Consolas, monospace; letter-spacing: 1px; text-align: right; }
   .bar { height: 2px; background: currentColor; opacity: .6; margin-top: 4px; transition: width 1s linear; }
 `;
@@ -195,6 +194,8 @@ async function openMenu(field) {
   closeMenu();
 
   const kind = kinds.get(field);
+  // Fresh every time: logins may have been kept or deleted since the page loaded.
+  lookup = null;
   let items = await entries();
   if (kind === 'code') items = items.filter((e) => e.hasCode);
   if (items.length === 0) return;
@@ -214,7 +215,7 @@ async function openMenu(field) {
     const text = document.createElement('div');
     text.className = 'text';
     const title = document.createElement('div');
-    title.className = entry.pending ? 'title pending' : 'title';
+    title.className = 'title';
     title.textContent = entry.title;
     const sub = document.createElement('div');
     sub.className = 'sub';
@@ -232,10 +233,10 @@ async function openMenu(field) {
       row.append(code);
       row.code = code;
       row.bar = bar;
-    } else if (entry.pending || entry.group) {
+    } else if (entry.group) {
       const group = document.createElement('div');
-      group.className = entry.pending ? 'group pending' : 'group';
-      group.textContent = entry.pending ? 'Not confirmed' : entry.group;
+      group.className = 'group';
+      group.textContent = entry.group;
       row.append(group);
     }
 
@@ -410,118 +411,3 @@ document.addEventListener(
   },
   true
 );
-
-// ---------- notices ----------
-
-function bar(build) {
-  document.getElementById('keyhold-bar')?.remove();
-  const host = document.createElement('div');
-  host.id = 'keyhold-bar';
-  const root = host.attachShadow({ mode: 'closed' });
-  const style = document.createElement('style');
-  style.textContent = `
-    .bar { position: fixed; z-index: 2147483647; right: 16px; bottom: 16px; background: #1B2A26; color: #E8F5F1;
-      font: 14px system-ui, sans-serif; padding: 12px 14px; border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.4);
-      display: flex; gap: 10px; align-items: center; }
-    button { background: #1FCFB4; color: #0C1714; border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer;
-      font: 500 14px system-ui, sans-serif; }
-    button.plain { background: transparent; color: #9FE1CB; }
-  `;
-  const box = document.createElement('div');
-  box.className = 'bar';
-  root.append(style, box);
-  build(box, () => host.remove());
-  document.documentElement.appendChild(host);
-  return host;
-}
-
-async function showNotice() {
-  const notice = await api.runtime.sendMessage({ type: 'pending' }).catch(() => null);
-  if (!notice) return;
-  const who = notice.username || 'this login';
-
-  const button = (label, title, plain, onClick) => {
-    const b = document.createElement('button');
-    b.textContent = label;
-    b.title = title;
-    if (plain) b.className = 'plain';
-    b.onclick = (e) => e.isTrusted && onClick();
-    return b;
-  };
-  const neverHere = (close, text) =>
-    button('⛔ Never here', 'Never save logins on this site', true, async () => {
-      await api.runtime.sendMessage({ type: 'never', on: true });
-      text.textContent = `Keyhold will not save logins on ${notice.host}`;
-      setTimeout(close, 2500);
-    });
-
-  if (notice.result === 'failed') {
-    const host = bar((box) => (box.textContent = 'That login did not work — Keyhold did not keep it'));
-    setTimeout(() => host.remove(), 5000);
-    return;
-  }
-
-  if (notice.result === 'saved') {
-    const host = bar((box, close) => {
-      const text = document.createElement('span');
-      text.textContent = `Saved ${who} to Keyhold`;
-      box.append(text, neverHere(close, text));
-    });
-    setTimeout(() => host.remove(), 6000);
-    return;
-  }
-
-  if (notice.result === 'unconfirmed') {
-    bar((box, close) => {
-      const text = document.createElement('span');
-      text.textContent = `Saved ${who} — did this login work?`;
-      const answer = (keep) => async () => {
-        await api.runtime.sendMessage({ type: 'review', keep });
-        text.textContent = keep ? 'Kept in Keyhold' : 'Removed from Keyhold';
-        box.querySelectorAll('button').forEach((b) => b.remove());
-        setTimeout(close, 2000);
-      };
-      box.append(
-        text,
-        button('✓', 'Yes — keep it', false, answer(true)),
-        button('✕', 'No — remove it', true, answer(false)),
-        neverHere(close, text)
-      );
-    });
-    return;
-  }
-
-  if (notice.result === 'changed') {
-    bar((box, close) => {
-      const text = document.createElement('span');
-      text.textContent = `Update the password for ${who} on ${notice.host}?`;
-      const yes = document.createElement('button');
-      yes.textContent = 'Update';
-      yes.onclick = async (e) => {
-        if (!e.isTrusted) return;
-        const result = await api.runtime.sendMessage({ type: 'update' });
-        text.textContent = result?.result === 'updated' ? 'Password updated' : 'Keyhold is not running';
-        yes.remove();
-        no.remove();
-        setTimeout(close, 2500);
-      };
-      const no = document.createElement('button');
-      no.className = 'plain';
-      no.textContent = 'Not now';
-      no.onclick = (e) => {
-        if (!e.isTrusted) return;
-        api.runtime.sendMessage({ type: 'dismiss' });
-        close();
-      };
-      box.append(text, yes, no);
-    });
-  }
-}
-
-// Notices belong to the page itself, not to a login frame inside it.
-if (window.top === window) {
-  showNotice();
-  api.runtime.onMessage.addListener((message) => {
-    if (message.type === 'notice') showNotice();
-  });
-}

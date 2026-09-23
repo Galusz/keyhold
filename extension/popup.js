@@ -92,12 +92,51 @@ function pairingScreen() {
   content.append(hint, input, button);
 }
 
-function render(entries, tab) {
-  content.className = '';
-  content.innerHTML = '';
+// Logins Keyhold caught and holds for two minutes: nothing is saved until ✓.
+function renderOffers(offers) {
+  for (const offer of offers) {
+    const row = document.createElement('div');
+    row.className = 'entry pending';
 
+    const box = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = offer.host;
+    const user = document.createElement('div');
+    user.className = 'user';
+    user.textContent = offer.username;
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = offer.changed ? 'Update the password in Keyhold?' : 'Save this login in Keyhold?';
+    box.append(title, user, note);
+
+    const review = document.createElement('div');
+    review.className = 'review';
+    for (const [label, keep, cls, tip] of [
+      ['✓', true, 'yes', offer.changed ? 'Update' : 'Save'],
+      ['✕', false, 'no', 'Forget it'],
+    ]) {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.className = cls;
+      b.title = tip;
+      b.onclick = async () => {
+        await api.runtime.sendMessage({ type: 'review', id: offer.id, keep });
+        load();
+      };
+      review.append(b);
+    }
+    row.append(box, review);
+    content.append(row);
+  }
+}
+
+function render(entries, tab) {
   if (entries.length === 0) {
-    message('No entry for this site yet. Log in once and Keyhold will offer to save it.');
+    const hint = document.createElement('p');
+    hint.className = 'muted';
+    hint.textContent = 'No entry for this site yet. Log in once and Keyhold will offer to save it.';
+    content.append(hint);
     return;
   }
 
@@ -114,34 +153,6 @@ function render(entries, tab) {
     user.textContent = entry.username;
     box.append(title, user);
     row.append(box);
-
-    // Saved by the extension on its own: maybe a failed attempt, so it asks.
-    if (entry.pending) {
-      row.classList.add('pending');
-      const note = document.createElement('div');
-      note.className = 'note';
-      note.textContent = 'Saved automatically — does this login work?';
-      box.append(note);
-
-      const review = document.createElement('div');
-      review.className = 'review';
-      for (const [label, keep, cls, tip] of [
-        ['✓', true, 'yes', 'Keep — it works'],
-        ['✕', false, 'no', 'Delete — it was a wrong attempt'],
-      ]) {
-        const b = document.createElement('button');
-        b.textContent = label;
-        b.className = cls;
-        b.title = tip;
-        b.onclick = async (e) => {
-          e.stopPropagation();
-          await api.runtime.sendMessage({ type: 'review', id: entry.id, keep });
-          load();
-        };
-        review.append(b);
-      }
-      row.append(review);
-    }
 
     if (entry.hasCode) {
       const badge = document.createElement('span');
@@ -193,8 +204,27 @@ async function load() {
     message('Keyhold is not running on this computer.');
     return;
   }
+  const offers = await api.runtime.sendMessage({ type: 'offers' });
+  content.className = '';
+  content.innerHTML = '';
+  renderOffers(offers || []);
   render(result.entries || [], tab);
   neverSwitch(result.never === true, tab);
+  autoSaveSwitch(result.autoSave === true);
+}
+
+function autoSaveSwitch(on) {
+  const row = document.createElement('label');
+  row.className = 'switch';
+  row.title = 'When a login clearly works, Keyhold keeps it straight away';
+  const box = document.createElement('input');
+  box.type = 'checkbox';
+  box.checked = on;
+  box.onchange = () => api.runtime.sendMessage({ type: 'autosave', on: box.checked });
+  const text = document.createElement('span');
+  text.textContent = 'Save logins without asking';
+  row.append(box, text);
+  content.append(row);
 }
 
 // Stop sign: switches saving off (or back on) for the site in this tab.

@@ -62,7 +62,6 @@ class _EntryPageState extends State<EntryPage> {
     e.url = _url.text.trim();
     e.notes = _notes.text;
     e.group = _group.text.trim();
-    e.pending = false;
 
     final secret = _totp.text.trim();
     e.totpSecret = secret.isEmpty

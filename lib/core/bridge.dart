@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'models.dart';
 import 'totp.dart';
@@ -13,28 +14,36 @@ class BrowserBridge {
   BrowserBridge({
     required this.vault,
     required this.token,
-    required this.onSave,
-    required this.onReview,
+    required this.loginState,
+    required this.storeLogin,
     required this.neverSave,
+    required this.autoSave,
     this.port = 19919,
   });
+
+  /// How long a caught login waits for the user's answer.
+  static const offerTime = Duration(minutes: 2);
 
   final Vault Function() vault;
   final String token;
   final int port;
 
-  /// Called when the extension sends credentials captured on a login form.
-  /// A changed password is only written when [update] is set, after the
-  /// user agreed in the browser.
-  final Future<String> Function(
-      String url, String username, String password, bool update) onSave;
+  /// 'same', 'changed' or 'new' for a login caught on a form.
+  final String Function(String url, String username, String password) loginState;
 
-  /// Keeps ([keep]) or removes an entry the extension saved on its own.
-  final Future<String> Function(String id, bool keep) onReview;
+  /// Writes a login the user kept; returns 'saved' or 'updated'.
+  final Future<String> Function(String url, String username, String password) storeLogin;
 
   /// The sites where saving is switched off; changes are saved by the owner.
   final List<String> Function() neverSave;
   void Function(String host, bool never)? onNever;
+
+  final bool Function() autoSave;
+  void Function(bool on)? onAutoSave;
+
+  /// Caught logins stay in memory only — nothing reaches the vault, the disk
+  /// or Drive until the user keeps them — and are forgotten after [offerTime].
+  final _offers = <String, _Offer>{};
 
   HttpServer? _server;
 
@@ -47,6 +56,7 @@ class BrowserBridge {
   }
 
   Future<void> stop() async {
+    _drop((_) => true);
     await _server?.close(force: true);
     _server = null;
   }
@@ -92,32 +102,40 @@ class BrowserBridge {
           await _json(response, HttpStatus.ok, await _code(payload['id'] as String? ?? ''));
         case '/never':
           final host = _hostOf(payload['url'] as String? ?? '');
-          if (host.isNotEmpty) onNever?.call(host, payload['never'] == true);
+          final never = payload['never'] == true;
+          if (host.isNotEmpty) onNever?.call(host, never);
+          if (never) _drop((o) => o.host == host);
           await _json(response, HttpStatus.ok, {'never': neverSave().contains(host)});
-        case '/review':
-          final outcome = await onReview(
-            payload['id'] as String? ?? '',
-            payload['keep'] == true,
-          );
-          await _json(response, HttpStatus.ok, {'result': outcome});
+        case '/autosave':
+          onAutoSave?.call(payload['on'] == true);
+          await _json(response, HttpStatus.ok, {'autoSave': autoSave()});
         case '/save':
-          if (neverSave().contains(_hostOf(payload['url'] as String? ?? ''))) {
-            await _json(response, HttpStatus.ok, {'result': 'blocked'});
-            break;
-          }
-          final outcome = await onSave(
-            payload['url'] as String? ?? '',
-            payload['username'] as String? ?? '',
-            payload['password'] as String? ?? '',
-            payload['update'] == true,
-          );
-          // "created:<id>" carries the new entry, so the extension can confirm
-          // or remove it once it sees whether the login worked.
-          final parts = outcome.split(':');
+          await _json(response, HttpStatus.ok, _offer(payload));
+        case '/offers':
+          final now = DateTime.now();
           await _json(response, HttpStatus.ok, {
-            'result': parts.first,
-            if (parts.length > 1) 'id': parts.sublist(1).join(':'),
+            'offers': _offers.entries
+                .map((o) => {
+                      'id': o.key,
+                      'host': o.value.host,
+                      'username': o.value.username,
+                      'changed': o.value.changed,
+                      'left': offerTime.inSeconds - now.difference(o.value.at).inSeconds,
+                    })
+                .toList(),
           });
+        case '/review':
+          final offer = _offers.remove(payload['id'] as String? ?? '');
+          offer?.expiry.cancel();
+          final String outcome;
+          if (offer == null) {
+            outcome = 'missing';
+          } else if (payload['keep'] == true) {
+            outcome = await storeLogin(offer.url, offer.username, offer.password);
+          } else {
+            outcome = 'dropped';
+          }
+          await _json(response, HttpStatus.ok, {'result': outcome});
         default:
           await _json(response, HttpStatus.notFound, {'error': 'unknown'});
       }
@@ -125,6 +143,44 @@ class BrowserBridge {
       await _json(response, HttpStatus.internalServerError, {'error': '$e'});
     }
   }
+
+  Map<String, dynamic> _offer(Map<String, dynamic> payload) {
+    final url = payload['url'] as String? ?? '';
+    final username = payload['username'] as String? ?? '';
+    final password = payload['password'] as String? ?? '';
+    final host = _hostOf(url);
+    if (password.isEmpty || host.isEmpty) return {'result': 'ignored'};
+    if (neverSave().contains(host)) return {'result': 'blocked'};
+
+    final state = loginState(url, username, password);
+    if (state == 'same') return {'result': 'same'};
+
+    // A retry on the same site replaces the earlier attempt.
+    _drop((o) => o.host == host && o.username == username);
+    final id = _newId();
+    _offers[id] = _Offer(
+      url: url,
+      host: host,
+      username: username,
+      password: password,
+      changed: state == 'changed',
+      expiry: Timer(offerTime, () => _offers.remove(id)),
+    );
+    return {'result': 'offered', 'id': id, 'autoSave': autoSave()};
+  }
+
+  void _drop(bool Function(_Offer offer) test) {
+    _offers.removeWhere((_, offer) {
+      if (!test(offer)) return false;
+      offer.expiry.cancel();
+      return true;
+    });
+  }
+
+  final _random = Random.secure();
+
+  String _newId() =>
+      List.generate(16, (_) => _random.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
 
   bool _originAllowed(String origin) =>
       origin.startsWith('chrome-extension://') ||
@@ -145,13 +201,13 @@ class BrowserBridge {
 
     return {
       'never': neverSave().contains(host),
+      'autoSave': autoSave(),
       'entries': matches
           .map((e) => {
                 'id': e.id,
                 'title': e.title,
                 'username': e.username,
                 'group': e.group,
-                'pending': e.pending,
                 'hasCode': e.totpSecret != null && e.totpSecret!.isNotEmpty,
               })
           .toList(),
@@ -194,4 +250,25 @@ class BrowserBridge {
       ..write(jsonEncode(body));
     await response.close();
   }
+}
+
+class _Offer {
+  _Offer({
+    required this.url,
+    required this.host,
+    required this.username,
+    required this.password,
+    required this.changed,
+    required this.expiry,
+  });
+
+  final String url;
+  final String host;
+  final String username;
+  final String password;
+
+  /// A new password for a login the vault already has.
+  final bool changed;
+  final Timer expiry;
+  final at = DateTime.now();
 }

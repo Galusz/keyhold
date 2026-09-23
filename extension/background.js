@@ -1,9 +1,9 @@
 const api = globalThis.browser ?? chrome;
 const BRIDGE = 'http://127.0.0.1:19919';
 const session = api.storage.session;
-const NOTICE_TTL = 2 * 60 * 1000;
 const USER_TTL = 10 * 60 * 1000;
-const ATTEMPT_TTL = 90 * 1000;
+const VERDICT_WAIT = 8 * 1000;
+const FAILED_SHOW = 10 * 1000;
 
 async function call(path, body) {
   const { token } = await api.storage.local.get('token');
@@ -38,6 +38,8 @@ async function allowed(message, sender) {
   return (result.entries || []).some((e) => e.id === message.id);
 }
 
+// ---------- catching logins ----------
+
 async function save(message, sender) {
   const tabId = sender.tab?.id;
   let username = message.username || '';
@@ -48,122 +50,131 @@ async function save(message, sender) {
     if (remembered && Date.now() - remembered.at < USER_TTL) username = remembered.username;
   }
 
-  const result = await call('/save', {
-    url: sender.url,
-    username,
-    password: message.password,
-    update: false,
-  });
+  const result = await call('/save', { url: sender.url, username, password: message.password });
+  if (result.result !== 'offered' || tabId == null) return { result: result.result };
 
-  if (tabId == null) return result;
-  refreshIcon(tabId, sender.tab.url);
-
-  // A new login is judged by what the page does next (see outcome()).
-  if (result.result === 'created') {
-    await session.set({
-      [`attempt:${tabId}`]: {
-        id: result.id,
-        username,
-        host: new URL(sender.url).hostname,
-        frameId: sender.frameId,
-        at: Date.now(),
-      },
-    });
-  }
-  if (result.result === 'changed') {
-    await notify(tabId, {
-      result: 'changed',
-      username,
+  // Keyhold holds the login; what the page does next decides what happens to it.
+  await session.set({
+    [`attempt:${tabId}`]: {
+      id: result.id,
       host: new URL(sender.url).hostname,
-      url: sender.url,
-      password: message.password,
-    });
-  }
-  return result;
+      frameId: sender.frameId,
+      autoSave: result.autoSave === true,
+      at: Date.now(),
+    },
+  });
+  setTimeout(() => decide(tabId, result.id, 'unclear'), VERDICT_WAIT);
+  return { result: 'offered' };
 }
 
-async function notify(tabId, notice) {
-  await session.set({ [`notice:${tabId}`]: { ...notice, at: Date.now() } });
-  api.tabs.sendMessage(tabId, { type: 'notice' }, { frameId: 0 }).catch(() => {});
-}
-
-/// After a new login was sent: a password field again on the same site means
-/// it failed, no password field means it worked, anything else stays open.
+/// A password field again on the same site means the login failed, no
+/// password field means it worked, anything else is left to the user.
 async function outcome(message, sender) {
   const tabId = sender.tab?.id;
-  const key = `attempt:${tabId}`;
-  const attempt = await read(key);
-  if (!attempt || Date.now() - attempt.at > ATTEMPT_TTL) return null;
-  if (sender.frameId !== attempt.frameId) return null;
+  const attempt = await read(`attempt:${tabId}`);
+  if (!attempt || sender.frameId !== attempt.frameId) return null;
 
   const sameSite = new URL(sender.url).hostname === attempt.host;
-  let verdict = 'unconfirmed';
-  if (message.passwordField === false) verdict = 'saved';
+  let verdict;
+  if (message.passwordField === false) verdict = 'worked';
   else if (message.passwordField === true && sameSite) verdict = 'failed';
-  else if (!message.final) return null;
+  else if (message.final) verdict = 'unclear';
+  else return null;
+  return decide(tabId, attempt.id, verdict);
+}
 
+async function decide(tabId, id, verdict) {
+  const key = `attempt:${tabId}`;
+  const attempt = await read(key);
+  if (!attempt || attempt.id !== id) return null;
   await session.remove(key);
-  if (verdict !== 'unconfirmed') {
-    await call('/review', { id: attempt.id, keep: verdict === 'saved' });
+
+  if (verdict === 'failed') {
+    await call('/review', { id, keep: false });
+    await session.set({ [`failed:${tabId}`]: Date.now() + FAILED_SHOW });
+    paint(tabId);
+    setTimeout(() => session.remove(`failed:${tabId}`).then(() => paint(tabId)), FAILED_SHOW);
+  } else if (verdict === 'worked' && attempt.autoSave) {
+    await call('/review', { id, keep: true });
   }
-  refreshIcon(tabId, sender.tab.url);
-  await notify(tabId, { result: verdict, username: attempt.username, host: attempt.host, id: attempt.id });
+  await syncOffers();
   return verdict;
 }
 
-async function never(message, sender) {
-  const url = sender.tab ? sender.tab.url : message.url;
-  if (sender.tab) {
-    // From the bar under a login that was just saved: that one goes too.
-    const notice = await read(`notice:${sender.tab.id}`);
-    if (notice?.id) await call('/review', { id: notice.id, keep: false });
-    await session.remove(`notice:${sender.tab.id}`);
-  }
-  const result = await call('/never', { url, never: message.on });
-  const [tab] = sender.tab ? [sender.tab] : await api.tabs.query({ active: true, currentWindow: true });
+// ---------- logins waiting for ✓ / ✕ ----------
+
+// Mirrors what Keyhold holds, minus logins whose outcome is still being watched.
+async function syncOffers() {
+  const result = await call('/offers');
+  const all = await session.get(null);
+  const judging = new Set(
+    Object.keys(all)
+      .filter((k) => k.startsWith('attempt:') && Date.now() - all[k].at < VERDICT_WAIT)
+      .map((k) => all[k].id)
+  );
+  const offers = (result.offers || []).filter((o) => !judging.has(o.id));
+  await session.set({ offers: offers.map((o) => Date.now() + o.left * 1000) });
+  blink();
+  return offers;
+}
+
+async function review(message) {
+  const result = await call('/review', { id: message.id, keep: message.keep });
+  await syncOffers();
+  return result;
+}
+
+async function never(message) {
+  const result = await call('/never', { url: message.url, never: message.on });
+  await syncOffers();
+  const [tab] = await api.tabs.query({ active: true, currentWindow: true });
   if (tab) refreshIcon(tab.id, tab.url);
   return result;
 }
 
-// What the page should tell the user after a save; the password never goes back to the page.
-async function pending(sender) {
-  const key = `notice:${sender.tab?.id}`;
-  const notice = await read(key);
-  if (!notice) return null;
-  if (Date.now() - notice.at > NOTICE_TTL) {
-    await session.remove(key);
-    return null;
-  }
-  // A changed password or an unconfirmed login stays until the user answers.
-  if (notice.result === 'saved' || notice.result === 'failed') await session.remove(key);
-  return { result: notice.result, username: notice.username, host: notice.host };
-}
+// ---------- toolbar icon ----------
 
-async function update(sender) {
-  const key = `notice:${sender.tab?.id}`;
-  const notice = await read(key);
-  if (!notice || notice.result !== 'changed') return { error: 'nothing to update' };
-  await session.remove(key);
-  return call('/save', {
-    url: notice.url,
-    username: notice.username,
-    password: notice.password,
-    update: true,
-  });
-}
+// Red lock: a login just failed here. Red stop: saving is off on this site.
+// Blinking orange: Keyhold holds a login that waits for ✓ / ✕.
+const stopTabs = new Set();
+let lit = false;
+let blinking = 0;
 
-// Orange lock: this site has a login the extension saved but nobody confirmed.
-// Red stop: saving is off here. Orange: a login saved here still needs confirming.
-async function refreshIcon(tabId, url) {
+async function paint(tabId) {
+  const failedUntil = await read(`failed:${tabId}`);
   let name = 'icon';
-  if (url && /^https?:/.test(url)) {
-    const result = await call('/lookup', { url });
-    if (result.never) name = 'stop';
-    else if ((result.entries || []).some((e) => e.pending)) name = 'pending';
-  }
+  if (failedUntil > Date.now()) name = 'failed';
+  else if (stopTabs.has(tabId)) name = 'stop';
+  else if (lit) name = 'pending';
   api.action
     .setIcon({ tabId, path: { 16: `icons/${name}16.png`, 32: `icons/${name}32.png` } })
     .catch(() => {});
+}
+
+async function refreshIcon(tabId, url) {
+  let stop = false;
+  if (url && /^https?:/.test(url)) stop = (await call('/lookup', { url })).never === true;
+  if (stop) stopTabs.add(tabId);
+  else stopTabs.delete(tabId);
+  paint(tabId);
+  blink();
+}
+
+function blink() {
+  if (blinking) return;
+  const tick = async () => {
+    const offers = (await read('offers')) || [];
+    const waiting = offers.some((until) => until > Date.now());
+    lit = waiting && !lit;
+    const tabs = await api.tabs.query({ active: true });
+    tabs.forEach((tab) => paint(tab.id));
+    if (!waiting) {
+      clearInterval(blinking);
+      blinking = 0;
+    }
+  };
+  blinking = setInterval(tick, 700);
+  tick();
 }
 
 api.tabs.onUpdated.addListener((tabId, change, tab) => {
@@ -172,24 +183,6 @@ api.tabs.onUpdated.addListener((tabId, change, tab) => {
 api.tabs.onActivated.addListener(({ tabId }) =>
   api.tabs.get(tabId).then((tab) => refreshIcon(tabId, tab.url), () => {})
 );
-
-// ✓ / ✕ on the bar under a login the extension could not judge.
-async function reviewFromBar(sender, message) {
-  const key = `notice:${sender.tab.id}`;
-  const notice = await read(key);
-  if (!notice?.id) return { error: 'nothing to review' };
-  await session.remove(key);
-  const result = await call('/review', { id: notice.id, keep: message.keep });
-  refreshIcon(sender.tab.id, sender.tab.url);
-  return result;
-}
-
-async function review(message) {
-  const result = await call('/review', { id: message.id, keep: message.keep });
-  const [tab] = await api.tabs.query({ active: true, currentWindow: true });
-  if (tab) refreshIcon(tab.id, tab.url);
-  return result;
-}
 
 api.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== api.runtime.id) return false;
@@ -200,17 +193,24 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
     code: async () => ((await allowed(message, sender)) ? call('/code', { id: message.id }) : { error: 'denied' }),
     save: () => save(message, sender),
     user: () => session.set({ [`user:${sender.tab?.id}`]: { username: message.username, at: Date.now() } }),
-    pending: () => pending(sender),
-    update: () => update(sender),
-    dismiss: () => session.remove(`notice:${sender.tab?.id}`),
-    review: () => (sender.tab ? reviewFromBar(sender, message) : review(message)),
     outcome: () => outcome(message, sender),
-    never: () => never(message, sender),
   };
+  // Answering what Keyhold caught is for the popup only, never for a page.
+  if (!sender.tab) {
+    Object.assign(routes, {
+      offers: () => syncOffers(),
+      review: () => review(message),
+      never: () => never(message),
+      autosave: () => call('/autosave', { on: message.on }),
+    });
+  }
   const route = routes[message.type];
   if (!route) return false;
   Promise.resolve(route()).then(reply, () => reply(null));
   return true;
 });
 
-api.tabs.onRemoved.addListener((tabId) => session.remove([`notice:${tabId}`, `user:${tabId}`]));
+api.tabs.onRemoved.addListener((tabId) => {
+  stopTabs.delete(tabId);
+  session.remove([`user:${tabId}`, `failed:${tabId}`]);
+});
