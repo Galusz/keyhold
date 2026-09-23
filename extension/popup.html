@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        width: 320px;
+        margin: 0;
+        padding: 14px;
+        background: #12201c;
+        color: #e8f5f1;
+        font: 14px system-ui, sans-serif;
+      }
+      h1 { font-size: 15px; font-weight: 500; margin: 0 0 10px; }
+      .entry {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 8px;
+        background: #1b2a26;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+      .entry:hover { background: #24382f; }
+      .entry .title { font-weight: 500; }
+      .entry .user { font-size: 12px; color: #9fe1cb; }
+      .badge {
+        margin-left: auto;
+        font-size: 11px;
+        color: #0c1714;
+        background: #1fcfb4;
+        border-radius: 4px;
+        padding: 2px 6px;
+      }
+      .muted { color: #8aa79f; font-size: 13px; line-height: 1.5; }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        background: #0c1714;
+        border: 1px solid #2c4740;
+        color: #e8f5f1;
+        border-radius: 6px;
+        padding: 8px;
+        font: 13px monospace;
+      }
+      button {
+        margin-top: 8px;
+        background: #1fcfb4;
+        color: #0c1714;
+        border: 0;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Keyhold</h1>
+    <div id="content" class="muted">Looking for matches…</div>
+    <script src="popup.js"></script>
+  </body>
+</html>

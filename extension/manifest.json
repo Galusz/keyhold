@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Keyhold",
+  "version": "1.0.0",
+  "description": "Fills logins and two-factor codes from your Keyhold vault.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["http://127.0.0.1:19919/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Keyhold"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "keyhold@zkv.pl",
+      "strict_min_version": "115.0"
+    }
+  }
+}
