@@ -115,6 +115,34 @@ function render(entries, tab) {
     box.append(title, user);
     row.append(box);
 
+    // Saved by the extension on its own: maybe a failed attempt, so it asks.
+    if (entry.pending) {
+      row.classList.add('pending');
+      const note = document.createElement('div');
+      note.className = 'note';
+      note.textContent = 'Saved automatically — does this login work?';
+      box.append(note);
+
+      const review = document.createElement('div');
+      review.className = 'review';
+      for (const [label, keep, cls, tip] of [
+        ['✓', true, 'yes', 'Keep — it works'],
+        ['✕', false, 'no', 'Delete — it was a wrong attempt'],
+      ]) {
+        const b = document.createElement('button');
+        b.textContent = label;
+        b.className = cls;
+        b.title = tip;
+        b.onclick = async (e) => {
+          e.stopPropagation();
+          await api.runtime.sendMessage({ type: 'review', id: entry.id, keep });
+          load();
+        };
+        review.append(b);
+      }
+      row.append(review);
+    }
+
     if (entry.hasCode) {
       const badge = document.createElement('span');
       badge.className = 'badge';

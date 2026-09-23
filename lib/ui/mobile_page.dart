@@ -10,6 +10,7 @@ import '../core/totp.dart';
 import 'entry_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
+import 'vault_page.dart' show kPending;
 
 /// Keyhold on a phone: mostly an authenticator, with the same vault as the
 /// computer kept in step through the user's Google Drive.
@@ -415,10 +416,29 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       leading: CircleAvatar(
         child: Text(e.title.isEmpty ? '?' : e.title.characters.first.toUpperCase()),
       ),
-      title: Text(e.title.isEmpty ? '(no title)' : e.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: Text(e.username, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(
+        e.title.isEmpty ? '(no title)' : e.title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: e.pending ? const TextStyle(color: kPending) : null,
+      ),
+      subtitle: Text(
+        e.pending ? '${e.username} · not confirmed' : e.username,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: code == null
-          ? const Icon(Icons.chevron_right)
+          ? (e.pending
+              ? IconButton(
+                  tooltip: 'Confirm',
+                  icon: const Icon(Icons.check_circle_outline, color: kPending),
+                  onPressed: () async {
+                    e.pending = false;
+                    _vault.put(e);
+                    await _persist();
+                  },
+                )
+              : const Icon(Icons.chevron_right))
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,

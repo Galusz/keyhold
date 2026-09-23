@@ -13,6 +13,10 @@ class VaultEntry {
   int updatedAt;
   bool deleted;
 
+  /// Saved on its own by the browser extension and not checked yet — it may
+  /// be a failed login attempt.
+  bool pending;
+
   VaultEntry({
     required this.id,
     this.title = '',
@@ -24,6 +28,7 @@ class VaultEntry {
     this.totpSecret,
     int? updatedAt,
     this.deleted = false,
+    this.pending = false,
   }) : updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +42,7 @@ class VaultEntry {
         if (totpSecret != null) 'totp': totpSecret,
         'updatedAt': updatedAt,
         if (deleted) 'deleted': true,
+        if (pending) 'pending': true,
       };
 
   factory VaultEntry.fromJson(Map<String, dynamic> j) => VaultEntry(
@@ -50,6 +56,7 @@ class VaultEntry {
         totpSecret: j['totp'] as String?,
         updatedAt: (j['updatedAt'] ?? 0) as int,
         deleted: (j['deleted'] ?? false) as bool,
+        pending: (j['pending'] ?? false) as bool,
       );
 
   void touch() => updatedAt = DateTime.now().millisecondsSinceEpoch;

@@ -54,6 +54,7 @@ async function save(message, sender) {
     update: false,
   });
 
+  if (tabId != null) refreshIcon(tabId, sender.tab.url);
   if (tabId != null && (result.result === 'created' || result.result === 'changed')) {
     await session.set({
       [`notice:${tabId}`]: {
@@ -97,6 +98,33 @@ async function update(sender) {
   });
 }
 
+// Orange lock: this site has a login the extension saved but nobody confirmed.
+async function refreshIcon(tabId, url) {
+  let pending = false;
+  if (url && /^https?:/.test(url)) {
+    const result = await call('/lookup', { url });
+    pending = (result.entries || []).some((e) => e.pending);
+  }
+  const name = pending ? 'pending' : 'icon';
+  api.action
+    .setIcon({ tabId, path: { 16: `icons/${name}16.png`, 32: `icons/${name}32.png` } })
+    .catch(() => {});
+}
+
+api.tabs.onUpdated.addListener((tabId, change, tab) => {
+  if (change.status === 'complete') refreshIcon(tabId, tab.url);
+});
+api.tabs.onActivated.addListener(({ tabId }) =>
+  api.tabs.get(tabId).then((tab) => refreshIcon(tabId, tab.url), () => {})
+);
+
+async function review(message) {
+  const result = await call('/review', { id: message.id, keep: message.keep });
+  const [tab] = await api.tabs.query({ active: true, currentWindow: true });
+  if (tab) refreshIcon(tab.id, tab.url);
+  return result;
+}
+
 api.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== api.runtime.id) return false;
 
@@ -109,6 +137,7 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
     pending: () => pending(sender),
     update: () => update(sender),
     dismiss: () => session.remove(`notice:${sender.tab?.id}`),
+    review: () => (sender.tab ? { error: 'denied' } : review(message)),
   };
   const route = routes[message.type];
   if (!route) return false;

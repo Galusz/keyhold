@@ -172,6 +172,7 @@ const STYLE = `
   .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sub { color: #9FB8B0; font-size: 12.5px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .group { color: #7F9A92; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .group.pending, .row:not(.active):not(:hover) .title.pending { color: #F29A2E; }
   .code { font: 600 18px ui-monospace, Consolas, monospace; letter-spacing: 1px; text-align: right; }
   .bar { height: 2px; background: currentColor; opacity: .6; margin-top: 4px; transition: width 1s linear; }
 `;
@@ -213,7 +214,7 @@ async function openMenu(field) {
     const text = document.createElement('div');
     text.className = 'text';
     const title = document.createElement('div');
-    title.className = 'title';
+    title.className = entry.pending ? 'title pending' : 'title';
     title.textContent = entry.title;
     const sub = document.createElement('div');
     sub.className = 'sub';
@@ -231,10 +232,10 @@ async function openMenu(field) {
       row.append(code);
       row.code = code;
       row.bar = bar;
-    } else if (entry.group) {
+    } else if (entry.pending || entry.group) {
       const group = document.createElement('div');
-      group.className = 'group';
-      group.textContent = entry.group;
+      group.className = entry.pending ? 'group pending' : 'group';
+      group.textContent = entry.pending ? 'Not confirmed' : entry.group;
       row.append(group);
     }
 

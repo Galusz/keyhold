@@ -23,6 +23,9 @@ import 'backup_page.dart';
 
 enum EntryFilter { all, twoFactor, plain, files }
 
+/// Logins the browser extension saved on its own and nobody has checked yet.
+const kPending = Color(0xFFF29A2E);
+
 class VaultPage extends StatefulWidget {
   const VaultPage({super.key});
 
@@ -102,9 +105,19 @@ class _VaultPageState extends State<VaultPage> {
 
     final existing = _findLogin(_vault.visible, url, '', username);
     if (existing != null) {
-      if (existing.password == password) return 'unchanged';
+      if (existing.password == password) {
+        // The same login twice: it works, so it no longer needs checking.
+        if (existing.pending) {
+          existing.pending = false;
+          _vault.put(existing);
+          await _persist();
+        }
+        return 'unchanged';
+      }
       if (!update) return 'changed';
-      existing.password = password;
+      existing
+        ..password = password
+        ..pending = false;
       _vault.put(existing);
       await _persist();
       return 'updated';
@@ -117,9 +130,23 @@ class _VaultPageState extends State<VaultPage> {
       password: password,
       url: url,
       group: 'Web',
+      pending: true,
     ));
     await _persist();
     return 'created';
+  }
+
+  Future<String> _reviewFromBrowser(String id, bool keep) async {
+    final entry = _vault.entries[id];
+    if (entry == null || entry.deleted) return 'missing';
+    if (keep) {
+      entry.pending = false;
+      _vault.put(entry);
+    } else {
+      _vault.remove(entry.id);
+    }
+    await _persist();
+    return keep ? 'kept' : 'removed';
   }
 
   /// The same login already in the vault: same site (or same title when there
@@ -176,6 +203,7 @@ class _VaultPageState extends State<VaultPage> {
       vault: () => _vault,
       token: _store.ensureBridgeToken(),
       onSave: _saveFromBrowser,
+      onReview: _reviewFromBrowser,
     );
     try {
       await bridge.start();
@@ -1119,11 +1147,24 @@ class _VaultPageState extends State<VaultPage> {
           ),
         ),
       ),
-      title: Text(e.title.isEmpty ? '(no title)' : e.title),
-      subtitle: Text(e.username, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(
+        e.title.isEmpty ? '(no title)' : e.title,
+        style: e.pending ? const TextStyle(color: kPending) : null,
+      ),
+      subtitle: Text(
+        e.pending ? '${e.username} · saved by the browser, not confirmed yet' : e.username,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (e.pending)
+            IconButton(
+              tooltip: 'Confirm — this login works',
+              icon: const Icon(Icons.check_circle_outline, color: kPending),
+              onPressed: () => _reviewFromBrowser(e.id, true),
+            ),
           if (code != null) ...[
             InkWell(
               onTap: () => _copy('Code', code),

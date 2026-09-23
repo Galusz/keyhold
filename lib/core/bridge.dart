@@ -14,6 +14,7 @@ class BrowserBridge {
     required this.vault,
     required this.token,
     required this.onSave,
+    required this.onReview,
     this.port = 19919,
   });
 
@@ -26,6 +27,9 @@ class BrowserBridge {
   /// user agreed in the browser.
   final Future<String> Function(
       String url, String username, String password, bool update) onSave;
+
+  /// Keeps ([keep]) or removes an entry the extension saved on its own.
+  final Future<String> Function(String id, bool keep) onReview;
 
   HttpServer? _server;
 
@@ -81,6 +85,12 @@ class BrowserBridge {
           await _json(response, HttpStatus.ok, await _fill(payload['id'] as String? ?? ''));
         case '/code':
           await _json(response, HttpStatus.ok, await _code(payload['id'] as String? ?? ''));
+        case '/review':
+          final outcome = await onReview(
+            payload['id'] as String? ?? '',
+            payload['keep'] == true,
+          );
+          await _json(response, HttpStatus.ok, {'result': outcome});
         case '/save':
           final outcome = await onSave(
             payload['url'] as String? ?? '',
@@ -121,6 +131,7 @@ class BrowserBridge {
                 'title': e.title,
                 'username': e.username,
                 'group': e.group,
+                'pending': e.pending,
                 'hasCode': e.totpSecret != null && e.totpSecret!.isNotEmpty,
               })
           .toList(),

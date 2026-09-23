@@ -12,13 +12,13 @@ img.ColorRgba8 rgba(int argb) => img.ColorRgba8(
       (argb >> 24) & 0xFF,
     );
 
-img.Image draw(int size) {
+img.Image draw(int size, {int color = accent}) {
   final s = size / 256.0;
   final canvas = img.Image(width: size, height: size, numChannels: 4);
   img.fill(canvas, color: img.ColorRgba8(0, 0, 0, 0));
 
   final back = rgba(bg);
-  final fg = rgba(accent);
+  final fg = rgba(color);
   final clear = img.ColorRgba8(0, 0, 0, 0);
 
   final r = (48 * s).round();
@@ -86,6 +86,11 @@ void main() {
   Directory('extension/icons').createSync(recursive: true);
   for (final size in [16, 32, 48, 128]) {
     File('extension/icons/icon$size.png').writeAsBytesSync(img.encodePng(draw(size)));
+  }
+  // Toolbar lock for a site with a login that still needs confirming.
+  for (final size in [16, 32]) {
+    File('extension/icons/pending$size.png')
+        .writeAsBytesSync(img.encodePng(draw(size, color: 0xFFF29A2E)));
   }
   stdout.writeln('icons written');
 }
