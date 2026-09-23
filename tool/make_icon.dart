@@ -80,5 +80,9 @@ void main() {
   File('assets/tray_icon.ico').writeAsBytesSync(img.encodeIco(draw(32)));
   File('assets/tray_icon.png').writeAsBytesSync(img.encodePng(draw(32)));
   File('assets/icon.png').writeAsBytesSync(img.encodePng(draw(512)));
+  Directory('extension/icons').createSync(recursive: true);
+  for (final size in [16, 32, 48, 128]) {
+    File('extension/icons/icon$size.png').writeAsBytesSync(img.encodePng(draw(size)));
+  }
   stdout.writeln('icons written');
 }
