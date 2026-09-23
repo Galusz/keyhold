@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
@@ -16,7 +18,7 @@ import 'import_page.dart';
 import 'password_page.dart';
 import 'backup_page.dart';
 
-enum EntryFilter { all, twoFactor, plain }
+enum EntryFilter { all, twoFactor, plain, files }
 
 class VaultPage extends StatefulWidget {
   const VaultPage({super.key});
@@ -295,7 +297,7 @@ class _VaultPageState extends State<VaultPage> {
     all = switch (_filter) {
       EntryFilter.twoFactor => all.where(_hasCode).toList(),
       EntryFilter.plain => all.where((e) => !_hasCode(e)).toList(),
-      EntryFilter.all => all,
+      EntryFilter.all || EntryFilter.files => all,
     };
 
     if (q.isNotEmpty) {
@@ -329,6 +331,7 @@ class _VaultPageState extends State<VaultPage> {
         chip(EntryFilter.all, 'All', visible.length),
         chip(EntryFilter.twoFactor, '2FA', withCode),
         chip(EntryFilter.plain, 'Passwords', visible.length - withCode),
+        chip(EntryFilter.files, 'Files', _vault.visibleFiles.length),
       ],
     );
   }
@@ -404,13 +407,118 @@ class _VaultPageState extends State<VaultPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _open(VaultEntry(id: UniqueKey().toString()), isNew: true),
-        icon: const Icon(Icons.add),
-        label: const Text('New'),
-      ),
+      floatingActionButton: _filter == EntryFilter.files
+          ? FloatingActionButton.extended(
+              onPressed: _addFile,
+              icon: const Icon(Icons.attach_file),
+              label: const Text('Add file'),
+            )
+          : FloatingActionButton.extended(
+              onPressed: () => _open(VaultEntry(id: UniqueKey().toString()), isNew: true),
+              icon: const Icon(Icons.add),
+              label: const Text('New'),
+            ),
       bottomNavigationBar: _backupBar(items.length),
-      body: _body(items),
+      body: _filter == EntryFilter.files ? _filesBody() : _body(items),
+    );
+  }
+
+  static const _maxFileBytes = 25 * 1024 * 1024;
+
+  String _humanSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  void _toast(String text) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(text), duration: const Duration(seconds: 3)));
+  }
+
+  Future<void> _addFile() async {
+    final picked = await openFile();
+    if (picked == null) return;
+
+    final bytes = await picked.readAsBytes();
+    if (bytes.length > _maxFileBytes) {
+      _toast('${picked.name} is ${_humanSize(bytes.length)} — the limit is 25 MB');
+      return;
+    }
+
+    _vault.putFile(VaultFile(
+      id: UniqueKey().toString(),
+      name: picked.name,
+      data: base64Encode(bytes),
+      size: bytes.length,
+    ));
+    await _persist();
+    _toast('${picked.name} is now in the vault');
+  }
+
+  Future<void> _saveFile(VaultFile f) async {
+    final target = await getSaveLocation(suggestedName: f.name);
+    if (target == null) return;
+    await File(target.path).writeAsBytes(f.bytes, flush: true);
+    _toast('Saved to ${target.path}');
+  }
+
+  Future<void> _deleteFile(VaultFile f) async {
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Remove ${f.name}?'),
+        content: const Text('It disappears from the vault. Older backups still hold it.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Remove')),
+        ],
+      ),
+    );
+    if (sure != true) return;
+    _vault.removeFile(f.id);
+    await _persist();
+  }
+
+  Widget _filesBody() {
+    final q = _search.text.trim().toLowerCase();
+    final files = _vault.visibleFiles
+        .where((f) => q.isEmpty || f.name.toLowerCase().contains(q))
+        .toList();
+
+    if (files.isEmpty) {
+      return const Center(
+        child: Text('No files yet — add recovery codes, keys or scans'),
+      );
+    }
+
+    return ListView.separated(
+      itemCount: files.length,
+      separatorBuilder: (_, _) => const Divider(height: 1),
+      itemBuilder: (context, i) {
+        final f = files[i];
+        return ListTile(
+          leading: const Icon(Icons.insert_drive_file_outlined),
+          title: Text(f.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text(_humanSize(f.size)),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: 'Save to disk',
+                icon: const Icon(Icons.save_alt),
+                onPressed: () => _saveFile(f),
+              ),
+              IconButton(
+                tooltip: 'Remove',
+                icon: const Icon(Icons.delete_outline),
+                onPressed: () => _deleteFile(f),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
