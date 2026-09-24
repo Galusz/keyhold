@@ -40,6 +40,19 @@
               android:resource="@style/NormalTheme"
               />
         </activity>
+        <activity
+            android:name=".CodeActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@style/SeeThrough"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true">
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/SeeThrough"
+              />
+        </activity>
         <service
             android:name=".KeyholdAutofillService"
             android:label="Keyhold"

@@ -42,6 +42,7 @@ Future<void> serveAutofillLookups() async {
     return [
       for (final e in autofillMatches(vault, args['domain'] as String? ?? '', args['app'] as String? ?? ''))
         {
+          'id': e.id,
           'title': e.title,
           'username': e.username,
           'password': e.password,
@@ -70,6 +71,9 @@ class _AutofillPageState extends State<AutofillPage> {
   Vault _vault = Vault();
   bool _loading = true;
   String? _message;
+
+  /// Seconds until the next two-factor code, while waiting for it.
+  int? _waiting;
 
   String get _site => _request['domain'] as String? ?? '';
   String get _app => _request['app'] as String? ?? '';
@@ -103,7 +107,29 @@ class _AutofillPageState extends State<AutofillPage> {
       await _keep();
       return;
     }
+    final entry = _request['entry'] as String?;
+    if (entry != null) {
+      await _fillCode(entry);
+      return;
+    }
     setState(() => _loading = false);
+  }
+
+  /// Behind a two-factor suggestion: the code of this very moment, or the
+  /// next one when this one has under three seconds left.
+  Future<void> _fillCode(String id) async {
+    final e = _vault.entries[id];
+    final secret = e?.totpSecret;
+    if (e == null || e.deleted || secret == null || secret.isEmpty) {
+      await _channel.invokeMethod('close');
+      return;
+    }
+    final left = secondsLeft();
+    if (left < 3) {
+      setState(() => _waiting = left);
+      await Future<void>.delayed(Duration(milliseconds: left * 1000 + 200));
+    }
+    await _channel.invokeMethod('fill', {'code': await totpCode(secret)});
   }
 
   List<VaultEntry> get _shown {
@@ -171,6 +197,22 @@ class _AutofillPageState extends State<AutofillPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Filling a two-factor code: see-through, a small note only while waiting.
+    if (_request['entry'] != null) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: _waiting == null
+            ? const SizedBox.shrink()
+            : Center(
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text('Next code in $_waiting s', style: Theme.of(context).textTheme.titleMedium),
+                  ),
+                ),
+              ),
+      );
+    }
     final title = _site.isNotEmpty ? _site : (_request['label'] as String? ?? 'Keyhold');
     return Scaffold(
       appBar: AppBar(

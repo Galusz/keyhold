@@ -8,13 +8,14 @@ import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import androidx.annotation.RequiresApi
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterActivityLaunchConfigs
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 /// The small Keyhold screen behind the "Keyhold" suggestion: the user picks a
 /// login (or it keeps one Android offered to save), then it closes.
 @RequiresApi(Build.VERSION_CODES.O)
-class AutofillActivity : FlutterActivity() {
+open class AutofillActivity : FlutterActivity() {
     override fun getDartEntrypointFunctionName() = "autofillMain"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -47,6 +48,7 @@ class AutofillActivity : FlutterActivity() {
             "domain" to (intent.getStringExtra(EXTRA_DOMAIN) ?: ""),
             "app" to (intent.getStringExtra(EXTRA_APP) ?: ""),
             "label" to (intent.getStringExtra(EXTRA_LABEL) ?: ""),
+            "entry" to intent.getStringExtra(EXTRA_ENTRY),
             "username" to if (save) intent.getStringExtra(EXTRA_USERNAME) else null,
             "password" to if (save) intent.getStringExtra(EXTRA_PASSWORD) else null,
             "wantsCode" to ids(EXTRA_CODES).isNotEmpty(),
@@ -83,6 +85,7 @@ class AutofillActivity : FlutterActivity() {
         const val EXTRA_DOMAIN = "keyhold.domain"
         const val EXTRA_APP = "keyhold.app"
         const val EXTRA_LABEL = "keyhold.label"
+        const val EXTRA_ENTRY = "keyhold.entry"
         const val EXTRA_USERNAMES = "keyhold.usernames"
         const val EXTRA_PASSWORDS = "keyhold.passwords"
         const val EXTRA_CODES = "keyhold.codes"
@@ -90,4 +93,11 @@ class AutofillActivity : FlutterActivity() {
         const val EXTRA_USERNAME = "keyhold.username"
         const val EXTRA_PASSWORD = "keyhold.password"
     }
+}
+
+/// Fills a two-factor code without a screen of its own: see-through, it only
+/// shows up when it has to wait a moment for the next code.
+@RequiresApi(Build.VERSION_CODES.O)
+class CodeActivity : AutofillActivity() {
+    override fun getBackgroundMode() = FlutterActivityLaunchConfigs.BackgroundMode.transparent
 }

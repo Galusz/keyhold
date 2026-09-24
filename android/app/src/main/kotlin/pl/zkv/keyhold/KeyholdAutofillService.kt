@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.CancellationSignal
@@ -131,6 +132,18 @@ class KeyholdAutofillService : AutofillService() {
             }
             val dataset = Dataset.Builder(presentation(this, title, sub))
             inlinePresentation(inline, shown, title, sub, pinned = false)?.let { dataset.setInlinePresentation(it) }
+
+            // Android keeps these suggestions for the whole page, so the digits
+            // shown may be old by the time they are tapped: the code that goes
+            // in is worked out at that moment instead.
+            val id = login["id"] as? String
+            if (form.codes.isNotEmpty() && code != null && id != null) {
+                for (field in form.ids) dataset.setValue(field, null)
+                dataset.setAuthentication(picker(form, entry = id))
+                response.addDataset(dataset.build())
+                shown++
+                continue
+            }
             var any = false
             fun put(ids: List<AutofillId>, value: String?) {
                 if (value.isNullOrEmpty()) return
@@ -147,7 +160,6 @@ class KeyholdAutofillService : AutofillService() {
             }
             put(form.usernames, username)
             put(form.passwords, login["password"] as? String)
-            put(form.codes, code)
             if (any) {
                 response.addDataset(dataset.build())
                 shown++
@@ -155,21 +167,10 @@ class KeyholdAutofillService : AutofillService() {
         }
 
         // "Keyhold": the whole vault, searchable, on a screen of its own.
-        val intent = Intent(this, AutofillActivity::class.java)
-            .putExtra(AutofillActivity.EXTRA_DOMAIN, form.domain)
-            .putExtra(AutofillActivity.EXTRA_APP, form.app)
-            .putParcelableArrayListExtra(AutofillActivity.EXTRA_USERNAMES, ArrayList(form.usernames))
-            .putParcelableArrayListExtra(AutofillActivity.EXTRA_PASSWORDS, ArrayList(form.passwords))
-            .putParcelableArrayListExtra(AutofillActivity.EXTRA_CODES, ArrayList(form.codes))
-        // The system adds the screen's structure to it, so it has to stay mutable.
-        val pending = PendingIntent.getActivity(
-            this, nextRequest++, intent,
-            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_CANCEL_CURRENT,
-        )
         val search = Dataset.Builder(presentation(this, "Keyhold", "Search all logins", search = true)).apply {
             inlinePresentation(inline, shown, "Keyhold", null, pinned = true)?.let { setInlinePresentation(it) }
             for (id in form.ids) setValue(id, null)
-            setAuthentication(pending.intentSender)
+            setAuthentication(picker(form, entry = null))
         }.build()
         response.addDataset(search)
 
@@ -184,6 +185,24 @@ class KeyholdAutofillService : AutofillService() {
             response.setSaveInfo(save.build())
         }
         return response.build()
+    }
+
+    /// The search screen, or — for [entry] — the see-through screen that fills
+    /// that login's current two-factor code.
+    private fun picker(form: LoginForm, entry: String?): IntentSender {
+        val screen = if (entry == null) AutofillActivity::class.java else CodeActivity::class.java
+        val intent = Intent(this, screen)
+            .putExtra(AutofillActivity.EXTRA_DOMAIN, form.domain)
+            .putExtra(AutofillActivity.EXTRA_APP, form.app)
+            .putExtra(AutofillActivity.EXTRA_ENTRY, entry)
+            .putParcelableArrayListExtra(AutofillActivity.EXTRA_USERNAMES, ArrayList(form.usernames))
+            .putParcelableArrayListExtra(AutofillActivity.EXTRA_PASSWORDS, ArrayList(form.passwords))
+            .putParcelableArrayListExtra(AutofillActivity.EXTRA_CODES, ArrayList(form.codes))
+        // The system adds the screen's structure to it, so it has to stay mutable.
+        return PendingIntent.getActivity(
+            this, nextRequest++, intent,
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_CANCEL_CURRENT,
+        ).intentSender
     }
 
     /// A chip in the keyboard's strip (Gboard and others), when the keyboard offers one.
