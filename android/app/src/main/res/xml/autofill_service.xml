@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Browsers that do not hand their pages to a filler on their own are read
-     through Android's compatibility mode. Firefox does it natively; Chrome
-     needs "Autofill using another service" switched on in its settings. -->
-<autofill-service xmlns:android="http://schemas.android.com/apk/res/android">
-    <compatibility-package android:name="com.android.chrome" android:maxLongVersionCode="10000000000" />
-    <compatibility-package android:name="com.chrome.beta" android:maxLongVersionCode="10000000000" />
-    <compatibility-package android:name="com.microsoft.emmx" android:maxLongVersionCode="10000000000" />
-    <compatibility-package android:name="com.brave.browser" android:maxLongVersionCode="10000000000" />
-    <compatibility-package android:name="com.sec.android.app.sbrowser" android:maxLongVersionCode="10000000000" />
-    <compatibility-package android:name="com.opera.browser" android:maxLongVersionCode="10000000000" />
-    <compatibility-package android:name="com.vivaldi.browser" android:maxLongVersionCode="10000000000" />
-    <compatibility-package android:name="com.duckduckgo.mobile.android" android:maxLongVersionCode="10000000000" />
-</autofill-service>
+<!-- No compatibility-mode browsers: that mode hands the keyboard to the
+     suggestion window, so nothing typed reaches the page. Firefox works on
+     its own; Chrome after "Autofill using another service" in its settings. -->
+<autofill-service xmlns:android="http://schemas.android.com/apk/res/android" />

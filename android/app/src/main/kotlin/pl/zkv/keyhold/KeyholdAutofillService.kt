@@ -23,6 +23,7 @@ import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
+import java.util.regex.Pattern
 
 /// Keyhold as the phone's password filler: the logins for the site or app
 /// right under the field, plus "Keyhold" to search the whole vault.
@@ -113,16 +114,22 @@ class KeyholdAutofillService : AutofillService() {
             val username = login["username"] as? String
             val dataset = Dataset.Builder(presentation(this, login["title"] as? String ?: "", username))
             var any = false
-            fun put(ids: List<android.view.autofill.AutofillId>, value: String?) {
+            fun put(ids: List<android.view.autofill.AutofillId>, value: String?, secret: Boolean) {
                 if (value.isNullOrEmpty()) return
                 for (id in ids) {
-                    dataset.setValue(id, AutofillValue.forText(value))
+                    // Typing in a password or code field hides the list instead of
+                    // matching it against the saved secret.
+                    if (secret && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        dataset.setValue(id, AutofillValue.forText(value), null as Pattern?)
+                    } else {
+                        dataset.setValue(id, AutofillValue.forText(value))
+                    }
                     any = true
                 }
             }
-            put(form.usernames, username)
-            put(form.passwords, login["password"] as? String)
-            put(form.codes, login["code"] as? String)
+            put(form.usernames, username, secret = false)
+            put(form.passwords, login["password"] as? String, secret = true)
+            put(form.codes, login["code"] as? String, secret = true)
             if (any) response.addDataset(dataset.build())
         }
 
