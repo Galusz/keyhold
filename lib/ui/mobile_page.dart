@@ -244,17 +244,21 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     _toast('${found.length} two-factor ${found.length == 1 ? 'code' : 'codes'} saved');
   }
 
-  Future<void> _edit(VaultEntry entry, {required bool isNew}) async {
+  /// True when the entry was deleted.
+  Future<bool> _edit(VaultEntry entry, {required bool isNew}) async {
     final result = await Navigator.of(context).push(MaterialPageRoute<Object?>(
       builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups),
     ));
     if (result == 'delete') {
       _vault.remove(entry.id);
       await _persist();
-    } else if (result == true) {
+      return true;
+    }
+    if (result == true) {
       _vault.put(entry);
       await _persist();
     }
+    return false;
   }
 
   Future<void> _details(VaultEntry entry) async {
@@ -507,7 +511,8 @@ class _Details extends StatefulWidget {
   final String? Function() code;
   final int Function() left;
   final void Function(String label, String value) onCopy;
-  final Future<void> Function() onEdit;
+  /// True when the entry was deleted.
+  final Future<bool> Function() onEdit;
 
   @override
   State<_Details> createState() => _DetailsState();
@@ -567,8 +572,14 @@ class _DetailsState extends State<_Details> {
             tooltip: 'Edit',
             icon: const Icon(Icons.edit_outlined),
             onPressed: () async {
-              await widget.onEdit();
-              if (mounted) setState(() {});
+              final deleted = await widget.onEdit();
+              if (!context.mounted) return;
+              // A deleted entry has nothing left to show: back to the list.
+              if (deleted) {
+                Navigator.of(context).pop();
+              } else {
+                setState(() {});
+              }
             },
           ),
         ],

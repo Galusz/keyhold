@@ -175,15 +175,31 @@ class Vault {
     return list;
   }
 
-  /// Logins for a site: the same host, or one a subdomain of the other.
+  /// Logins for a site. Only those for this very host (and port, when the
+  /// address names one) if there are any: on a home domain every subdomain is
+  /// another service. Otherwise ones for its parent domain or a subdomain
+  /// (login.bank.pl ↔ bank.pl).
   List<VaultEntry> forSite(String address) {
     final host = hostOf(address);
     if (host.isEmpty) return [];
-    return visible.where((e) {
+    final port = _portOf(address);
+    final withAddress = visible.where((e) => hostOf(e.url).isNotEmpty);
+
+    final exact = withAddress
+        .where((e) => hostOf(e.url) == host && (port == null || _portOf(e.url) == port))
+        .toList();
+    if (exact.isNotEmpty) return exact;
+    return withAddress.where((e) {
       final entryHost = hostOf(e.url);
-      if (entryHost.isEmpty) return false;
       return entryHost == host || host.endsWith('.$entryHost') || entryHost.endsWith('.$host');
     }).toList();
+  }
+
+  static int? _portOf(String url) {
+    var text = url.trim();
+    if (!text.contains('://')) text = 'https://$text';
+    final uri = Uri.tryParse(text);
+    return uri != null && uri.hasPort ? uri.port : null;
   }
 
   List<String> get groups {

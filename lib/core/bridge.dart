@@ -214,7 +214,7 @@ class BrowserBridge {
   Map<String, dynamic> _lookup(String pageUrl) {
     final host = hostOf(pageUrl);
     if (host.isEmpty) return {'entries': <dynamic>[]};
-    final matches = vault().forSite(host);
+    final matches = vault().forSite(pageUrl);
 
     return {
       'never': neverSave().contains(host),
