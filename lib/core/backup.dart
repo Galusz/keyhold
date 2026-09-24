@@ -40,6 +40,9 @@ class BackupService {
   /// A login that clearly worked is saved without asking in the browser.
   bool autoSave = false;
 
+  /// Two-factor codes (by id) this device no longer offers to pin to a site.
+  List<String> noPinAsk = [];
+
   /// Google Drive sync: the refresh token is kept DPAPI-protected, base64.
   String driveToken = '';
   String driveEmail = '';
@@ -60,6 +63,7 @@ class BackupService {
       watched = (raw['watched'] as List<dynamic>?)?.cast<String>();
       neverSave = (raw['neverSave'] as List<dynamic>?)?.cast<String>() ?? [];
       autoSave = (raw['autoSave'] ?? false) as bool;
+      noPinAsk = (raw['noPinAsk'] as List<dynamic>?)?.cast<String>() ?? [];
       driveToken = (raw['driveToken'] ?? '') as String;
       driveEmail = (raw['driveEmail'] ?? '') as String;
       driveSyncedAt = DateTime.tryParse((raw['driveSyncedAt'] ?? '') as String);
@@ -83,6 +87,7 @@ class BackupService {
       if (watched != null) 'watched': watched,
       if (neverSave.isNotEmpty) 'neverSave': neverSave,
       if (autoSave) 'autoSave': true,
+      if (noPinAsk.isNotEmpty) 'noPinAsk': noPinAsk,
       if (driveToken.isNotEmpty) 'driveToken': driveToken,
       if (driveEmail.isNotEmpty) 'driveEmail': driveEmail,
       if (driveSyncedAt != null) 'driveSyncedAt': driveSyncedAt!.toIso8601String(),

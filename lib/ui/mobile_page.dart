@@ -78,6 +78,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       ));
     }
     _vault = await _store.load();
+    if (_vault.splitCodes()) await _store.save(_vault);
     _store.icons.fetchAll(_vault.visible);
     _welcome = _vault.visible.isEmpty && !_drive.connected;
     setState(() => _loading = false);
@@ -120,6 +121,8 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       final theirs = result.vault;
       if (theirs != null) {
         _vault = Vault.merge(_vault, theirs);
+        // Another device may still keep codes inside logins.
+        _vault.splitCodes();
         await _store.save(_vault);
         _codeWindow = -1;
         await _refreshCodes();
@@ -210,8 +213,14 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
               onTap: () => Navigator.pop(context, 'qr'),
             ),
             ListTile(
+              leading: const Icon(Icons.pin_outlined),
+              title: const Text('New two-factor code'),
+              subtitle: const Text('Type the setup key yourself'),
+              onTap: () => Navigator.pop(context, 'code'),
+            ),
+            ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('New entry'),
+              title: const Text('New login'),
               onTap: () => Navigator.pop(context, 'new'),
             ),
           ],
@@ -219,6 +228,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       ),
     );
     if (choice == 'qr') await _scanQr();
+    if (choice == 'code') await _edit(VaultEntry(id: UniqueKey().toString()), isNew: true, code: true);
     if (choice == 'new') await _edit(VaultEntry(id: UniqueKey().toString()), isNew: true);
   }
 
@@ -230,15 +240,15 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             if ((e.totpSecret ?? '').isNotEmpty) e.totpSecret!,
         },
         onSave: (code) async {
-          final title = code.issuer.isNotEmpty ? code.issuer : code.account;
-          _vault.put(VaultEntry(
-            id: UniqueKey().toString(),
-            title: title,
-            username: code.account,
-            totpSecret: code.secret,
-          ));
+          // Named like in Google Authenticator: the service and the account.
+          final name = code.issuer.isEmpty
+              ? code.account
+              : code.account.isEmpty
+                  ? code.issuer
+                  : '${code.issuer} (${code.account})';
+          _vault.put(VaultEntry(id: UniqueKey().toString(), title: name, totpSecret: code.secret));
           await _persist();
-          return code.issuer.isNotEmpty ? '$title — ${code.account}' : title;
+          return name;
         },
       ),
     ));
@@ -247,9 +257,9 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
 
   /// True when the entry was deleted.
-  Future<bool> _edit(VaultEntry entry, {required bool isNew}) async {
+  Future<bool> _edit(VaultEntry entry, {required bool isNew, bool code = false}) async {
     final result = await Navigator.of(context).push(MaterialPageRoute<Object?>(
-      builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups, addresses: _vault.addresses),
+      builder: (_) => EntryPage(entry: entry, isNew: isNew, vault: _vault, code: code),
     ));
     if (result == 'delete') {
       _vault.remove(entry.id);

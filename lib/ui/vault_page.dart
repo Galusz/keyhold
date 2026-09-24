@@ -89,7 +89,8 @@ class _VaultPageState extends State<VaultPage> {
       }
     }
     _vault = await _store.load();
-    if (_autoGroup()) await _store.save(_vault);
+    final grouped = _autoGroup();
+    if (_vault.splitCodes() || grouped) await _store.save(_vault);
     _store.icons.fetchAll(_vault.visible);
     setState(() => _loading = false);
     await _startBridge();
@@ -241,15 +242,15 @@ class _VaultPageState extends State<VaultPage> {
             if ((e.totpSecret ?? '').isNotEmpty) e.totpSecret!,
         },
         onSave: (code) async {
-          final title = code.issuer.isNotEmpty ? code.issuer : code.account;
-          _vault.put(VaultEntry(
-            id: UniqueKey().toString(),
-            title: title,
-            username: code.account,
-            totpSecret: code.secret,
-          ));
+          // Named like in Google Authenticator: the service and the account.
+          final name = code.issuer.isEmpty
+              ? code.account
+              : code.account.isEmpty
+                  ? code.issuer
+                  : '${code.issuer} (${code.account})';
+          _vault.put(VaultEntry(id: UniqueKey().toString(), title: name, totpSecret: code.secret));
           await _persist();
-          return code.issuer.isNotEmpty ? '$title — ${code.account}' : title;
+          return name;
         },
       ),
     ));
@@ -309,6 +310,8 @@ class _VaultPageState extends State<VaultPage> {
       final theirs = result.vault;
       if (theirs != null) {
         _vault = Vault.merge(_vault, theirs);
+        // Another device may still keep codes inside logins.
+        _vault.splitCodes();
         _revision++;
         _codeWindow = -1;
         await _store.save(_vault);
@@ -327,10 +330,10 @@ class _VaultPageState extends State<VaultPage> {
     }
   }
 
-  Future<void> _open(VaultEntry entry, {required bool isNew}) async {
+  Future<void> _open(VaultEntry entry, {required bool isNew, bool code = false}) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute<Object?>(
-        builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups, addresses: _vault.addresses),
+        builder: (_) => EntryPage(entry: entry, isNew: isNew, vault: _vault, code: code),
       ),
     );
     if (result == 'delete') {
@@ -356,7 +359,7 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Future<void> _autoType(VaultEntry entry, {bool codeOnly = false}) async {
-    final code = _codes[entry.id];
+    final code = _codes[entry.id] ?? _codes[entry.twoFactor];
     if (codeOnly && (code == null || code.isEmpty)) return;
 
     await windowManager.hide();
@@ -703,7 +706,8 @@ class _VaultPageState extends State<VaultPage> {
           : FloatingActionButton.extended(
               onPressed: () => _open(
                   VaultEntry(id: UniqueKey().toString(), group: _group ?? ''),
-                  isNew: true),
+                  isNew: true,
+                  code: _filter == EntryFilter.twoFactor),
               icon: const Icon(Icons.add),
               label: const Text('New'),
             ),

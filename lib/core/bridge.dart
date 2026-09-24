@@ -254,7 +254,9 @@ class BrowserBridge {
                 'group': e.group,
                 'duplicate': duplicates.contains(e.id),
                 'icon': _icon(e.url),
-                'hasCode': e.totpSecret != null && e.totpSecret!.isNotEmpty,
+                'hasCode': (vault().secretFor(e) ?? '').isNotEmpty,
+                'isCode': e.isCode,
+                'linked': e.twoFactor.isNotEmpty,
               })
           .toList(),
     };
@@ -265,6 +267,7 @@ class BrowserBridge {
         'title': e.title,
         'username': e.username,
         'hasCode': true,
+        'paired': hostOf(e.url).isNotEmpty || vault().loginsOf(e).isNotEmpty,
         'icon': _icon(e.url),
       };
 
@@ -277,7 +280,7 @@ class BrowserBridge {
     final entry = vault().entries[id];
     if (entry == null || entry.deleted) return {'error': 'not found'};
 
-    final secret = entry.totpSecret;
+    final secret = vault().secretFor(entry);
     return {
       'username': entry.username,
       'password': entry.password,
@@ -287,7 +290,7 @@ class BrowserBridge {
 
   Future<Map<String, dynamic>> _code(String id) async {
     final entry = vault().entries[id];
-    final secret = entry?.totpSecret;
+    final secret = entry == null ? null : vault().secretFor(entry);
     if (entry == null || entry.deleted || secret == null || secret.isEmpty) {
       return {'error': 'not found'};
     }

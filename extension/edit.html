@@ -11,6 +11,12 @@
       h1 { flex: 1; font-size: 20px; font-weight: 500; margin: 0; }
       label { display: block; margin: 18px 0 6px; font-size: 13px; color: #8aa79f; }
       .help { font-size: 12px; color: #6f8a83; margin-top: 4px; }
+      select {
+        width: 100%; box-sizing: border-box; background: #0c1714; border: 1px solid #2c4740; color: #e8f5f1;
+        border-radius: 8px; padding: 10px 12px; font: 15px system-ui, sans-serif;
+      }
+      body.is-code .login, body:not(.is-code) .code { display: none; }
+      #pinned { margin-top: 18px; font-size: 13px; color: #8aa79f; }
       input, textarea {
         width: 100%; box-sizing: border-box; background: #0c1714; border: 1px solid #2c4740; color: #e8f5f1;
         border-radius: 8px; padding: 10px 12px; font: 15px system-ui, sans-serif;
@@ -41,28 +47,40 @@
         <button class="delete" id="delete">Delete</button>
         <button class="save" id="save">Save</button>
       </header>
-      <label for="title">Title</label>
+      <label for="title" id="title-label">Title</label>
       <input id="title" />
-      <label for="username">Username</label>
-      <input id="username" autocomplete="off" />
-      <label for="password">Password</label>
-      <div class="with-eye">
-        <input id="password" type="password" autocomplete="off" />
-        <button class="eye" id="eye" title="Show">👁</button>
+      <div class="login">
+        <label for="username">Username</label>
+        <input id="username" autocomplete="off" />
+        <label for="password">Password</label>
+        <div class="with-eye">
+          <input id="password" type="password" autocomplete="off" />
+          <button class="eye" id="eye" title="Show">👁</button>
+        </div>
+      </div>
+      <div class="code">
+        <label for="totp">Key</label>
+        <div class="with-eye">
+          <input id="totp" type="password" autocomplete="off" />
+          <button class="eye" id="key-eye" title="Show">👁</button>
+        </div>
+        <div class="help">Paste the setup key or the whole otpauth:// link</div>
       </div>
       <label for="url">Address</label>
-      <input id="url" list="addresses" />
-      <datalist id="addresses"></datalist>
-      <div class="help">For a two-factor code: the site it is used on — pick one of your logins or type it</div>
-      <label for="totp">Two-factor secret</label>
-      <input id="totp" autocomplete="off" />
-      <div class="help">Paste the setup key or the whole otpauth:// link</div>
-      <label for="group">Group</label>
-      <input id="group" list="groups" />
-      <datalist id="groups"></datalist>
-      <div class="help">Pick one or type a new name</div>
-      <label for="notes">Notes</label>
+      <input id="url" />
+      <div class="help code">The site it is used on. Fills itself when you pin it to a login or use it on a site.</div>
+      <div class="login">
+        <label for="twoFactor">2FA</label>
+        <select id="twoFactor"><option value="">None</option></select>
+        <div class="help">Names can repeat — the current code tells them apart</div>
+        <label for="group">Group</label>
+        <input id="group" list="groups" />
+        <datalist id="groups"></datalist>
+        <div class="help">Pick one or type a new name</div>
+      </div>
+      <label for="notes" id="notes-label">Notes</label>
       <textarea id="notes" rows="5"></textarea>
+      <div class="code" id="pinned"></div>
       <div id="status"></div>
     </main>
     <script src="edit.js"></script>

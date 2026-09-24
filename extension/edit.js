@@ -4,7 +4,7 @@ const api = globalThis.browser ?? chrome;
 const id = new URLSearchParams(location.search).get('id');
 const field = (name) => document.getElementById(name);
 const status = (text) => (field('status').textContent = text);
-const FIELDS = ['title', 'username', 'password', 'url', 'totp', 'group', 'notes'];
+const FIELDS = ['title', 'username', 'password', 'url', 'totp', 'group', 'notes', 'twoFactor'];
 
 // Like the app: the key from an otpauth:// link, or the pasted key without spaces.
 function secretOf(text) {
@@ -27,14 +27,22 @@ async function open() {
     field('delete').disabled = true;
     return;
   }
-  for (const name of FIELDS) field(name).value = result.entry[name] || '';
-  field('heading').textContent = result.entry.title || 'Edit login';
-  document.title = `Keyhold — ${result.entry.title || 'edit'}`;
-  for (const address of result.addresses || []) {
-    const option = document.createElement('option');
-    option.value = address;
-    field('addresses').append(option);
+  // A two-factor code of its own: name, key, note, address.
+  if (result.code) {
+    document.body.classList.add('is-code');
+    field('title-label').textContent = 'Name';
+    field('notes-label').textContent = 'Note';
+    if (result.pinnedTo && result.pinnedTo.length) field('pinned').textContent = `Pinned to: ${result.pinnedTo.join(', ')}`;
   }
+  for (const code of result.codes || []) {
+    const option = document.createElement('option');
+    option.value = code.id;
+    option.textContent = `${code.title || '(no name)'} — ${code.code.slice(0, 3)} ${code.code.slice(3)}`;
+    field('twoFactor').append(option);
+  }
+  for (const name of FIELDS) field(name).value = result.entry[name] || '';
+  field('heading').textContent = result.entry.title || (result.code ? 'Two-factor code' : 'Edit login');
+  document.title = `Keyhold — ${result.entry.title || 'edit'}`;
   for (const group of result.groups || []) {
     const option = document.createElement('option');
     option.value = group;
@@ -42,10 +50,11 @@ async function open() {
   }
 }
 
-field('eye').onclick = () => {
-  const input = field('password');
-  input.type = input.type === 'password' ? 'text' : 'password';
-};
+for (const [eye, input] of [['eye', 'password'], ['key-eye', 'totp']]) {
+  field(eye).onclick = () => {
+    field(input).type = field(input).type === 'password' ? 'text' : 'password';
+  };
+}
 
 field('save').onclick = async () => {
   const entry = { id };

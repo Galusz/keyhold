@@ -41,17 +41,21 @@ Future<void> serveAutofillLookups() async {
     final wantsCode = args['wantsCode'] == true;
     final matches = autofillMatches(vault, args['domain'] as String? ?? '', args['app'] as String? ?? '');
     // A code field with no code for this site: the codes not tied to any site yet.
-    final unpaired = wantsCode && !matches.any((e) => (e.totpSecret ?? '').isNotEmpty)
+    final unpaired = wantsCode && !matches.any((e) => (vault.secretFor(e) ?? '').isNotEmpty)
         ? vault.unpairedCodes
         : const <VaultEntry>[];
+    // A code field lists the codes; a login pointing at one would repeat it.
+    final offered = wantsCode
+        ? [...matches.where((e) => e.twoFactor.isEmpty), ...unpaired]
+        : matches.where((e) => !e.isCode).toList();
     return [
-      for (final e in [...matches, ...unpaired])
+      for (final e in offered)
         {
           'id': e.id,
           'title': e.title,
           'username': e.username,
           'password': e.password,
-          'code': wantsCode && (e.totpSecret ?? '').isNotEmpty ? await totpCode(e.totpSecret!) : null,
+          'code': wantsCode && (vault.secretFor(e) ?? '').isNotEmpty ? await totpCode(vault.secretFor(e)!) : null,
           'unpaired': unpaired.contains(e),
         },
     ];
@@ -122,20 +126,63 @@ class _AutofillPageState extends State<AutofillPage> {
   /// quietly — the next one when this one is in its last second.
   Future<void> _fillCode(String id) async {
     final e = _vault.entries[id];
-    final secret = e?.totpSecret;
+    final secret = e == null ? null : _vault.secretFor(e);
     if (e == null || e.deleted || secret == null || secret.isEmpty) {
       await _channel.invokeMethod('close');
       return;
     }
+    await _offerPin(e);
     final left = secondsLeft();
     if (left <= 1) await Future<void>.delayed(Duration(milliseconds: left * 1000 + 200));
-    await _pair(e);
     await _channel.invokeMethod('fill', {'code': await totpCode(secret)});
   }
 
-  /// A code with no site yet belongs to this site or app from now on.
-  Future<void> _pair(VaultEntry e) async {
-    if ((e.totpSecret ?? '').isEmpty || hostOf(e.url).isNotEmpty) return;
+  /// A code with no site yet: asks from the bottom of the screen whether it
+  /// belongs to this site or app from now on.
+  Future<void> _offerPin(VaultEntry e) async {
+    if (!e.isCode || hostOf(e.url).isNotEmpty || _vault.loginsOf(e).isNotEmpty) return;
+    if (_store.backup.noPinAsk.contains(e.id)) return;
+    final place = _site.isNotEmpty ? _site : ((_request['label'] as String?) ?? _app);
+    var never = false;
+    final pin = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheet) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Pin "${e.title}" to $place?', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 4),
+                const Text('Then it is offered here right away, without searching.'),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: never,
+                  onChanged: (v) => setSheet(() => never = v ?? false),
+                  title: const Text('Do not ask about this code again'),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Not now')),
+                    const SizedBox(width: 8),
+                    FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Pin')),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    if (never) {
+      _store.backup.noPinAsk.add(e.id);
+      _store.backup.saveSettings();
+    }
+    if (pin != true) return;
     e.url = _site.isNotEmpty ? 'https://$_site' : _address;
     _vault.put(e);
     await _store.save(_vault);
@@ -150,11 +197,10 @@ class _AutofillPageState extends State<AutofillPage> {
   }
 
   Future<void> _pick(VaultEntry e) async {
-    final secret = e.totpSecret;
-    final code = _request['wantsCode'] == true && secret != null && secret.isNotEmpty
-        ? await totpCode(secret)
-        : null;
-    if (code != null) await _pair(e);
+    final secret = _vault.secretFor(e);
+    final wantsCode = _request['wantsCode'] == true && secret != null && secret.isNotEmpty;
+    if (wantsCode) await _offerPin(e);
+    final code = wantsCode ? await totpCode(secret) : null;
     await _channel.invokeMethod('fill', {
       'username': e.username,
       'password': e.password,

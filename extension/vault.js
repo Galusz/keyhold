@@ -239,6 +239,7 @@ const Standalone = (() => {
   function duplicateIds(data) {
     const bySite = new Map();
     for (const e of visible(data)) {
+      if (e.totp && !e.password) continue;
       const host = hostOf(e.url);
       const site = host ? `${host}:${portOf(e.url) || ''}` : (e.title || '').trim().toLowerCase();
       if (!site) continue;
@@ -372,7 +373,44 @@ const Standalone = (() => {
     return null;
   }
 
-  const codeOf = (e, map) => ({ id: e.id, title: e.title, username: e.username, hasCode: true, icon: iconFrom(map, e.url) });
+  // Two-factor codes of their own (name, key, note, address) and the logins
+  // that point at one by its id — as in the app.
+  const isCode = (e) => !!e.totp && !e.password;
+  const codesOf = (data) => visible(data).filter(isCode);
+  const loginsOf = (data, code) => visible(data).filter((e) => e.twoFactor === code.id);
+  const paired = (data, code) => !!hostOf(code.url) || loginsOf(data, code).length > 0;
+  const secretFor = (data, e) => {
+    if (e.totp) return e.totp;
+    const code = (data.entries || []).find((x) => x.id === e.twoFactor && !x.deleted);
+    return code ? code.totp : null;
+  };
+  const codeOf = (data, e, map) => ({
+    id: e.id,
+    title: e.title,
+    username: e.username || '',
+    hasCode: true,
+    paired: paired(data, e),
+    icon: iconFrom(map, e.url),
+  });
+
+  // A login's code takes the login's address; the one let go loses it,
+  // unless another login still holds it.
+  function setCode(data, login, codeId) {
+    const find = (id) => (data.entries || []).find((x) => x.id === id && !x.deleted);
+    const previous = find(login.twoFactor);
+    if (codeId) login.twoFactor = codeId;
+    else delete login.twoFactor;
+    const others = (code) => (data.entries || []).some((x) => !x.deleted && x.id !== login.id && x.twoFactor === code.id);
+    if (previous && previous.id !== codeId && previous.url === login.url && !others(previous)) {
+      previous.url = '';
+      previous.updatedAt = Date.now();
+    }
+    const code = find(codeId);
+    if (code && code.url !== login.url) {
+      code.url = login.url;
+      code.updatedAt = Date.now();
+    }
+  }
 
   // ---------- two-factor codes ----------
 
@@ -433,19 +471,21 @@ const Standalone = (() => {
       const { neverSave, autoSave } = await settings();
       const duplicates = duplicateIds(data);
       const map = await iconMap();
-      const codes = visible(data).filter((e) => e.totp);
+      const codes = codesOf(data);
       return {
         alone: true,
         never: neverSave.includes(host),
         autoSave,
-        unpaired: codes.filter((e) => !hostOf(e.url)).map((e) => codeOf(e, map)),
+        unpaired: codes.filter((e) => !paired(data, e)).map((e) => codeOf(data, e, map)),
         codeCount: codes.length,
         entries: forSite(data, body.url).map((e) => ({
           id: e.id,
           title: e.title,
           username: e.username,
           group: e.group || '',
-          hasCode: !!e.totp,
+          hasCode: !!secretFor(data, e),
+          isCode: isCode(e),
+          linked: !!e.twoFactor,
           duplicate: duplicates.has(e.id),
           icon: iconFrom(map, e.url),
         })),
@@ -454,7 +494,7 @@ const Standalone = (() => {
 
     async '/codes'(data) {
       const map = await iconMap();
-      return { codes: visible(data).filter((e) => e.totp).map((e) => codeOf(e, map)) };
+      return { codes: codesOf(data).map((e) => codeOf(data, e, map)) };
     },
 
     // A code with no site yet gets the page it was just used on.
@@ -473,13 +513,15 @@ const Standalone = (() => {
     async '/fill'(data, body) {
       const e = visible(data).find((x) => x.id === body.id);
       if (!e) return { error: 'not found' };
-      return { username: e.username, password: e.password, code: e.totp ? await totp(e.totp) : null };
+      const secret = secretFor(data, e);
+      return { username: e.username, password: e.password, code: secret ? await totp(secret) : null };
     },
 
     async '/code'(data, body) {
       const e = visible(data).find((x) => x.id === body.id);
-      if (!e || !e.totp) return { error: 'not found' };
-      return { code: await totp(e.totp), left: secondsLeft() };
+      const secret = e && secretFor(data, e);
+      if (!secret) return { error: 'not found' };
+      return { code: await totp(secret), left: secondsLeft() };
     },
 
     async '/save'(data, body) {
@@ -582,13 +624,16 @@ const Standalone = (() => {
       return { never: neverSave.includes(host) };
     },
 
-    // The edit page: one whole entry, and the group names to pick from.
+    // The edit page: one whole entry; for a login also the codes to pin to it,
+    // each with its current digits, as names can repeat.
     async '/entry'(data, body) {
       const e = visible(data).find((x) => x.id === body.id);
       if (!e) return { error: 'not found' };
       const groups = [...new Set(visible(data).map((x) => x.group).filter(Boolean))].sort();
-      const addresses = [...new Set(visible(data).map((x) => (x.url || '').trim()).filter(Boolean))].sort();
+      const codes = [];
+      for (const c of codesOf(data)) codes.push({ id: c.id, title: c.title, code: await totp(c.totp) });
       return {
+        code: isCode(e),
         entry: {
           id: e.id,
           title: e.title || '',
@@ -598,9 +643,11 @@ const Standalone = (() => {
           totp: e.totp || '',
           group: e.group || '',
           notes: e.notes || '',
+          twoFactor: e.twoFactor || '',
         },
+        pinnedTo: isCode(e) ? loginsOf(data, e).map((l) => `${l.title} — ${l.username}`) : [],
+        codes,
         groups,
-        addresses,
       };
     },
 
@@ -610,11 +657,17 @@ const Standalone = (() => {
         result: await write((fresh) => {
           const e = (fresh.entries || []).find((x) => x.id === changed.id && !x.deleted);
           if (!e) return 'missing';
-          for (const field of ['title', 'username', 'password', 'url', 'group', 'notes']) {
-            e[field] = changed[field] || '';
+          e.title = changed.title || '';
+          e.url = changed.url || '';
+          e.notes = changed.notes || '';
+          if (isCode(e)) {
+            if (changed.totp) e.totp = changed.totp;
+          } else {
+            e.username = changed.username || '';
+            e.password = changed.password || '';
+            e.group = changed.group || '';
+            setCode(fresh, e, changed.twoFactor || '');
           }
-          if (changed.totp) e.totp = changed.totp;
-          else delete e.totp;
           e.updatedAt = Date.now();
           return 'saved';
         }),

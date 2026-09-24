@@ -124,8 +124,8 @@ async function scan() {
   if (found.length === 0) return;
 
   const result = await lookupResult();
-  const list = result.entries || [];
-  const anyCode = list.some((e) => e.hasCode) || (result.codeCount || 0) > 0;
+  const list = (result.entries || []).filter((e) => !e.isCode);
+  const anyCode = (result.entries || []).some((e) => e.hasCode) || (result.codeCount || 0) > 0;
 
   for (const input of found) {
     const kind = kindOf(input);
@@ -203,8 +203,10 @@ async function openMenu(field, allCodes) {
   lookup = null;
   const result = await lookupResult();
   let items = result.entries || [];
+  if (kind !== 'code') items = items.filter((e) => !e.isCode);
   if (kind === 'code') {
-    items = allCodes || items.filter((e) => e.hasCode);
+    // The codes themselves; a login pointing at one is not listed twice.
+    items = allCodes || items.filter((e) => e.hasCode && !e.linked);
     // No code of this site's own: the codes not tied to any site yet, and
     // the whole list at the bottom in case the right one is paired elsewhere.
     if (!allCodes && items.length === 0) items = (result.unpaired || []).map((e) => ({ ...e, unpaired: true }));
@@ -364,8 +366,8 @@ async function pick(index) {
     const code = codes[index];
     closeMenu();
     if (code) fillCode(field, code);
-    // A code with no site yet belongs to this one from now on.
-    api.runtime.sendMessage({ type: 'pair', id: entry.id }).catch(() => {});
+    // A code with no site yet: the lock asks whether it belongs here from now on.
+    api.runtime.sendMessage({ type: 'pin-offer', id: entry.id }).catch(() => {});
     return;
   }
 

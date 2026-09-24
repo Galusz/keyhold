@@ -162,6 +162,40 @@ function siteIcon(row, icon, name) {
   row.append(box);
 }
 
+// "Pin this code to the site?" after a code with no site was used there.
+function renderPins(pins) {
+  for (const pin of pins) {
+    const row = document.createElement('div');
+    row.className = 'entry pending';
+    const box = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = pin.title || 'Two-factor code';
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = `Pin this code to ${pin.host}?`;
+    box.append(title, note);
+    const answers = document.createElement('div');
+    answers.className = 'review';
+    for (const [label, yes, cls, tip] of [
+      ['✓', true, 'yes', 'Pin it'],
+      ['✕', false, 'no', 'Not now'],
+    ]) {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.className = cls;
+      b.title = tip;
+      b.onclick = async () => {
+        await api.runtime.sendMessage({ type: 'pin-answer', key: pin.key, yes });
+        load();
+      };
+      answers.append(b);
+    }
+    row.append(box, answers);
+    content.append(row);
+  }
+}
+
 function render(entries, tab, alone) {
   if (entries.length === 0) {
     const hint = document.createElement('p');
@@ -267,8 +301,10 @@ async function load() {
     return;
   }
   const offers = await api.runtime.sendMessage({ type: 'offers' });
+  const pins = await api.runtime.sendMessage({ type: 'pins' });
   content.className = '';
   content.innerHTML = '';
+  renderPins(pins || []);
   renderOffers(offers || []);
   render(result.entries || [], tab, result.alone === true);
   neverSwitch(result.never === true, tab);

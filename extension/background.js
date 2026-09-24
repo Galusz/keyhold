@@ -141,9 +141,44 @@ async function syncOffers() {
   );
   const offers = (result.offers || []).filter((o) => !judging.has(o.id));
   const waiting = offers.filter((o) => !o.failed);
-  await session.set({ offers: waiting.map((o) => Date.now() + o.left * 1000) });
+  const pins = (await read('pins')) || {};
+  await session.set({
+    offers: [...waiting.map((o) => Date.now() + o.left * 1000), ...Object.values(pins).map((p) => p.until)],
+  });
   blink();
   return offers;
+}
+
+// A code with no site was just used on a page: the lock blinks and the popup
+// asks whether it belongs to that page from now on.
+async function offerPin(message, sender) {
+  const all = await call('/codes');
+  const code = (all.codes || []).find((c) => c.id === message.id);
+  if (!code || code.paired) return null;
+  const pins = (await read('pins')) || {};
+  const host = new URL(sender.url).hostname;
+  pins[`${code.id} ${host}`] = { id: code.id, title: code.title, host, url: sender.url, until: Date.now() + 2 * 60 * 1000 };
+  await session.set({ pins });
+  await syncOffers();
+  return { asked: true };
+}
+
+async function pins() {
+  const all = (await read('pins')) || {};
+  const now = Date.now();
+  for (const [key, pin] of Object.entries(all)) if (pin.until < now) delete all[key];
+  await session.set({ pins: all });
+  return Object.entries(all).map(([key, pin]) => ({ key, ...pin }));
+}
+
+async function answerPin(message) {
+  const all = (await read('pins')) || {};
+  const pin = all[message.key];
+  delete all[message.key];
+  await session.set({ pins: all });
+  if (pin && message.yes) await call('/pair', { id: pin.id, url: pin.url });
+  await syncOffers();
+  return { ok: true };
 }
 
 async function review(message) {
@@ -220,7 +255,7 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
     fill: async () => ((await allowed(message, sender)) ? call('/fill', { id: message.id }) : { error: 'denied' }),
     code: async () => ((await allowedCode(message, sender)) ? call('/code', { id: message.id }) : { error: 'denied' }),
     codes: () => call('/codes'),
-    pair: () => call('/pair', { id: message.id, url: sender.url }),
+    'pin-offer': () => offerPin(message, sender),
     save: () => save(message, sender),
     user: () => session.set({ [`user:${sender.tab?.id}`]: { username: message.username, at: Date.now() } }),
     outcome: () => outcome(message, sender),
@@ -240,6 +275,8 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
       'alone-lock': () => Standalone.lock(),
       'alone-disconnect': () => Standalone.disconnect(),
       open: () => call('/open', { id: message.id }),
+      pins: () => pins(),
+      'pin-answer': () => answerPin(message),
       entry: () => call('/entry', { id: message.id }),
       put: () => call('/put', { entry: message.entry }),
       delete: () => call('/delete', { id: message.id }),
