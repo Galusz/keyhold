@@ -22,7 +22,7 @@ import 'password_page.dart';
 import 'qr_page.dart';
 import 'backup_page.dart';
 
-enum EntryFilter { all, twoFactor, plain, files }
+enum EntryFilter { all, twoFactor, plain, files, duplicates }
 
 class VaultPage extends StatefulWidget {
   const VaultPage({super.key});
@@ -41,6 +41,9 @@ class _VaultPageState extends State<VaultPage> {
   bool _loading = true;
   EntryFilter _filter = EntryFilter.all;
   String? _group;
+
+  /// Under "Duplicates": which one is newest and how the others differ.
+  Map<String, String> _duplicateNotes = const {};
   final _selected = <String>{};
   BrowserBridge? _bridge;
   Timer? _watchTimer;
@@ -426,10 +429,17 @@ class _VaultPageState extends State<VaultPage> {
     _filteredKey = key;
     var all = _vault.visible;
 
+    _duplicateNotes = const {};
+    if (_filter == EntryFilter.duplicates) {
+      final groups = _vault.duplicates;
+      _duplicateNotes = Vault.duplicateNotes(groups);
+      all = [for (final group in groups) ...group];
+    }
+
     all = switch (_filter) {
       EntryFilter.twoFactor => all.where(_hasCode).toList(),
       EntryFilter.plain => all.where((e) => !_hasCode(e)).toList(),
-      EntryFilter.all || EntryFilter.files => all,
+      EntryFilter.all || EntryFilter.files || EntryFilter.duplicates => all,
     };
 
     final group = _group;
@@ -457,6 +467,7 @@ class _VaultPageState extends State<VaultPage> {
       counts[e.group] = (counts[e.group] ?? 0) + 1;
     }
     final groups = _vault.groups;
+    final duplicates = _vault.duplicates.fold<int>(0, (n, g) => n + g.length);
 
     Widget item(IconData icon, String label, int count, bool selected,
             VoidCallback onTap) =>
@@ -497,6 +508,8 @@ class _VaultPageState extends State<VaultPage> {
               EntryFilter.plain),
           filter(Icons.attach_file, 'Files', _vault.visibleFiles.length,
               EntryFilter.files),
+          if (duplicates > 0 || _filter == EntryFilter.duplicates)
+            filter(Icons.content_copy_outlined, 'Duplicates', duplicates, EntryFilter.duplicates),
           if (groups.isNotEmpty) ...[
             const Divider(height: 24),
             Padding(
@@ -886,6 +899,24 @@ class _VaultPageState extends State<VaultPage> {
     _toast('Saved to ${target.path}');
   }
 
+  Future<void> _deleteEntry(VaultEntry e) async {
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete ${e.title.isEmpty ? 'this login' : e.title}?'),
+        content: Text(_duplicateNotes[e.id] ?? e.username),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (sure != true) return;
+    _vault.remove(e.id);
+    await _persist();
+    if (mounted) setState(() {});
+  }
+
   Future<void> _deleteFile(VaultFile f) async {
     final sure = await showDialog<bool>(
       context: context,
@@ -1140,13 +1171,19 @@ class _VaultPageState extends State<VaultPage> {
         e.title.isEmpty ? '(no title)' : e.title,
       ),
       subtitle: Text(
-        e.username,
+        _duplicateNotes[e.id] ?? e.username,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (_filter == EntryFilter.duplicates)
+            IconButton(
+              tooltip: 'Delete',
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () => _deleteEntry(e),
+            ),
           if (code != null) ...[
             InkWell(
               onTap: () => _copy('Code', code),

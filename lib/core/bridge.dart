@@ -223,6 +223,10 @@ class BrowserBridge {
     final host = hostOf(pageUrl);
     if (host.isEmpty) return {'entries': <dynamic>[]};
     final matches = vault().forSite(pageUrl);
+    final duplicates = {
+      for (final group in vault().duplicates)
+        for (final e in group) e.id,
+    };
 
     return {
       'never': neverSave().contains(host),
@@ -233,6 +237,7 @@ class BrowserBridge {
                 'title': e.title,
                 'username': e.username,
                 'group': e.group,
+                'duplicate': duplicates.contains(e.id),
                 'icon': _icon(e.url),
                 'hasCode': e.totpSecret != null && e.totpSecret!.isNotEmpty,
               })

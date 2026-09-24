@@ -195,6 +195,41 @@ class Vault {
     }).toList();
   }
 
+  /// Logins kept more than once: the same site (host and port; the title when
+  /// there is no address) and the same username. Each group newest first.
+  List<List<VaultEntry>> get duplicates {
+    final bySite = <String, List<VaultEntry>>{};
+    for (final e in visible) {
+      final host = hostOf(e.url);
+      final site = host.isNotEmpty ? '$host:${_portOf(e.url) ?? ''}' : e.title.trim().toLowerCase();
+      if (site.isEmpty) continue;
+      bySite.putIfAbsent('$site\n${e.username.trim().toLowerCase()}', () => []).add(e);
+    }
+    return [
+      for (final group in bySite.values)
+        if (group.length > 1) group..sort((a, b) => b.updatedAt.compareTo(a.updatedAt)),
+    ];
+  }
+
+  /// How an entry stands among its duplicates, for the list: the newest one,
+  /// and whether its password matches the newest one's.
+  static Map<String, String> duplicateNotes(List<List<VaultEntry>> groups) {
+    final notes = <String, String>{};
+    for (final group in groups) {
+      final newest = group.first;
+      for (final e in group) {
+        final day = DateTime.fromMillisecondsSinceEpoch(e.updatedAt).toIso8601String().substring(0, 10);
+        final password = e == newest
+            ? 'newest'
+            : e.password == newest.password
+                ? 'same password as the newest'
+                : 'different password';
+        notes[e.id] = '${e.username.isEmpty ? '(no username)' : e.username} · $password · changed $day';
+      }
+    }
+    return notes;
+  }
+
   static int? _portOf(String url) {
     var text = url.trim();
     if (!text.contains('://')) text = 'https://$text';

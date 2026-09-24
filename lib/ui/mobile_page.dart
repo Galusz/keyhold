@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../core/drive.dart';
+import '../core/favicons.dart';
 import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
@@ -274,6 +275,20 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     setState(() {});
   }
 
+  Future<void> _duplicates() async {
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => _Duplicates(
+        vault: _vault,
+        icons: _store.icons,
+        onDelete: (e) async {
+          _vault.remove(e.id);
+          await _persist();
+        },
+      ),
+    ));
+    if (mounted) setState(() {});
+  }
+
   Future<void> _settings() async {
     await Navigator.of(context).push(MaterialPageRoute<void>(
       builder: (_) => _Settings(store: _store, drive: _drive, onConnect: _connect, onSync: _sync),
@@ -308,6 +323,15 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             const Padding(
               padding: EdgeInsets.all(16),
               child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+            ),
+          if (_vault.duplicates.isNotEmpty)
+            IconButton(
+              tooltip: 'Duplicates',
+              icon: Badge(
+                label: Text('${_vault.duplicates.fold<int>(0, (n, g) => n + g.length)}'),
+                child: const Icon(Icons.content_copy_outlined),
+              ),
+              onPressed: _duplicates,
             ),
           IconButton(
             tooltip: 'Settings',
@@ -753,6 +777,66 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Logins kept more than once, side by side, so the extra ones can go.
+class _Duplicates extends StatefulWidget {
+  const _Duplicates({required this.vault, required this.icons, required this.onDelete});
+
+  final Vault vault;
+  final Favicons icons;
+  final Future<void> Function(VaultEntry e) onDelete;
+
+  @override
+  State<_Duplicates> createState() => _DuplicatesState();
+}
+
+class _DuplicatesState extends State<_Duplicates> {
+  Future<void> _delete(VaultEntry e, String note) async {
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete ${e.title.isEmpty ? 'this login' : e.title}?'),
+        content: Text(note),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (sure != true) return;
+    await widget.onDelete(e);
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final groups = widget.vault.duplicates;
+    final notes = Vault.duplicateNotes(groups);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Duplicates')),
+      body: groups.isEmpty
+          ? const Center(child: Text('No duplicates left.'))
+          : ListView(
+              children: [
+                for (final group in groups) ...[
+                  for (final e in group)
+                    ListTile(
+                      leading: SiteAvatar(entry: e, icons: widget.icons),
+                      title: Text(e.title.isEmpty ? '(no title)' : e.title),
+                      subtitle: Text(notes[e.id] ?? ''),
+                      trailing: IconButton(
+                        tooltip: 'Delete',
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () => _delete(e, notes[e.id] ?? ''),
+                      ),
+                    ),
+                  const Divider(),
+                ],
+              ],
+            ),
     );
   }
 }

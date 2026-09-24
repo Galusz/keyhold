@@ -186,6 +186,13 @@ function render(entries, tab, alone) {
     box.append(title, user);
     row.append(box);
 
+    if (entry.duplicate) {
+      const badge = document.createElement('span');
+      badge.className = 'badge duplicate';
+      badge.title = 'Kept more than once for this site and username';
+      badge.textContent = 'duplicate';
+      row.append(badge);
+    }
     if (entry.hasCode) {
       const badge = document.createElement('span');
       badge.className = 'badge';

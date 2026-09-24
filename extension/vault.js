@@ -234,6 +234,144 @@ const Standalone = (() => {
     });
   }
 
+  // The same site (host and port; the title without an address) and username
+  // kept more than once.
+  function duplicateIds(data) {
+    const bySite = new Map();
+    for (const e of visible(data)) {
+      const host = hostOf(e.url);
+      const site = host ? `${host}:${portOf(e.url) || ''}` : (e.title || '').trim().toLowerCase();
+      if (!site) continue;
+      const key = `${site}\n${(e.username || '').trim().toLowerCase()}`;
+      bySite.set(key, [...(bySite.get(key) || []), e.id]);
+    }
+    return new Set([...bySite.values()].filter((ids) => ids.length > 1).flat());
+  }
+
+  // ---------- site icons, fetched straight from each site ----------
+
+  // Never through an icon service, which would learn every site the user has
+  // an account on; no cookies are sent. Kept here, next to the vault copy.
+  const ICON_RETRY = 24 * 60 * 60 * 1000;
+  const ICON_LINK = /<link\b[^>]*>/gi;
+  let icons = null;
+  let iconSaving = Promise.resolve();
+  const iconQueue = [];
+  const iconBusy = new Set();
+  let iconRunning = 0;
+
+  const iconKey = (url) => {
+    const host = hostOf(url);
+    if (!host) return '';
+    const port = portOf(url);
+    return port ? `${host}:${port}` : host;
+  };
+
+  async function iconMap() {
+    if (!icons) icons = (await local.get('icons')).icons || {};
+    return icons;
+  }
+
+  function iconFrom(map, url) {
+    const key = iconKey(url);
+    if (!key) return null;
+    const known = map[key];
+    if (typeof known === 'string') return known;
+    if ((!known || Date.now() - known.failed > ICON_RETRY) && !iconBusy.has(key)) {
+      iconBusy.add(key);
+      iconQueue.push([key, url]);
+      pumpIcons();
+    }
+    return null;
+  }
+
+  function pumpIcons() {
+    while (iconRunning < 4 && iconQueue.length) {
+      const [key, url] = iconQueue.shift();
+      iconRunning++;
+      fetchIcon(url)
+        .catch(() => null)
+        .then(async (icon) => {
+          const map = await iconMap();
+          map[key] = icon || { failed: Date.now() };
+          iconSaving = iconSaving.then(() => local.set({ icons: map }));
+        })
+        .finally(() => {
+          iconRunning--;
+          iconBusy.delete(key);
+          pumpIcons();
+        });
+    }
+  }
+
+  async function grab(url, asText) {
+    const stop = new AbortController();
+    const timer = setTimeout(() => stop.abort(), 6000);
+    try {
+      const response = await fetch(url, { signal: stop.signal, credentials: 'omit' });
+      if (!response.ok) return null;
+      if (asText) return { text: (await response.text()).slice(0, 512 * 1024), url: response.url };
+      const type = (response.headers.get('content-type') || '').split(';')[0].trim();
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (bytes.length < 50 || bytes.length > 200 * 1024) return null;
+      if (!type.startsWith('image/') && !/\.ico(\?|$)/i.test(url)) return null;
+      return `data:${type.startsWith('image/') ? type : 'image/x-icon'};base64,${toB64(bytes)}`;
+    } catch (e) {
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  // Icons the page names itself, the larger and the more touch-friendly first.
+  function iconLinks(html, base) {
+    const found = [];
+    for (const tag of html.match(ICON_LINK) || []) {
+      const attr = (name) => {
+        const m = tag.match(new RegExp(`\\b${name}\\s*=\\s*("([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'));
+        return m ? m[2] ?? m[3] ?? m[4] : null;
+      };
+      const rel = (attr('rel') || '').toLowerCase();
+      const href = attr('href');
+      if (!rel.includes('icon') || !href || href.startsWith('data:')) continue;
+      let score = parseInt(((attr('sizes') || '').match(/(\d+)x/) || [])[1] || '32', 10);
+      if (rel.includes('apple-touch')) score += 1000;
+      try {
+        found.push([score, new URL(href, base).href]);
+      } catch (e) {
+        // an address the page got wrong
+      }
+    }
+    return found.sort((a, b) => b[0] - a[0]).map(([, href]) => href);
+  }
+
+  // The address as given first, then the other scheme; a login page on a
+  // subdomain (id.…, passport.…) falls back to the main site.
+  async function fetchIcon(url) {
+    let text = url.trim();
+    if (!text.includes('://')) text = `https://${text}`;
+    const first = new URL(text);
+    const hosts = [first.host];
+    const labels = first.hostname.split('.');
+    if (labels.length > 2 && !/^[\d.]+$/.test(first.hostname)) hosts.push(labels.slice(1).join('.'));
+    const schemes = first.protocol === 'http:' ? ['http:', 'https:'] : ['https:', 'http:'];
+
+    for (const host of hosts) {
+      for (const scheme of schemes) {
+        const origin = `${scheme}//${host}/`;
+        const page = await grab(origin, true);
+        const candidates = page ? iconLinks(page.text, page.url) : [];
+        candidates.push(new URL('/favicon.ico', page ? page.url : origin).href);
+        for (const candidate of candidates) {
+          const icon = await grab(candidate, false);
+          if (icon) return icon;
+        }
+        if (page) break;
+      }
+    }
+    return null;
+  }
+
   // ---------- two-factor codes ----------
 
   function base32(text) {
@@ -291,6 +429,8 @@ const Standalone = (() => {
       pullSoon();
       const host = hostOf(body.url);
       const { neverSave, autoSave } = await settings();
+      const duplicates = duplicateIds(data);
+      const map = await iconMap();
       return {
         alone: true,
         never: neverSave.includes(host),
@@ -301,6 +441,8 @@ const Standalone = (() => {
           username: e.username,
           group: e.group || '',
           hasCode: !!e.totp,
+          duplicate: duplicates.has(e.id),
+          icon: iconFrom(map, e.url),
         })),
       };
     },
@@ -533,6 +675,9 @@ const Standalone = (() => {
         const dek = await unwrap(password, parts.salt, parts.wrapped);
         await session.set({ dek: toB64(dek) });
         loaded = null;
+        // Every missing icon, so the list under the fields has them too.
+        const map = await iconMap();
+        for (const e of visible(await vault())) iconFrom(map, e.url);
         return { ok: true };
       } catch (e) {
         return { error: 'Wrong master password' };
