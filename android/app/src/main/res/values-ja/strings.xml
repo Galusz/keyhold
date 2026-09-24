@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_all_logins">すべてのログイン情報を検索</string>
+    <string name="code_suggestion">2FA コード %1$s</string>
+    <string name="not_tied_to_site">まだサイトに固定されていません</string>
+</resources>

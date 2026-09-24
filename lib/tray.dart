@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:tray_manager/tray_manager.dart' as tray;
 
+import 'l10n/l10n.dart';
+
 class TrayController {
   tray.TrayIcon? _icon;
   final List<tray.MenuItem> _items = [];
@@ -76,7 +78,7 @@ class TrayController {
     final menu = tray.Menu.create();
     if (menu != null) {
       final open = tray.MenuItem.createWithLabelAndType(
-          'Open Keyhold', tray.MenuItemType.normal);
+          t.openKeyhold, tray.MenuItemType.normal);
       open?.addListener((event) {
         if (event is tray.MenuItemClickedEvent) onShow();
       });
@@ -85,7 +87,7 @@ class TrayController {
           tray.MenuItem.createWithLabelAndType('', tray.MenuItemType.separator);
 
       final quit =
-          tray.MenuItem.createWithLabelAndType('Quit', tray.MenuItemType.normal);
+          tray.MenuItem.createWithLabelAndType(t.quit, tray.MenuItemType.normal);
       quit?.addListener((event) {
         if (event is tray.MenuItemClickedEvent) onQuit();
       });

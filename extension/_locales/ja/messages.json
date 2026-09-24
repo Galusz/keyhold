@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "Keyhold の保管庫からログイン情報と 2 段階認証コードを自動入力します。"
+  },
+  "lookingForMatches": {
+    "message": "一致する項目を検索中…"
+  },
+  "permissionHint": {
+    "message": "このパソコンのアプリと連携してログインフォームに入力するには、Keyhold への許可が必要です。"
+  },
+  "allow": {
+    "message": "許可"
+  },
+  "pairingHint": {
+    "message": "Keyhold を開き、パズルのアイコンをクリックして、ペアリングトークンをここに貼り付けてください。"
+  },
+  "pairingToken": {
+    "message": "ペアリングトークン"
+  },
+  "connect": {
+    "message": "接続"
+  },
+  "offerKnownFailed": {
+    "message": "保存したパスワードは使えませんでした。新しいパスワードでログインすると、Keyhold が更新を提案します。"
+  },
+  "offerFailed": {
+    "message": "このログイン情報は使えませんでした"
+  },
+  "offerChanged": {
+    "message": "Keyhold のパスワードを更新しますか？"
+  },
+  "offerNew": {
+    "message": "このログイン情報を Keyhold に保存しますか？"
+  },
+  "saveAnyway": {
+    "message": "それでも保存"
+  },
+  "update": {
+    "message": "更新"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "forgetIt": {
+    "message": "破棄"
+  },
+  "twoFactorCode": {
+    "message": "2 段階認証コード"
+  },
+  "pinThisCode": {
+    "message": "このコードを $HOST$ に固定しますか？",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "固定"
+  },
+  "notNow": {
+    "message": "今はしない"
+  },
+  "noEntryYet": {
+    "message": "このサイトの項目はまだありません。一度ログインすると、Keyhold が保存を提案します。"
+  },
+  "duplicateHint": {
+    "message": "このサイトとユーザー名で複数保存されています"
+  },
+  "duplicate": {
+    "message": "重複"
+  },
+  "edit": {
+    "message": "編集"
+  },
+  "appDidNotAnswer": {
+    "message": "Keyhold から応答がありません。アプリは起動していますか？"
+  },
+  "noLoginField": {
+    "message": "このページにログイン欄が見つかりません。"
+  },
+  "openWebsiteFirst": {
+    "message": "先にウェブサイトを開いてください。"
+  },
+  "pairedNotRunning": {
+    "message": "このパソコンの Keyhold アプリとペアリング済みですが、アプリが起動していません。Keyhold を起動すれば、アプリが引き継ぎます。"
+  },
+  "notRunning": {
+    "message": "このパソコンで Keyhold が起動していません。"
+  },
+  "useDriveVault": {
+    "message": "Google Drive の保管庫を使う"
+  },
+  "driveVaultHint": {
+    "message": "暗号化されたまま、マスターパスワードでここで開きます。"
+  },
+  "connecting": {
+    "message": "接続中…"
+  },
+  "driveNotConnected": {
+    "message": "Google Drive に接続できませんでした。"
+  },
+  "pairAgain": {
+    "message": "もう一度ペアリング"
+  },
+  "pairWithApp": {
+    "message": "Keyhold アプリが起動中です — ペアリングしてください"
+  },
+  "masterPasswordOfVault": {
+    "message": "Keyhold 保管庫のマスターパスワード"
+  },
+  "show": {
+    "message": "表示"
+  },
+  "unlock": {
+    "message": "ロック解除"
+  },
+  "opening": {
+    "message": "開いています…"
+  },
+  "vaultDidNotOpen": {
+    "message": "保管庫を開けませんでした。"
+  },
+  "disconnectDrive": {
+    "message": "Google Drive との接続を解除"
+  },
+  "vaultFromDrive": {
+    "message": "Google Drive の保管庫"
+  },
+  "lock": {
+    "message": "ロック"
+  },
+  "autoSaveHint": {
+    "message": "ログインの成功が明らかな場合、Keyhold がすぐに保存します"
+  },
+  "autoSave": {
+    "message": "確認せずにログイン情報を保存"
+  },
+  "neverOn": {
+    "message": "$HOST$ ではログイン情報を保存しません — クリックして許可",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "このサイトではログイン情報を保存しない"
+  },
+  "allCodes": {
+    "message": "すべてのコード…"
+  },
+  "notTiedToSite": {
+    "message": "まだサイトに固定されていません"
+  },
+  "editLogin": {
+    "message": "ログイン情報を編集"
+  },
+  "delete": {
+    "message": "削除"
+  },
+  "title": {
+    "message": "タイトル"
+  },
+  "username": {
+    "message": "ユーザー名"
+  },
+  "password": {
+    "message": "パスワード"
+  },
+  "key": {
+    "message": "キー"
+  },
+  "keyHint": {
+    "message": "セットアップキーか、otpauth:// リンク全体を貼り付けてください"
+  },
+  "address": {
+    "message": "アドレス"
+  },
+  "none": {
+    "message": "なし"
+  },
+  "namesRepeatHint": {
+    "message": "名前は重複してもかまいません — 現在のコードで区別できます"
+  },
+  "group": {
+    "message": "グループ"
+  },
+  "groupHint": {
+    "message": "選択するか、新しい名前を入力してください"
+  },
+  "groupWeb": {
+    "message": "ウェブ"
+  },
+  "notes": {
+    "message": "メモ"
+  },
+  "addresses": {
+    "message": "アドレス"
+  },
+  "addAddress": {
+    "message": "アドレスを追加"
+  },
+  "add": {
+    "message": "追加"
+  },
+  "remove": {
+    "message": "削除"
+  },
+  "codeNotUsedYet": {
+    "message": "まだどこにも使われていません。サイトで初めて使うと自動で固定されます。ログイン情報から固定することもできます。"
+  },
+  "loginNotInVault": {
+    "message": "このログイン情報は、開いている保管庫にありません。ツールバーで Keyhold のロックを解除して、もう一度お試しください。"
+  },
+  "name": {
+    "message": "名前"
+  },
+  "note": {
+    "message": "メモ"
+  },
+  "noName": {
+    "message": "（名前なし）"
+  },
+  "savingToDrive": {
+    "message": "Google Drive に保存中…"
+  },
+  "notSaved": {
+    "message": "保存されませんでした。"
+  },
+  "deleteConfirm": {
+    "message": "このログイン情報を Keyhold から削除しますか？"
+  },
+  "deleting": {
+    "message": "削除中…"
+  },
+  "notDeleted": {
+    "message": "削除されませんでした。"
+  },
+  "notFound": {
+    "message": "見つかりません"
+  },
+  "googleDidNotSignIn": {
+    "message": "Google にログインできませんでした"
+  },
+  "driveAnswered": {
+    "message": "Google Drive の応答：$STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "この Google Drive にはまだ Keyhold の保管庫がありません"
+  },
+  "driveNotReachable": {
+    "message": "Google Drive に接続できません"
+  },
+  "setPasswordInApp": {
+    "message": "先に Keyhold アプリでマスターパスワードを設定してください"
+  },
+  "signInWindowOpen": {
+    "message": "Google のログイン画面がまだ開いています。閉じてから、もう一度お試しください。"
+  },
+  "wrongMasterPassword": {
+    "message": "マスターパスワードが違います"
+  }
+}

@@ -9,9 +9,9 @@ import androidx.fragment.app.FragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-/// The phone's own fingerprint panel: under the system's icon and app name our
-/// title and one line, the rest is the system's. The phone's PIN or pattern
-/// stands in when the finger fails.
+/// The phone's own fingerprint panel: under the system's icon and app name the
+/// title and one line Keyhold sends in the user's language, the rest is the
+/// system's. The phone's PIN or pattern stands in when the finger fails.
 object Fingerprint {
     private const val ALLOWED = BIOMETRIC_WEAK or DEVICE_CREDENTIAL
 
@@ -37,7 +37,7 @@ object Fingerprint {
                 }
                 BiometricPrompt(activity, ContextCompat.getMainExecutor(activity), callback).authenticate(
                     BiometricPrompt.PromptInfo.Builder()
-                        .setTitle("Keyhold Vault")
+                        .setTitle(call.argument<String>("title") ?: "Keyhold")
                         .setSubtitle(call.argument<String>("hint"))
                         .setAllowedAuthenticators(ALLOWED)
                         .build()

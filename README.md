@@ -8,6 +8,7 @@ Passwords, two-factor codes and important files in one encrypted file that backs
 - **Important files** — watched folders such as `.ssh` are copied into the vault whenever they change.
 - **Backups** — every change goes to the folders you choose, optionally to your own server over SSH and to your own Google Drive, which also keeps your devices in sync.
 - **QR codes** — adds 2FA codes from the screen, an image or the phone's camera, including the Google Authenticator export.
+- **Your language** — English, Polish, German, Spanish, French, Portuguese, Italian, Chinese and Japanese, picked from the language of the device or the browser.
 
 The vault is encrypted with AES-256-GCM on your device. There is no Keyhold server and no account. See [how Keyhold protects your data](https://galusz.github.io/keyhold/security.html) and the [privacy policy](https://galusz.github.io/keyhold/privacy.html).
 

@@ -8,6 +8,7 @@ import '../core/drive.dart';
 import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
+import '../l10n/l10n.dart';
 import 'mobile_page.dart' show askFingerprint;
 import 'vault_page.dart' show SiteAvatar;
 
@@ -109,7 +110,7 @@ class _AutofillPageState extends State<AutofillPage> {
     _request = await _channel.invokeMapMethod<String, dynamic>('request') ?? {};
     if (!await _store.init()) {
       setState(() {
-        _message = 'Open Keyhold once and enter the master password, then try again.';
+        _message = t.openKeyholdFirst;
         _loading = false;
       });
       return;
@@ -164,22 +165,22 @@ class _AutofillPageState extends State<AutofillPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Pin "${e.title}" to $place?', style: Theme.of(context).textTheme.titleMedium),
+                Text(t.pinTo(e.title, place), style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 4),
-                const Text('Then it is offered here right away, without searching.'),
+                Text(t.pinHint),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
                   value: never,
                   onChanged: (v) => setSheet(() => never = v ?? false),
-                  title: const Text('Do not ask about this code again'),
+                  title: Text(t.doNotAskCode),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Not now')),
+                    TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.notNow)),
                     const SizedBox(width: 8),
-                    FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Pin')),
+                    FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.pin)),
                   ],
                 ),
               ],
@@ -236,12 +237,12 @@ class _AutofillPageState extends State<AutofillPage> {
         username: username,
         password: password,
         url: _site.isNotEmpty ? 'https://$_site' : _address,
-        group: _site.isNotEmpty ? 'Web' : 'Apps',
+        group: _site.isNotEmpty ? _vault.defaultGroup('Web', t.groupWeb) : _vault.defaultGroup('Apps', t.groupApps),
       ));
     }
     await _store.save(_vault);
     setState(() {
-      _message = existing == null ? 'Saved to Keyhold' : 'Password updated in Keyhold';
+      _message = existing == null ? t.savedToKeyhold : t.passwordUpdated;
       _loading = false;
     });
 
@@ -295,10 +296,10 @@ class _AutofillPageState extends State<AutofillPage> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: TextField(
             controller: _search,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.search),
-              hintText: 'Search all logins',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search),
+              hintText: t.searchAllLogins,
+              border: const OutlineInputBorder(),
             ),
             onChanged: (_) => setState(() {}),
           ),
@@ -308,9 +309,11 @@ class _AutofillPageState extends State<AutofillPage> {
               ? Padding(
                   padding: const EdgeInsets.all(32),
                   child: Text(
-                    _search.text.isEmpty
-                        ? 'No login for this ${_site.isNotEmpty ? 'site' : 'app'} yet. Search above, or log in and Android will offer to save it.'
-                        : 'Nothing found.',
+                    _search.text.isNotEmpty
+                        ? t.nothingFound
+                        : _site.isNotEmpty
+                            ? t.noLoginForSite
+                            : t.noLoginForApp,
                     textAlign: TextAlign.center,
                   ),
                 )
@@ -319,7 +322,7 @@ class _AutofillPageState extends State<AutofillPage> {
                     for (final e in shown)
                       ListTile(
                         leading: SiteAvatar(entry: e, icons: _store.icons),
-                        title: Text(e.title.isEmpty ? '(no title)' : e.title),
+                        title: Text(e.title.isEmpty ? t.noTitle : e.title),
                         subtitle: Text(e.username),
                         onTap: () => _pick(e),
                       ),

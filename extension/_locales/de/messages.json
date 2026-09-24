@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "Füllt Zugangsdaten und Zwei-Faktor-Codes aus deinem Keyhold-Tresor aus."
+  },
+  "lookingForMatches": {
+    "message": "Suche nach Treffern…"
+  },
+  "permissionHint": {
+    "message": "Keyhold braucht deine Erlaubnis, um mit der App auf diesem Computer zu sprechen und Anmeldeformulare auszufüllen."
+  },
+  "allow": {
+    "message": "Erlauben"
+  },
+  "pairingHint": {
+    "message": "Keyhold öffnen, auf das Puzzle-Symbol klicken und das Kopplungstoken hier einfügen."
+  },
+  "pairingToken": {
+    "message": "Kopplungstoken"
+  },
+  "connect": {
+    "message": "Verbinden"
+  },
+  "offerKnownFailed": {
+    "message": "Das gespeicherte Passwort hat nicht funktioniert. Mit dem neuen anmelden – Keyhold bietet dann an, es zu aktualisieren."
+  },
+  "offerFailed": {
+    "message": "Diese Zugangsdaten haben nicht funktioniert"
+  },
+  "offerChanged": {
+    "message": "Passwort in Keyhold aktualisieren?"
+  },
+  "offerNew": {
+    "message": "Diese Zugangsdaten in Keyhold speichern?"
+  },
+  "saveAnyway": {
+    "message": "Trotzdem speichern"
+  },
+  "update": {
+    "message": "Aktualisieren"
+  },
+  "save": {
+    "message": "Speichern"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "forgetIt": {
+    "message": "Verwerfen"
+  },
+  "twoFactorCode": {
+    "message": "Zwei-Faktor-Code"
+  },
+  "pinThisCode": {
+    "message": "Diesen Code an $HOST$ anheften?",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "Anheften"
+  },
+  "notNow": {
+    "message": "Nicht jetzt"
+  },
+  "noEntryYet": {
+    "message": "Noch kein Eintrag für diese Website. Einmal anmelden – Keyhold bietet dann das Speichern an."
+  },
+  "duplicateHint": {
+    "message": "Für diese Website und diesen Nutzernamen mehrfach gespeichert"
+  },
+  "duplicate": {
+    "message": "Duplikat"
+  },
+  "edit": {
+    "message": "Bearbeiten"
+  },
+  "appDidNotAnswer": {
+    "message": "Keyhold antwortet nicht. Läuft die App?"
+  },
+  "noLoginField": {
+    "message": "Kein Anmeldefeld auf dieser Seite gefunden."
+  },
+  "openWebsiteFirst": {
+    "message": "Zuerst eine Website öffnen."
+  },
+  "pairedNotRunning": {
+    "message": "Mit der Keyhold-App auf diesem Computer gekoppelt, aber sie läuft nicht. Keyhold starten – dann übernimmt die App."
+  },
+  "notRunning": {
+    "message": "Keyhold läuft auf diesem Computer nicht."
+  },
+  "useDriveVault": {
+    "message": "Meinen Tresor aus Google Drive nutzen"
+  },
+  "driveVaultHint": {
+    "message": "Er bleibt verschlüsselt und öffnet sich hier mit deinem Master-Passwort."
+  },
+  "connecting": {
+    "message": "Wird verbunden…"
+  },
+  "driveNotConnected": {
+    "message": "Google Drive wurde nicht verbunden."
+  },
+  "pairAgain": {
+    "message": "Erneut koppeln"
+  },
+  "pairWithApp": {
+    "message": "Die Keyhold-App läuft hier – mit ihr koppeln"
+  },
+  "masterPasswordOfVault": {
+    "message": "Master-Passwort deines Keyhold-Tresors"
+  },
+  "show": {
+    "message": "Anzeigen"
+  },
+  "unlock": {
+    "message": "Entsperren"
+  },
+  "opening": {
+    "message": "Wird geöffnet…"
+  },
+  "vaultDidNotOpen": {
+    "message": "Der Tresor ließ sich nicht öffnen."
+  },
+  "disconnectDrive": {
+    "message": "Google Drive trennen"
+  },
+  "vaultFromDrive": {
+    "message": "Tresor aus Google Drive"
+  },
+  "lock": {
+    "message": "Sperren"
+  },
+  "autoSaveHint": {
+    "message": "Wenn Zugangsdaten eindeutig funktionieren, speichert Keyhold sie sofort"
+  },
+  "autoSave": {
+    "message": "Zugangsdaten ohne Nachfrage speichern"
+  },
+  "neverOn": {
+    "message": "Auf $HOST$ werden keine Zugangsdaten gespeichert – zum Erlauben klicken",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "Auf dieser Website nie Zugangsdaten speichern"
+  },
+  "allCodes": {
+    "message": "Alle Codes…"
+  },
+  "notTiedToSite": {
+    "message": "noch keiner Website zugeordnet"
+  },
+  "editLogin": {
+    "message": "Zugangsdaten bearbeiten"
+  },
+  "delete": {
+    "message": "Löschen"
+  },
+  "title": {
+    "message": "Titel"
+  },
+  "username": {
+    "message": "Nutzername"
+  },
+  "password": {
+    "message": "Passwort"
+  },
+  "key": {
+    "message": "Schlüssel"
+  },
+  "keyHint": {
+    "message": "Einrichtungsschlüssel oder ganzen otpauth://-Link einfügen"
+  },
+  "address": {
+    "message": "Adresse"
+  },
+  "none": {
+    "message": "Keiner"
+  },
+  "namesRepeatHint": {
+    "message": "Namen können sich wiederholen – der aktuelle Code unterscheidet sie"
+  },
+  "group": {
+    "message": "Gruppe"
+  },
+  "groupHint": {
+    "message": "Eine wählen oder neuen Namen eingeben"
+  },
+  "groupWeb": {
+    "message": "Web"
+  },
+  "notes": {
+    "message": "Notizen"
+  },
+  "addresses": {
+    "message": "Adressen"
+  },
+  "addAddress": {
+    "message": "Adresse hinzufügen"
+  },
+  "add": {
+    "message": "Hinzufügen"
+  },
+  "remove": {
+    "message": "Entfernen"
+  },
+  "codeNotUsedYet": {
+    "message": "Noch nirgends verwendet. Er wird angeheftet, sobald du ihn zum ersten Mal auf einer Website nutzt, oder du heftest ihn in Zugangsdaten an."
+  },
+  "loginNotInVault": {
+    "message": "Diese Zugangsdaten sind nicht im geöffneten Tresor. Keyhold in der Symbolleiste entsperren und erneut versuchen."
+  },
+  "name": {
+    "message": "Name"
+  },
+  "note": {
+    "message": "Notiz"
+  },
+  "noName": {
+    "message": "(kein Name)"
+  },
+  "savingToDrive": {
+    "message": "Wird in Google Drive gespeichert…"
+  },
+  "notSaved": {
+    "message": "Nicht gespeichert."
+  },
+  "deleteConfirm": {
+    "message": "Diese Zugangsdaten aus Keyhold löschen?"
+  },
+  "deleting": {
+    "message": "Wird gelöscht…"
+  },
+  "notDeleted": {
+    "message": "Nicht gelöscht."
+  },
+  "notFound": {
+    "message": "Nicht gefunden"
+  },
+  "googleDidNotSignIn": {
+    "message": "Google hat die Anmeldung nicht abgeschlossen"
+  },
+  "driveAnswered": {
+    "message": "Antwort von Google Drive: $STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "In diesem Google Drive gibt es noch keinen Keyhold-Tresor"
+  },
+  "driveNotReachable": {
+    "message": "Google Drive ist nicht erreichbar"
+  },
+  "setPasswordInApp": {
+    "message": "Zuerst in der Keyhold-App ein Master-Passwort festlegen"
+  },
+  "signInWindowOpen": {
+    "message": "Ein Google-Anmeldefenster ist noch offen. Schließen und erneut versuchen."
+  },
+  "wrongMasterPassword": {
+    "message": "Falsches Master-Passwort"
+  }
+}

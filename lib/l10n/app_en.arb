@@ -1,0 +1,697 @@
+{
+  "@@locale": "en",
+  "cancel": "Cancel",
+  "open": "Open",
+  "delete": "Delete",
+  "copy": "Copy",
+  "edit": "Edit",
+  "add": "Add",
+  "search": "Search",
+  "settings": "Settings",
+  "change": "Change",
+  "connect": "Connect",
+  "disconnect": "Disconnect",
+  "unlock": "Unlock",
+  "noTitle": "(no title)",
+  "code": "Code",
+  "codes": "Codes",
+  "username": "Username",
+  "password": "Password",
+  "address": "Address",
+  "notes": "Notes",
+  "duplicates": "Duplicates",
+  "masterPassword": "Master password",
+  "setMasterPassword": "Set master password",
+  "copied": "{what} copied",
+  "@copied": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "fingerprintTitle": "Keyhold Vault",
+  "fingerprintUnlockHint": "Unlock to see your passwords and codes",
+  "fingerprintConfirmHint": "Confirm with your fingerprint",
+  "driveNotConnected": "Google Drive was not connected: {error}",
+  "@driveNotConnected": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "masterPasswordOfVault": "Master password of your vault",
+  "masterPasswordFromComputer": "The one you set in Keyhold on your computer",
+  "scanQr": "Scan a QR code",
+  "scanQrHint": "Two-factor code of a website or a Google Authenticator export",
+  "newCode": "New two-factor code",
+  "newCodeHint": "Type the setup key yourself",
+  "newLogin": "New login",
+  "locked": "Keyhold is locked",
+  "everything": "Everything",
+  "noCodesYet": "No two-factor codes yet — tap + to scan one",
+  "nothingYet": "Nothing here yet",
+  "justNow": "just now",
+  "minutesAgo": "{count} min ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count} h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notBackedUp": "Not backed up — tap to connect Google Drive",
+  "backingUp": "Backing up…",
+  "backupFailed": "Backup failed: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "waitingFirstBackup": "Waiting for the first backup",
+  "backedUpToDrive": "Backed up to Google Drive {ago}",
+  "@backedUpToDrive": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneWelcome": "Your passwords and two-factor codes — the same vault as on your computer, kept in step through your own Google Drive.",
+  "connectDrive": "Connect Google Drive",
+  "startEmpty": "Start with an empty vault",
+  "codeSeconds": "Code ({seconds} s)",
+  "@codeSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "driveOnlyPhone": "Not connected — the vault lives only on this phone.",
+  "connectedAs": "Connected as {email}",
+  "@connectedAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "connectedAsSynced": "Connected as {email} — last sync {time}",
+  "@connectedAsSynced": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "syncNow": "Sync now",
+  "fingerprintLock": "Fingerprint lock",
+  "fingerprintSwitch": "Open Keyhold with a fingerprint",
+  "fingerprintSwitchHint": "Locks when the screen goes dark or after a minute away. Suggestions under login fields keep working.",
+  "fillingPasswords": "Filling passwords",
+  "fillerOn": "Keyhold fills logins in apps and browsers: tap \"Keyhold\" under a login field. In Chrome also switch on Settings → Autofill services → Autofill using another service.",
+  "fillerOff": "Let Keyhold fill logins and two-factor codes in apps and browsers.",
+  "fillWithKeyhold": "Fill passwords with Keyhold",
+  "passwordSetPhone": "Set. It opens this vault on a new device.",
+  "passwordNotSetPhone": "Not set. Without it a new device cannot open the vault.",
+  "deleteThisLogin": "Delete this login?",
+  "deleteNamed": "Delete {name}?",
+  "@deleteNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noDuplicatesLeft": "No duplicates left.",
+  "groupWeb": "Web",
+  "groupLocal": "Local network",
+  "groupServers": "Servers",
+  "filterAll": "All",
+  "filter2fa": "2FA",
+  "filterPasswords": "Passwords",
+  "filterFiles": "Files",
+  "groups": "Groups",
+  "noGroup": "No group",
+  "moveCountToGroup": "{count, plural, =1{Move 1 item to a group} other{Move {count} items to a group}}",
+  "@moveCountToGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newGroup": "New group",
+  "newGroupHint": "Leave empty to take them out of any group",
+  "move": "Move",
+  "clearSelection": "Clear selection",
+  "selectedCount": "{count} selected",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moveToGroup": "Move to group",
+  "addCodesFromQr": "Add two-factor codes from a QR code",
+  "browserExtension": "Browser extension",
+  "backup": "Backup",
+  "importCsv": "Import from CSV",
+  "changeMasterPassword": "Change master password",
+  "addFile": "Add file",
+  "newEntry": "New",
+  "checking": "Checking…",
+  "notCheckedYet": "Not checked yet",
+  "filesNew": "{count} new",
+  "@filesNew": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filesChanged": "{count} changed",
+  "@filesChanged": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filesSkipped": "{count} skipped",
+  "@filesSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkedNothingChanged": "Checked {when} — nothing changed",
+  "@checkedNothingChanged": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "checkedWith": "Checked {when} — {changes}",
+  "@checkedWith": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "changes": {
+        "type": "String"
+      }
+    }
+  },
+  "watchedHint": "Watched — copied into the vault whenever they change, every 15 minutes",
+  "nothingWatched": "Nothing watched yet",
+  "pathNotFound": "{path} — not found",
+  "@pathNotFound": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "stopWatching": "Stop watching",
+  "watchFolder": "Watch folder",
+  "watchFile": "Watch file",
+  "checkNow": "Check now",
+  "fileTooBig": "{name} is {size} — the limit is 25 MB",
+  "@fileTooBig": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "fileAdded": "{name} is now in the vault",
+  "@fileAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "savedTo": "Saved to {path}",
+  "@savedTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "removeNamed": "Remove {name}?",
+  "@removeNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeFileHint": "It disappears from the vault. Older backups still hold it.",
+  "remove": "Remove",
+  "noFilesYet": "No files yet — add recovery codes, keys or scans",
+  "saveToDisk": "Save to disk",
+  "forWindow": "For \"{window}\"",
+  "@forWindow": {
+    "placeholders": {
+      "window": {
+        "type": "String"
+      }
+    }
+  },
+  "dismiss": "Dismiss",
+  "noBackupYet": "No backup yet — it runs on the first save",
+  "lastBackup": "Last backup {ago}",
+  "@lastBackup": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "backedUpTo": "Backed up {ago} — {targets}",
+  "@backedUpTo": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      },
+      "targets": {
+        "type": "String"
+      }
+    }
+  },
+  "driveNeedsPassword": "Google Drive: open Backup and enter the master password",
+  "driveProblem": "Google Drive: {problem}",
+  "@driveProblem": {
+    "placeholders": {
+      "problem": {
+        "type": "String"
+      }
+    }
+  },
+  "driveSynced": "Google Drive: synced {ago}",
+  "@driveSynced": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "itemCount": "{count, plural, =1{1 item} other{{count} items}}",
+  "@itemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "select": "Select",
+  "typeCode": "Type the code into the previous window",
+  "typeLogin": "Type username and password",
+  "copyPassword": "Copy password",
+  "save": "Save",
+  "off": "Off",
+  "onWith": "On — {detail}",
+  "@onWith": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "join": "Join",
+  "synced": "Synced",
+  "alreadyInSync": "Already in sync",
+  "fillHostFirst": "Fill in the host first",
+  "fillUserFirst": "Fill in the user first",
+  "pickKeyFirst": "Pick your private key file first",
+  "noFileAt": "There is no file at {path}",
+  "@noFileAt": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "serverUnreachable": "Cannot reach {host} on port {port}. Check the address, the port and whether the server is up.",
+  "@serverUnreachable": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "serverRefusedKey": "The server refused this key for user {user}. Make sure the matching public key sits in its authorized_keys.",
+  "@serverRefusedKey": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
+  "notAPrivateKey": "That file is not a usable private key.",
+  "cannotWriteFolder": "Logged in, but cannot write into \"{folder}\". Pick another folder.",
+  "@cannotWriteFolder": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "driveHoldsVault": "Google Drive already holds a Keyhold vault. Its master password is needed to join it.",
+  "masterPasswordOfDriveVault": "Master password of the vault in Google Drive",
+  "driveHint": "Keeps the encrypted vault in a \"Keyhold\" folder in your own Google Drive, so your other devices stay in sync and a lost computer loses nothing. Google cannot read it.",
+  "driveNotInBuild": "Google Drive is not set up in this build.",
+  "setPasswordFirst": "Set a master password first — a new device needs it to open the vault.",
+  "foldersOnComputer": "Folders on this computer",
+  "folderCount": "{count, plural, =1{1 folder} other{{count} folders}}",
+  "@folderCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderCountCopied": "{count, plural, =1{1 folder — last copy {time}} other{{count} folders — last copy {time}}}",
+  "@folderCountCopied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "yourServer": "Your server",
+  "foldersHint": "Every save drops a dated copy into each folder and keeps the last 30.",
+  "noFolders": "No folders — local copies are off",
+  "addFolder": "Add folder",
+  "serverHint": "The same copy goes over SFTP to a machine you own. The file stays encrypted, so the server sees bytes and nothing else. Leave the host empty to skip this.",
+  "host": "Host",
+  "port": "Port",
+  "user": "User",
+  "privateKeyFile": "Private key file",
+  "chooseFile": "Choose file",
+  "serverFolder": "Folder on the server",
+  "testConnection": "Test connection",
+  "notReachable": "Not reachable right now",
+  "enterCodeKey": "Enter the key of the two-factor code",
+  "twoFactorCode": "Two-factor code",
+  "newEntryTitle": "New entry",
+  "editEntry": "Edit entry",
+  "name": "Name",
+  "key": "Key",
+  "keyHint": "Paste the setup key or the whole otpauth:// link",
+  "note": "Note",
+  "addresses": "Addresses",
+  "codeNotUsedYet": "Not used anywhere yet. It pins itself the first time you use it on a site, or pin it from a login.",
+  "noAddress": "no address",
+  "unpin": "Unpin",
+  "addAddress": "Add an address",
+  "title": "Title",
+  "noName": "(no name)",
+  "none": "None",
+  "choose": "Choose",
+  "group": "Group",
+  "groupHint": "Pick one or type a new name",
+  "driveTabConnected": "Keyhold is connected to Google Drive. You can close this tab.",
+  "driveTabNotConnected": "Google Drive was not connected. You can close this tab.",
+  "signInTooLong": "Google sign-in took too long — try again",
+  "signInCancelled": "Google sign-in was cancelled",
+  "noOfflineAccess": "Google did not allow offline access",
+  "noInternet": "No internet connection",
+  "wrongMasterPassword": "Wrong master password",
+  "driveRefusedDownload": "Google Drive refused the download ({status})",
+  "@driveRefusedDownload": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "driveRefusedUpload": "Google Drive refused the upload ({status})",
+  "@driveRefusedUpload": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "driveAnswered": "Google Drive answered {status}",
+  "@driveAnswered": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "driveSignInAgain": "Google Drive needs you to sign in again",
+  "driveNotConnectedError": "Google Drive is not connected",
+  "driveAccessEnded": "Google Drive access ended — connect again",
+  "signInFailed": "Google sign-in failed ({status})",
+  "@signInFailed": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "dupNewest": "newest",
+  "dupSamePassword": "same password as the newest",
+  "dupDifferentPassword": "different password",
+  "noUsername": "(no username)",
+  "duplicateNote": "{username} · {password} · changed {day}",
+  "@duplicateNote": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      },
+      "password": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "fileEmpty": "The file is empty",
+  "noLoginColumns": "No username or password column found in this file",
+  "noQrOnScreen": "No QR code found on the screen",
+  "noQrInImage": "No QR code found in this image",
+  "qrNotTwoFactor": "This QR code is not a two-factor code",
+  "exportQrEmpty": "The export QR code is empty",
+  "exportQrUnreadable": "This export QR code could not be read",
+  "serverWritable": "Connected as {account}, folder is writable",
+  "@serverWritable": {
+    "placeholders": {
+      "account": {
+        "type": "String"
+      }
+    }
+  },
+  "openKeyhold": "Open Keyhold",
+  "quit": "Quit",
+  "codesFound": "{count} found",
+  "@codesFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "codesUnsupported": "{count, plural, =1{1 uses a code type Keyhold cannot generate yet} other{{count} use a code type Keyhold cannot generate yet}}",
+  "@codesUnsupported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedAs": "Saved as {name}",
+  "@savedAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "savedCodes": "{count, plural, =1{Saved 1 code} other{Saved {count} codes}}",
+  "@savedCodes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "images": "Images",
+  "addCodes": "Add two-factor codes",
+  "saveAll": "Save all",
+  "qrHintPhone": "Point the camera at the QR code a website shows when you turn on two-factor login, or at the export from Google Authenticator (Transfer accounts → Export).",
+  "qrHintComputer": "Show the QR code on the screen and scan it. It can be the code a website shows when you turn on two-factor login, or the export from Google Authenticator (Transfer accounts → Export). A photo of the code works too.",
+  "qrMicrosoftHint": "Microsoft Authenticator cannot export its codes — turn two-factor login off and on again on each site and scan the new code here.",
+  "scanCamera": "Scan with the camera",
+  "scanScreen": "Scan the screen",
+  "openImage": "Open an image",
+  "saved": "Saved",
+  "alreadyInKeyhold": "Already in Keyhold",
+  "asName": "as \"{name}\"",
+  "@asName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "typePasswordFirst": "Type your password first",
+  "atLeast8": "Use at least 8 characters",
+  "passwordsDiffer": "The two passwords differ",
+  "passwordDoesNotOpen": "That password does not open this vault",
+  "currentPasswordWrong": "The current master password is wrong",
+  "unlockVault": "Unlock vault",
+  "unlockHint": "This vault came from another machine. Type the master password to open it here.",
+  "masterPasswordHint": "Windows opens this vault for you automatically. The master password is the way back in after a reinstall, on a new machine, or on your phone.",
+  "currentMasterPassword": "Current master password",
+  "newMasterPassword": "New master password",
+  "repeatIt": "Repeat it",
+  "openVault": "Open vault",
+  "savePassword": "Save password",
+  "nobodyCanRecover": "Nobody can recover it for you — not even this app. Write it down somewhere safe.",
+  "groupApps": "Apps",
+  "openKeyholdFirst": "Open Keyhold once and enter the master password, then try again.",
+  "pinTo": "Pin \"{name}\" to {place}?",
+  "@pinTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "place": {
+        "type": "String"
+      }
+    }
+  },
+  "pinHint": "Then it is offered here right away, without searching.",
+  "doNotAskCode": "Do not ask about this code again",
+  "notNow": "Not now",
+  "pin": "Pin",
+  "savedToKeyhold": "Saved to Keyhold",
+  "passwordUpdated": "Password updated in Keyhold",
+  "searchAllLogins": "Search all logins",
+  "nothingFound": "Nothing found.",
+  "noLoginForSite": "No login for this site yet. Search above, or log in and Android will offer to save it.",
+  "noLoginForApp": "No login for this app yet. Search above, or log in and Android will offer to save it.",
+  "listening": "Listening on {address}",
+  "@listening": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "notListening": "Not listening — another Keyhold may already be running",
+  "pairingToken": "Pairing token",
+  "pairingTokenHint": "Paste this into the extension once. Only requests carrying it are answered, and only from the extension itself — a web page cannot reach the vault.",
+  "tokenCopied": "Token copied",
+  "copyToken": "Copy token",
+  "installIt": "Install it",
+  "installChrome": "Chrome or Edge: open chrome://extensions, turn on Developer mode, click \"Load unpacked\" and pick the folder below.",
+  "installFirefox": "Firefox: open about:debugging#/runtime/this-firefox, click \"Load Temporary Add-on\" and pick manifest.json in that folder.",
+  "installPaste": "Click the Keyhold icon in the toolbar and paste the token.",
+  "newCodeShort": "New code",
+  "free": "Free",
+  "searchCodes": "Search codes",
+  "everyCodePinned": "Every code is pinned somewhere. Switch to All to see them.",
+  "noCodesFound": "No codes found.",
+  "pinnedTo": "pinned to {hosts}",
+  "@pinnedTo": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "notPinned": "not pinned",
+  "changedOn": "changed {day}",
+  "@changedOn": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "importPasswords": "Import passwords",
+  "importHint": "Export your passwords from the browser as CSV, then load the file here. Chrome, Edge, Firefox, Bitwarden and KeePassXC exports all work.",
+  "chooseCsv": "Choose CSV file",
+  "entriesReady": "{count, plural, =1{1 entry ready} other{{count} entries ready}}",
+  "@entriesReady": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "entriesReadySkipped": "{count, plural, =1{1 entry ready} other{{count} entries ready}}, {skipped, plural, =1{1 empty row skipped} other{{skipped} empty rows skipped}}",
+  "@entriesReadySkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "andMore": "and {count} more",
+  "@andMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteCsv": "Delete the CSV file after importing",
+  "deleteCsvHint": "It holds every password in plain text",
+  "importEntries": "{count, plural, =1{Import 1 entry} other{Import {count} entries}}",
+  "@importEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cameraHint": "Point at the two-factor QR code of a website, or at the export from Google Authenticator."
+}

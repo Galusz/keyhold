@@ -6,6 +6,8 @@ import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../l10n/l10n.dart';
+
 import 'crypto.dart';
 import 'models.dart';
 import 'storage.dart';
@@ -129,17 +131,17 @@ class DriveSync {
         code = query['code'];
         request.response.headers.contentType = ContentType.html;
         request.response.write(_page(code != null
-            ? 'Keyhold is connected to Google Drive. You can close this tab.'
-            : 'Google Drive was not connected. You can close this tab.'));
+            ? t.driveTabConnected
+            : t.driveTabNotConnected));
         await request.response.close();
         break;
       }
     } on TimeoutException {
-      throw DriveError('Google sign-in took too long — try again');
+      throw DriveError(t.signInTooLong);
     } finally {
       await server.close(force: true);
     }
-    if (code == null) throw DriveError('Google sign-in was cancelled');
+    if (code == null) throw DriveError(t.signInCancelled);
 
     final tokens = await _tokenRequest({
       'code': code,
@@ -148,7 +150,7 @@ class DriveSync {
       'grant_type': 'authorization_code',
     });
     final refresh = tokens['refresh_token'] as String?;
-    if (refresh == null) throw DriveError('Google did not allow offline access');
+    if (refresh == null) throw DriveError(t.noOfflineAccess);
     await _writeRefresh(refresh);
     _setAccess(tokens);
   }
@@ -196,7 +198,7 @@ class DriveSync {
       lastError = e.message;
       rethrow;
     } on SocketException {
-      lastError = 'No internet connection';
+      lastError = t.noInternet;
       throw DriveError(lastError!);
     }
   }
@@ -208,7 +210,7 @@ class DriveSync {
 
     if (remote == null) {
       if (!store.hasPassword) {
-        throw DriveError('Set a master password first — a new device needs it to open the vault');
+        throw DriveError(t.setPasswordFirst);
       }
       await _upload(folder, null, await store.fileFor(local));
       return SyncResult(uploaded: true);
@@ -221,7 +223,7 @@ class DriveSync {
       theirs = await store.open(bytes);
     } catch (_) {
       if (password == null) return SyncResult(needsPassword: true);
-      if (!await store.adopt(bytes, password)) throw DriveError('Wrong master password');
+      if (!await store.adopt(bytes, password)) throw DriveError(t.wrongMasterPassword);
       theirs = await store.open(bytes);
       adopted = true;
     }
@@ -282,7 +284,7 @@ class DriveSync {
 
   Future<Uint8List> _download(String id) async {
     final (status, body) = await _authorized('GET', _api('/drive/v3/files/$id', {'alt': 'media'}));
-    if (status != 200) throw DriveError('Google Drive refused the download ($status)');
+    if (status != 200) throw DriveError(t.driveRefusedDownload('$status'));
     return body;
   }
 
@@ -294,7 +296,7 @@ class DriveSync {
         headers: {'content-type': 'application/octet-stream'},
         body: bytes,
       );
-      if (status != 200) throw DriveError('Google Drive refused the upload ($status)');
+      if (status != 200) throw DriveError(t.driveRefusedUpload('$status'));
       return;
     }
 
@@ -311,7 +313,7 @@ class DriveSync {
       headers: {'content-type': 'multipart/related; boundary=$boundary'},
       body: body.takeBytes(),
     );
-    if (status != 200) throw DriveError('Google Drive refused the upload ($status)');
+    if (status != 200) throw DriveError(t.driveRefusedUpload('$status'));
   }
 
   // ---------- HTTP ----------
@@ -326,7 +328,7 @@ class DriveSync {
       headers: body == null ? const {} : {'content-type': 'application/json'},
       body: body == null ? null : utf8.encode(jsonEncode(body)),
     );
-    if (status < 200 || status >= 300) throw DriveError('Google Drive answered $status');
+    if (status < 200 || status >= 300) throw DriveError(t.driveAnswered('$status'));
     return jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
   }
 
@@ -352,20 +354,20 @@ class DriveSync {
       await _google();
       final authz =
           await GoogleSignIn.instance.authorizationClient.authorizationForScopes([_scope]);
-      if (authz == null) throw DriveError('Google Drive needs you to sign in again');
+      if (authz == null) throw DriveError(t.driveSignInAgain);
       _access = authz.accessToken;
       _accessUntil = DateTime.now().add(const Duration(minutes: 50));
       return _access!;
     }
     final refresh = await _readRefresh();
-    if (refresh == null) throw DriveError('Google Drive is not connected');
+    if (refresh == null) throw DriveError(t.driveNotConnectedError);
     try {
       _setAccess(await _tokenRequest({'refresh_token': refresh, 'grant_type': 'refresh_token'}));
     } on DriveError catch (e) {
       // 400/401: revoked, or expired while the Google project was still in testing
       if (e.status == 400 || e.status == 401) {
         await disconnect();
-        throw DriveError('Google Drive access ended — connect again');
+        throw DriveError(t.driveAccessEnded);
       }
       rethrow;
     }
@@ -389,7 +391,7 @@ class DriveSync {
         'client_secret': _clientSecret,
       }).query),
     );
-    if (status != 200) throw DriveError('Google sign-in failed ($status)', status: status);
+    if (status != 200) throw DriveError(t.signInFailed('$status'), status: status);
     return jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
   }
 

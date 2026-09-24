@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_all_logins">Szukaj we wszystkich danych logowania</string>
+    <string name="code_suggestion">Kod 2FA %1$s</string>
+    <string name="not_tied_to_site">jeszcze nieprzypisany do strony</string>
+</resources>

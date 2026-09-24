@@ -9,6 +9,7 @@ import 'package:image/image.dart' as img;
 import 'package:win32/win32.dart';
 import 'package:zxing2/qrcode.dart';
 
+import '../l10n/l10n.dart';
 import 'crypto.dart';
 
 /// A two-factor account read from a QR code.
@@ -104,7 +105,7 @@ String? _decode(_Picture picture) {
 Future<QrResult> scanScreen() async {
   final picture = _captureScreen();
   final text = await Isolate.run(() => _decode(picture));
-  if (text == null) return QrResult(error: 'No QR code found on the screen');
+  if (text == null) return QrResult(error: t.noQrOnScreen);
   return parseOtp(text);
 }
 
@@ -114,7 +115,7 @@ Future<QrResult> scanImage(String path) async {
     final picture = _pictureFromFile(bytes);
     return picture == null ? null : _decode(picture);
   });
-  if (text == null) return QrResult(error: 'No QR code found in this image');
+  if (text == null) return QrResult(error: t.noQrInImage);
   return parseOtp(text);
 }
 
@@ -122,19 +123,19 @@ Future<QrResult> scanImage(String path) async {
 /// export of Google Authenticator, which holds many accounts at once.
 QrResult parseOtp(String text) {
   final uri = Uri.tryParse(text.trim());
-  if (uri == null) return QrResult(error: 'This QR code is not a two-factor code');
+  if (uri == null) return QrResult(error: t.qrNotTwoFactor);
 
   if (uri.scheme == 'otpauth-migration') {
     final data = uri.queryParameters['data'];
-    if (data == null) return QrResult(error: 'The export QR code is empty');
+    if (data == null) return QrResult(error: t.exportQrEmpty);
     try {
       return _parseMigration(base64.decode(base64.normalize(data.replaceAll(' ', '+'))));
     } catch (_) {
-      return QrResult(error: 'This export QR code could not be read');
+      return QrResult(error: t.exportQrUnreadable);
     }
   }
 
-  if (uri.scheme != 'otpauth') return QrResult(error: 'This QR code is not a two-factor code');
+  if (uri.scheme != 'otpauth') return QrResult(error: t.qrNotTwoFactor);
 
   final params = uri.queryParameters;
   final supported = uri.host == 'totp' &&

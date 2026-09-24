@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "从您的 Keyhold 密码库中填写登录信息和双重验证码。"
+  },
+  "lookingForMatches": {
+    "message": "正在查找匹配项…"
+  },
+  "permissionHint": {
+    "message": "Keyhold 需要您的许可，才能与这台电脑上的应用通信并填写登录表单。"
+  },
+  "allow": {
+    "message": "允许"
+  },
+  "pairingHint": {
+    "message": "打开 Keyhold，点击拼图图标，然后将配对令牌粘贴到这里。"
+  },
+  "pairingToken": {
+    "message": "配对令牌"
+  },
+  "connect": {
+    "message": "连接"
+  },
+  "offerKnownFailed": {
+    "message": "已保存的密码无效。请用新密码登录，Keyhold 会提示您更新。"
+  },
+  "offerFailed": {
+    "message": "此登录信息无效"
+  },
+  "offerChanged": {
+    "message": "要在 Keyhold 中更新密码吗？"
+  },
+  "offerNew": {
+    "message": "要将此登录信息保存到 Keyhold 吗？"
+  },
+  "saveAnyway": {
+    "message": "仍然保存"
+  },
+  "update": {
+    "message": "更新"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "ok": {
+    "message": "确定"
+  },
+  "forgetIt": {
+    "message": "不用了"
+  },
+  "twoFactorCode": {
+    "message": "双重验证码"
+  },
+  "pinThisCode": {
+    "message": "将此验证码关联到 $HOST$？",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "关联"
+  },
+  "notNow": {
+    "message": "以后再说"
+  },
+  "noEntryYet": {
+    "message": "此网站还没有条目。登录一次，Keyhold 就会提示您保存。"
+  },
+  "duplicateHint": {
+    "message": "此网站和用户名下保存了不止一份"
+  },
+  "duplicate": {
+    "message": "重复"
+  },
+  "edit": {
+    "message": "编辑"
+  },
+  "appDidNotAnswer": {
+    "message": "Keyhold 没有响应。应用是否正在运行？"
+  },
+  "noLoginField": {
+    "message": "此网页上找不到登录框。"
+  },
+  "openWebsiteFirst": {
+    "message": "请先打开一个网站。"
+  },
+  "pairedNotRunning": {
+    "message": "已与这台电脑上的 Keyhold 应用配对，但它没有运行。启动 Keyhold 后，它会接管。"
+  },
+  "notRunning": {
+    "message": "Keyhold 没有在这台电脑上运行。"
+  },
+  "useDriveVault": {
+    "message": "使用我在 Google Drive 中的密码库"
+  },
+  "driveVaultHint": {
+    "message": "它始终保持加密，在这里用您的主密码打开。"
+  },
+  "connecting": {
+    "message": "正在连接…"
+  },
+  "driveNotConnected": {
+    "message": "未能连接 Google Drive。"
+  },
+  "pairAgain": {
+    "message": "重新配对"
+  },
+  "pairWithApp": {
+    "message": "Keyhold 应用正在此运行，与它配对"
+  },
+  "masterPasswordOfVault": {
+    "message": "Keyhold 密码库的主密码"
+  },
+  "show": {
+    "message": "显示"
+  },
+  "unlock": {
+    "message": "解锁"
+  },
+  "opening": {
+    "message": "正在打开…"
+  },
+  "vaultDidNotOpen": {
+    "message": "未能打开密码库。"
+  },
+  "disconnectDrive": {
+    "message": "断开 Google Drive"
+  },
+  "vaultFromDrive": {
+    "message": "来自 Google Drive 的密码库"
+  },
+  "lock": {
+    "message": "锁定"
+  },
+  "autoSaveHint": {
+    "message": "登录明显成功时，Keyhold 会立即保存"
+  },
+  "autoSave": {
+    "message": "不经询问直接保存登录信息"
+  },
+  "neverOn": {
+    "message": "不在 $HOST$ 上保存登录信息，点击即可允许",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "永不在此网站上保存登录信息"
+  },
+  "allCodes": {
+    "message": "所有验证码…"
+  },
+  "notTiedToSite": {
+    "message": "尚未关联网站"
+  },
+  "editLogin": {
+    "message": "编辑登录信息"
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "title": {
+    "message": "标题"
+  },
+  "username": {
+    "message": "用户名"
+  },
+  "password": {
+    "message": "密码"
+  },
+  "key": {
+    "message": "密钥"
+  },
+  "keyHint": {
+    "message": "粘贴设置密钥或完整的 otpauth:// 链接"
+  },
+  "address": {
+    "message": "网址"
+  },
+  "none": {
+    "message": "无"
+  },
+  "namesRepeatHint": {
+    "message": "名称可以重复，可通过当前验证码区分"
+  },
+  "group": {
+    "message": "分组"
+  },
+  "groupHint": {
+    "message": "选择一个或输入新名称"
+  },
+  "groupWeb": {
+    "message": "网站"
+  },
+  "notes": {
+    "message": "备注"
+  },
+  "addresses": {
+    "message": "网址"
+  },
+  "addAddress": {
+    "message": "添加网址"
+  },
+  "add": {
+    "message": "添加"
+  },
+  "remove": {
+    "message": "移除"
+  },
+  "codeNotUsedYet": {
+    "message": "尚未在任何地方使用。首次在某个网站上使用时会自动关联，也可以从登录信息中关联。"
+  },
+  "loginNotInVault": {
+    "message": "此登录信息不在已打开的密码库中。请在工具栏中解锁 Keyhold，然后重试。"
+  },
+  "name": {
+    "message": "名称"
+  },
+  "note": {
+    "message": "备注"
+  },
+  "noName": {
+    "message": "（无名称）"
+  },
+  "savingToDrive": {
+    "message": "正在保存到 Google Drive…"
+  },
+  "notSaved": {
+    "message": "未保存。"
+  },
+  "deleteConfirm": {
+    "message": "要从 Keyhold 中删除此登录信息吗？"
+  },
+  "deleting": {
+    "message": "正在删除…"
+  },
+  "notDeleted": {
+    "message": "未删除。"
+  },
+  "notFound": {
+    "message": "未找到"
+  },
+  "googleDidNotSignIn": {
+    "message": "Google 登录未完成"
+  },
+  "driveAnswered": {
+    "message": "Google Drive 返回了 $STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "此 Google Drive 中还没有 Keyhold 密码库"
+  },
+  "driveNotReachable": {
+    "message": "无法连接 Google Drive"
+  },
+  "setPasswordInApp": {
+    "message": "请先在 Keyhold 应用中设置主密码"
+  },
+  "signInWindowOpen": {
+    "message": "Google 登录窗口仍处于打开状态。请关闭它，然后重试。"
+  },
+  "wrongMasterPassword": {
+    "message": "主密码错误"
+  }
+}

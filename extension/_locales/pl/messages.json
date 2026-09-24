@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "Uzupełnia dane logowania i kody weryfikacyjne z sejfu Keyhold."
+  },
+  "lookingForMatches": {
+    "message": "Szukanie dopasowań…"
+  },
+  "permissionHint": {
+    "message": "Keyhold potrzebuje zgody, aby łączyć się z aplikacją na tym komputerze i uzupełniać formularze logowania."
+  },
+  "allow": {
+    "message": "Zezwól"
+  },
+  "pairingHint": {
+    "message": "Otwórz Keyhold, kliknij ikonę puzzla i wklej tu token parowania."
+  },
+  "pairingToken": {
+    "message": "Token parowania"
+  },
+  "connect": {
+    "message": "Połącz"
+  },
+  "offerKnownFailed": {
+    "message": "Zapisane hasło nie zadziałało. Zaloguj się nowym, a Keyhold zaproponuje jego aktualizację."
+  },
+  "offerFailed": {
+    "message": "Te dane logowania nie zadziałały"
+  },
+  "offerChanged": {
+    "message": "Zaktualizować hasło w Keyhold?"
+  },
+  "offerNew": {
+    "message": "Zapisać te dane logowania w Keyhold?"
+  },
+  "saveAnyway": {
+    "message": "Zapisz mimo to"
+  },
+  "update": {
+    "message": "Aktualizuj"
+  },
+  "save": {
+    "message": "Zapisz"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "forgetIt": {
+    "message": "Nie zapisuj"
+  },
+  "twoFactorCode": {
+    "message": "Kod weryfikacyjny"
+  },
+  "pinThisCode": {
+    "message": "Przypiąć ten kod do $HOST$?",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "Przypnij"
+  },
+  "notNow": {
+    "message": "Nie teraz"
+  },
+  "noEntryYet": {
+    "message": "Brak wpisu do tej strony. Zaloguj się raz, a Keyhold zaproponuje zapisanie."
+  },
+  "duplicateHint": {
+    "message": "Zapisane więcej niż raz dla tej strony i nazwy użytkownika"
+  },
+  "duplicate": {
+    "message": "duplikat"
+  },
+  "edit": {
+    "message": "Edytuj"
+  },
+  "appDidNotAnswer": {
+    "message": "Keyhold nie odpowiada. Czy aplikacja jest uruchomiona?"
+  },
+  "noLoginField": {
+    "message": "Nie znaleziono pola logowania na tej stronie."
+  },
+  "openWebsiteFirst": {
+    "message": "Najpierw otwórz stronę."
+  },
+  "pairedNotRunning": {
+    "message": "Sparowano z aplikacją Keyhold na tym komputerze, ale nie jest uruchomiona. Uruchom Keyhold, a przejmie działanie."
+  },
+  "notRunning": {
+    "message": "Keyhold nie działa na tym komputerze."
+  },
+  "useDriveVault": {
+    "message": "Użyj mojego sejfu z Google Drive"
+  },
+  "driveVaultHint": {
+    "message": "Pozostaje zaszyfrowany i otwiera się tu hasłem głównym."
+  },
+  "connecting": {
+    "message": "Łączenie…"
+  },
+  "driveNotConnected": {
+    "message": "Nie połączono z Google Drive."
+  },
+  "pairAgain": {
+    "message": "Sparuj ponownie"
+  },
+  "pairWithApp": {
+    "message": "Aplikacja Keyhold działa tutaj — sparuj z nią"
+  },
+  "masterPasswordOfVault": {
+    "message": "Hasło główne sejfu Keyhold"
+  },
+  "show": {
+    "message": "Pokaż"
+  },
+  "unlock": {
+    "message": "Odblokuj"
+  },
+  "opening": {
+    "message": "Otwieranie…"
+  },
+  "vaultDidNotOpen": {
+    "message": "Nie udało się otworzyć sejfu."
+  },
+  "disconnectDrive": {
+    "message": "Rozłącz Google Drive"
+  },
+  "vaultFromDrive": {
+    "message": "Sejf z Google Drive"
+  },
+  "lock": {
+    "message": "Zablokuj"
+  },
+  "autoSaveHint": {
+    "message": "Gdy dane logowania na pewno działają, Keyhold od razu je zapisuje"
+  },
+  "autoSave": {
+    "message": "Zapisuj dane logowania bez pytania"
+  },
+  "neverOn": {
+    "message": "Na $HOST$ dane logowania nie są zapisywane — kliknij, aby zezwolić",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "Nigdy nie zapisuj danych logowania na tej stronie"
+  },
+  "allCodes": {
+    "message": "Wszystkie kody…"
+  },
+  "notTiedToSite": {
+    "message": "jeszcze nieprzypisany do strony"
+  },
+  "editLogin": {
+    "message": "Edytuj dane logowania"
+  },
+  "delete": {
+    "message": "Usuń"
+  },
+  "title": {
+    "message": "Tytuł"
+  },
+  "username": {
+    "message": "Nazwa użytkownika"
+  },
+  "password": {
+    "message": "Hasło"
+  },
+  "key": {
+    "message": "Klucz"
+  },
+  "keyHint": {
+    "message": "Wklej klucz konfiguracyjny albo cały link otpauth://"
+  },
+  "address": {
+    "message": "Adres"
+  },
+  "none": {
+    "message": "Brak"
+  },
+  "namesRepeatHint": {
+    "message": "Nazwy mogą się powtarzać — rozróżnisz je po bieżącym kodzie"
+  },
+  "group": {
+    "message": "Grupa"
+  },
+  "groupHint": {
+    "message": "Wybierz lub wpisz nową nazwę"
+  },
+  "groupWeb": {
+    "message": "Strony"
+  },
+  "notes": {
+    "message": "Notatki"
+  },
+  "addresses": {
+    "message": "Adresy"
+  },
+  "addAddress": {
+    "message": "Dodaj adres"
+  },
+  "add": {
+    "message": "Dodaj"
+  },
+  "remove": {
+    "message": "Usuń"
+  },
+  "codeNotUsedYet": {
+    "message": "Jeszcze nigdzie nieużywany. Przypnie się sam, gdy pierwszy raz użyjesz go na stronie, albo przypnij go w danych logowania."
+  },
+  "loginNotInVault": {
+    "message": "Tych danych logowania nie ma w otwartym sejfie. Odblokuj Keyhold na pasku narzędzi i spróbuj ponownie."
+  },
+  "name": {
+    "message": "Nazwa"
+  },
+  "note": {
+    "message": "Notatka"
+  },
+  "noName": {
+    "message": "(bez nazwy)"
+  },
+  "savingToDrive": {
+    "message": "Zapisywanie w Google Drive…"
+  },
+  "notSaved": {
+    "message": "Nie zapisano."
+  },
+  "deleteConfirm": {
+    "message": "Usunąć te dane logowania z Keyhold?"
+  },
+  "deleting": {
+    "message": "Usuwanie…"
+  },
+  "notDeleted": {
+    "message": "Nie usunięto."
+  },
+  "notFound": {
+    "message": "Nie znaleziono"
+  },
+  "googleDidNotSignIn": {
+    "message": "Logowanie w Google nie powiodło się"
+  },
+  "driveAnswered": {
+    "message": "Google Drive odpowiedział: $STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "W tym Google Drive nie ma jeszcze sejfu Keyhold"
+  },
+  "driveNotReachable": {
+    "message": "Brak połączenia z Google Drive"
+  },
+  "setPasswordInApp": {
+    "message": "Najpierw ustaw hasło główne w aplikacji Keyhold"
+  },
+  "signInWindowOpen": {
+    "message": "Okno logowania Google jest nadal otwarte. Zamknij je i spróbuj ponownie."
+  },
+  "wrongMasterPassword": {
+    "message": "Nieprawidłowe hasło główne"
+  }
+}

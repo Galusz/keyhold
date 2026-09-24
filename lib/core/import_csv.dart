@@ -1,5 +1,7 @@
 import 'package:csv/csv.dart';
 
+import '../l10n/l10n.dart';
+
 import 'models.dart';
 
 class ImportResult {
@@ -39,7 +41,7 @@ ImportResult parseCsv(String source) {
   final rows = csv.decode(source.replaceAll('\r\n', '\n'));
 
   if (rows.isEmpty) {
-    return ImportResult(entries: [], skipped: 0, error: 'The file is empty');
+    return ImportResult(entries: [], skipped: 0, error: t.fileEmpty);
   }
 
   final header = rows.first
@@ -57,7 +59,7 @@ ImportResult parseCsv(String source) {
     return ImportResult(
       entries: [],
       skipped: 0,
-      error: 'No username or password column found in this file',
+      error: t.noLoginColumns,
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../core/import_csv.dart';
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 
 class ImportPage extends StatefulWidget {
   const ImportPage({super.key});
@@ -50,20 +51,19 @@ class _ImportPageState extends State<ImportPage> {
     final result = _result;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Import passwords')),
+      appBar: AppBar(title: Text(t.importPasswords)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
           Text(
-            'Export your passwords from the browser as CSV, then load the file here. '
-            'Chrome, Edge, Firefox, Bitwarden and KeePassXC exports all work.',
+            t.importHint,
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
           ),
           const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: _pick,
             icon: const Icon(Icons.folder_open),
-            label: const Text('Choose CSV file'),
+            label: Text(t.chooseCsv),
           ),
           if (_path != null) ...[
             const SizedBox(height: 12),
@@ -75,8 +75,9 @@ class _ImportPageState extends State<ImportPage> {
               Text(result.error!, style: TextStyle(color: theme.colorScheme.error))
             else ...[
               Text(
-                '${result.entries.length} entries ready'
-                '${result.skipped > 0 ? ', ${result.skipped} empty rows skipped' : ''}',
+                result.skipped > 0
+                    ? t.entriesReadySkipped(result.entries.length, result.skipped)
+                    : t.entriesReady(result.entries.length),
                 style: theme.textTheme.titleMedium,
               ),
               const SizedBox(height: 12),
@@ -84,7 +85,7 @@ class _ImportPageState extends State<ImportPage> {
               if (result.entries.length > 8)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text('and ${result.entries.length - 8} more',
+                  child: Text(t.andMore(result.entries.length - 8),
                       style: theme.textTheme.bodySmall),
                 ),
               const SizedBox(height: 20),
@@ -92,13 +93,13 @@ class _ImportPageState extends State<ImportPage> {
                 value: _deleteSource,
                 onChanged: (v) => setState(() => _deleteSource = v ?? true),
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Delete the CSV file after importing'),
-                subtitle: const Text('It holds every password in plain text'),
+                title: Text(t.deleteCsv),
+                subtitle: Text(t.deleteCsvHint),
               ),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: _finish,
-                child: Text('Import ${result.entries.length} entries'),
+                child: Text(t.importEntries(result.entries.length)),
               ),
             ],
           ],

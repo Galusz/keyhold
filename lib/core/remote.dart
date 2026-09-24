@@ -4,6 +4,8 @@ import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
 
+import '../l10n/l10n.dart';
+
 class RemoteConfig {
   RemoteConfig({
     this.host = '',
@@ -129,7 +131,7 @@ class RemoteClient {
       await handle.write(Stream.value(utf8.encode('ok')).cast<Uint8List>());
       await handle.close();
       await sftp.remove(probe);
-      return 'Connected as ${config.user}@${config.host}, folder is writable';
+      return t.serverWritable('${config.user}@${config.host}');
     } finally {
       client.close();
     }

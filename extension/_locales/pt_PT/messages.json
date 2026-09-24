@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "Preenche logins e códigos de dois fatores do seu cofre Keyhold."
+  },
+  "lookingForMatches": {
+    "message": "Procurando correspondências…"
+  },
+  "permissionHint": {
+    "message": "O Keyhold precisa da sua permissão para falar com o app neste computador e preencher formulários de login."
+  },
+  "allow": {
+    "message": "Permitir"
+  },
+  "pairingHint": {
+    "message": "Abra o Keyhold, clique no ícone de quebra-cabeça e cole aqui o token de pareamento."
+  },
+  "pairingToken": {
+    "message": "Token de pareamento"
+  },
+  "connect": {
+    "message": "Conectar"
+  },
+  "offerKnownFailed": {
+    "message": "A senha salva não funcionou. Faça login com a nova e o Keyhold vai oferecer para atualizá-la."
+  },
+  "offerFailed": {
+    "message": "Este login não funcionou"
+  },
+  "offerChanged": {
+    "message": "Atualizar a senha no Keyhold?"
+  },
+  "offerNew": {
+    "message": "Salvar este login no Keyhold?"
+  },
+  "saveAnyway": {
+    "message": "Salvar mesmo assim"
+  },
+  "update": {
+    "message": "Atualizar"
+  },
+  "save": {
+    "message": "Salvar"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "forgetIt": {
+    "message": "Esquecer"
+  },
+  "twoFactorCode": {
+    "message": "Código de dois fatores"
+  },
+  "pinThisCode": {
+    "message": "Fixar este código em $HOST$?",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "Fixar"
+  },
+  "notNow": {
+    "message": "Agora não"
+  },
+  "noEntryYet": {
+    "message": "Ainda não há item para este site. Faça login uma vez e o Keyhold vai oferecer para salvá-lo."
+  },
+  "duplicateHint": {
+    "message": "Salvo mais de uma vez para este site e nome de usuário"
+  },
+  "duplicate": {
+    "message": "duplicado"
+  },
+  "edit": {
+    "message": "Editar"
+  },
+  "appDidNotAnswer": {
+    "message": "O Keyhold não respondeu. O app está aberto?"
+  },
+  "noLoginField": {
+    "message": "Nenhum campo de login encontrado nesta página."
+  },
+  "openWebsiteFirst": {
+    "message": "Abra um site primeiro."
+  },
+  "pairedNotRunning": {
+    "message": "Pareado com o app Keyhold deste computador, mas ele não está aberto. Abra o Keyhold e ele assume."
+  },
+  "notRunning": {
+    "message": "O Keyhold não está aberto neste computador."
+  },
+  "useDriveVault": {
+    "message": "Usar meu cofre do Google Drive"
+  },
+  "driveVaultHint": {
+    "message": "Ele continua criptografado e abre aqui com sua senha mestra."
+  },
+  "connecting": {
+    "message": "Conectando…"
+  },
+  "driveNotConnected": {
+    "message": "O Google Drive não foi conectado."
+  },
+  "pairAgain": {
+    "message": "Parear novamente"
+  },
+  "pairWithApp": {
+    "message": "O app Keyhold está aberto aqui — parear com ele"
+  },
+  "masterPasswordOfVault": {
+    "message": "Senha mestra do seu cofre Keyhold"
+  },
+  "show": {
+    "message": "Mostrar"
+  },
+  "unlock": {
+    "message": "Desbloquear"
+  },
+  "opening": {
+    "message": "Abrindo…"
+  },
+  "vaultDidNotOpen": {
+    "message": "O cofre não abriu."
+  },
+  "disconnectDrive": {
+    "message": "Desconectar o Google Drive"
+  },
+  "vaultFromDrive": {
+    "message": "Cofre do Google Drive"
+  },
+  "lock": {
+    "message": "Bloquear"
+  },
+  "autoSaveHint": {
+    "message": "Quando um login claramente funciona, o Keyhold o guarda na hora"
+  },
+  "autoSave": {
+    "message": "Salvar logins sem perguntar"
+  },
+  "neverOn": {
+    "message": "Logins não são salvos em $HOST$ — clique para permitir",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "Nunca salvar logins neste site"
+  },
+  "allCodes": {
+    "message": "Todos os códigos…"
+  },
+  "notTiedToSite": {
+    "message": "ainda não fixado em um site"
+  },
+  "editLogin": {
+    "message": "Editar login"
+  },
+  "delete": {
+    "message": "Excluir"
+  },
+  "title": {
+    "message": "Título"
+  },
+  "username": {
+    "message": "Nome de usuário"
+  },
+  "password": {
+    "message": "Senha"
+  },
+  "key": {
+    "message": "Chave"
+  },
+  "keyHint": {
+    "message": "Cole a chave de configuração ou o link otpauth:// inteiro"
+  },
+  "address": {
+    "message": "Endereço"
+  },
+  "none": {
+    "message": "Nenhum"
+  },
+  "namesRepeatHint": {
+    "message": "Nomes podem se repetir — o código atual os diferencia"
+  },
+  "group": {
+    "message": "Grupo"
+  },
+  "groupHint": {
+    "message": "Escolha um ou digite um novo nome"
+  },
+  "groupWeb": {
+    "message": "Web"
+  },
+  "notes": {
+    "message": "Notas"
+  },
+  "addresses": {
+    "message": "Endereços"
+  },
+  "addAddress": {
+    "message": "Adicionar um endereço"
+  },
+  "add": {
+    "message": "Adicionar"
+  },
+  "remove": {
+    "message": "Remover"
+  },
+  "codeNotUsedYet": {
+    "message": "Ainda não usado em lugar nenhum. Ele se fixa sozinho na primeira vez que você o usar em um site, ou fixe-o a partir de um login."
+  },
+  "loginNotInVault": {
+    "message": "Este login não está no cofre aberto. Desbloqueie o Keyhold na barra de ferramentas e tente novamente."
+  },
+  "name": {
+    "message": "Nome"
+  },
+  "note": {
+    "message": "Nota"
+  },
+  "noName": {
+    "message": "(sem nome)"
+  },
+  "savingToDrive": {
+    "message": "Salvando no Google Drive…"
+  },
+  "notSaved": {
+    "message": "Não salvo."
+  },
+  "deleteConfirm": {
+    "message": "Excluir este login do Keyhold?"
+  },
+  "deleting": {
+    "message": "Excluindo…"
+  },
+  "notDeleted": {
+    "message": "Não excluído."
+  },
+  "notFound": {
+    "message": "Não encontrado"
+  },
+  "googleDidNotSignIn": {
+    "message": "O login do Google não foi concluído"
+  },
+  "driveAnswered": {
+    "message": "O Google Drive respondeu $STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "Ainda não há nenhum cofre Keyhold neste Google Drive"
+  },
+  "driveNotReachable": {
+    "message": "O Google Drive está inacessível"
+  },
+  "setPasswordInApp": {
+    "message": "Defina primeiro uma senha mestra no app Keyhold"
+  },
+  "signInWindowOpen": {
+    "message": "Uma janela de login do Google ainda está aberta. Feche-a e tente novamente."
+  },
+  "wrongMasterPassword": {
+    "message": "Senha mestra incorreta"
+  }
+}

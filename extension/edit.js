@@ -1,6 +1,10 @@
 // One login from the vault opened from Google Drive, with the same fields as
 // the app's edit screen. Saving writes straight back to Drive.
 const api = globalThis.browser ?? chrome;
+const t = (key, ...subs) => api.i18n.getMessage(key, subs);
+for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
+for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
+for (const el of document.querySelectorAll('[data-i18n-placeholder]')) el.placeholder = t(el.dataset.i18nPlaceholder);
 const id = new URLSearchParams(location.search).get('id');
 const field = (name) => document.getElementById(name);
 const status = (text) => (field('status').textContent = text);
@@ -28,7 +32,7 @@ function renderSites() {
     }
     const x = document.createElement('button');
     x.textContent = '✕';
-    x.title = 'Remove';
+    x.title = t('remove');
     x.onclick = () => {
       remove();
       renderSites();
@@ -41,7 +45,7 @@ function renderSites() {
   if (!box.children.length) {
     const empty = document.createElement('div');
     empty.className = 'empty';
-    empty.textContent = 'Not used anywhere yet. It pins itself the first time you use it on a site, or pin it from a login.';
+    empty.textContent = t('codeNotUsedYet');
     box.append(empty);
   }
 }
@@ -69,7 +73,7 @@ function secretOf(text) {
 async function open() {
   const result = await api.runtime.sendMessage({ type: 'entry', id });
   if (!result || result.error) {
-    status('This login is not in the open vault. Unlock Keyhold in the toolbar and try again.');
+    status(t('loginNotInVault'));
     field('save').disabled = true;
     field('delete').disabled = true;
     return;
@@ -77,8 +81,8 @@ async function open() {
   // A two-factor code of its own: name, key, note, address.
   if (result.code) {
     document.body.classList.add('is-code');
-    field('title-label').textContent = 'Name';
-    field('notes-label').textContent = 'Note';
+    field('title-label').textContent = t('name');
+    field('notes-label').textContent = t('note');
     sites = [...(result.sites || [])];
     pinned = result.pinned || [];
     renderSites();
@@ -86,12 +90,12 @@ async function open() {
   for (const code of result.codes || []) {
     const option = document.createElement('option');
     option.value = code.id;
-    option.textContent = `${code.title || '(no name)'} — ${code.code.slice(0, 3)} ${code.code.slice(3)}`;
+    option.textContent = `${code.title || t('noName')} — ${code.code.slice(0, 3)} ${code.code.slice(3)}`;
     field('twoFactor').append(option);
   }
   for (const name of FIELDS) field(name).value = result.entry[name] || '';
-  field('heading').textContent = result.entry.title || (result.code ? 'Two-factor code' : 'Edit login');
-  document.title = `Keyhold — ${result.entry.title || 'edit'}`;
+  field('heading').textContent = result.entry.title || (result.code ? t('twoFactorCode') : t('editLogin'));
+  document.title = `Keyhold — ${result.entry.title || t('editLogin')}`;
   for (const group of result.groups || []) {
     const option = document.createElement('option');
     option.value = group;
@@ -116,18 +120,18 @@ field('save').onclick = async () => {
   addSite();
   entry.sites = sites;
   entry.unpin = [...unpin];
-  status('Saving to Google Drive…');
+  status(t('savingToDrive'));
   const result = await api.runtime.sendMessage({ type: 'put', entry });
   if (result && result.result === 'saved') window.close();
-  else status((result && result.error) || 'Not saved.');
+  else status((result && result.error) || t('notSaved'));
 };
 
 field('delete').onclick = async () => {
-  if (!confirm('Delete this login from Keyhold?')) return;
-  status('Deleting…');
+  if (!confirm(t('deleteConfirm'))) return;
+  status(t('deleting'));
   const result = await api.runtime.sendMessage({ type: 'delete', id });
   if (result && result.result === 'deleted') window.close();
-  else status((result && result.error) || 'Not deleted.');
+  else status((result && result.error) || t('notDeleted'));
 };
 
 field('add-site').onclick = addSite;

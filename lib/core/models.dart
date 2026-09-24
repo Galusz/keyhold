@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import '../l10n/l10n.dart';
+
 /// "example.com" from any address, without "www.".
 String hostOf(String url) {
   var text = url.trim();
@@ -353,11 +355,11 @@ class Vault {
       for (final e in group) {
         final day = DateTime.fromMillisecondsSinceEpoch(e.updatedAt).toIso8601String().substring(0, 10);
         final password = e == newest
-            ? 'newest'
+            ? t.dupNewest
             : e.password == newest.password
-                ? 'same password as the newest'
-                : 'different password';
-        notes[e.id] = '${e.username.isEmpty ? '(no username)' : e.username} · $password · changed $day';
+                ? t.dupSamePassword
+                : t.dupDifferentPassword;
+        notes[e.id] = t.duplicateNote(e.username.isEmpty ? t.noUsername : e.username, password, day);
       }
     }
     return notes;
@@ -369,6 +371,10 @@ class Vault {
     final uri = Uri.tryParse(text);
     return uri != null && uri.hasPort ? uri.port : null;
   }
+
+  /// A group Keyhold fills by itself: under its English name when the vault was
+  /// grouped that way before Keyhold spoke other languages, else in the user's.
+  String defaultGroup(String english, String local) => groups.contains(english) ? english : local;
 
   List<String> get groups {
     final names = entries.values

@@ -1,6 +1,8 @@
 const api = globalThis.browser ?? chrome;
+const t = (key, ...subs) => api.i18n.getMessage(key, subs);
 const ORIGINS = ['http://127.0.0.1:19919/*', '*://*/*'];
 const content = document.getElementById('content');
+content.textContent = t('lookingForMatches');
 
 // Runs inside the page, so it must not reference anything outside itself.
 function fillPage(data) {
@@ -65,9 +67,9 @@ function permissionScreen() {
   content.innerHTML = '';
   const hint = document.createElement('p');
   hint.className = 'muted';
-  hint.textContent = 'Keyhold needs your permission to talk to the app on this computer and to fill login forms.';
+  hint.textContent = t('permissionHint');
   const button = document.createElement('button');
-  button.textContent = 'Allow';
+  button.textContent = t('allow');
   button.onclick = async () => {
     const granted = await api.permissions.request({ origins: ORIGINS });
     if (granted) load();
@@ -80,11 +82,11 @@ function pairingScreen() {
   content.innerHTML = '';
   const hint = document.createElement('p');
   hint.className = 'muted';
-  hint.textContent = 'Open Keyhold, click the puzzle icon and paste the pairing token here.';
+  hint.textContent = t('pairingHint');
   const input = document.createElement('input');
-  input.placeholder = 'Pairing token';
+  input.placeholder = t('pairingToken');
   const button = document.createElement('button');
-  button.textContent = 'Connect';
+  button.textContent = t('connect');
   button.onclick = async () => {
     await api.storage.local.set({ token: input.value.trim() });
     load();
@@ -109,19 +111,19 @@ function renderOffers(offers) {
     const note = document.createElement('div');
     note.className = 'note';
     note.textContent = offer.known
-      ? 'The saved password did not work. Sign in with the new one and Keyhold will offer to update it.'
+      ? t('offerKnownFailed')
       : offer.failed
-        ? 'This login did not work'
+        ? t('offerFailed')
         : offer.changed
-          ? 'Update the password in Keyhold?'
-          : 'Save this login in Keyhold?';
+          ? t('offerChanged')
+          : t('offerNew');
     box.append(title, user, note);
 
     const review = document.createElement('div');
     review.className = 'review';
     const answers = [
-      ['✓', true, 'yes', offer.failed ? 'Save anyway' : offer.changed ? 'Update' : 'Save'],
-      ['✕', false, 'no', offer.known ? 'OK' : 'Forget it'],
+      ['✓', true, 'yes', offer.failed ? t('saveAnyway') : offer.changed ? t('update') : t('save')],
+      ['✕', false, 'no', offer.known ? t('ok') : t('forgetIt')],
     ];
     for (const [label, keep, cls, tip] of offer.known ? answers.slice(1) : answers) {
       const b = document.createElement('button');
@@ -170,16 +172,16 @@ function renderPins(pins) {
     const box = document.createElement('div');
     const title = document.createElement('div');
     title.className = 'title';
-    title.textContent = pin.title || 'Two-factor code';
+    title.textContent = pin.title || t('twoFactorCode');
     const note = document.createElement('div');
     note.className = 'note';
-    note.textContent = `Pin this code to ${pin.host}?`;
+    note.textContent = t('pinThisCode', pin.host);
     box.append(title, note);
     const answers = document.createElement('div');
     answers.className = 'review';
     for (const [label, yes, cls, tip] of [
-      ['✓', true, 'yes', 'Pin it'],
-      ['✕', false, 'no', 'Not now'],
+      ['✓', true, 'yes', t('pinIt')],
+      ['✕', false, 'no', t('notNow')],
     ]) {
       const b = document.createElement('button');
       b.textContent = label;
@@ -200,7 +202,7 @@ function render(entries, tab, alone) {
   if (entries.length === 0) {
     const hint = document.createElement('p');
     hint.className = 'muted';
-    hint.textContent = 'No entry for this site yet. Log in once and Keyhold will offer to save it.';
+    hint.textContent = t('noEntryYet');
     content.append(hint);
     return;
   }
@@ -223,8 +225,8 @@ function render(entries, tab, alone) {
     if (entry.duplicate) {
       const badge = document.createElement('span');
       badge.className = 'badge duplicate';
-      badge.title = 'Kept more than once for this site and username';
-      badge.textContent = 'duplicate';
+      badge.title = t('duplicateHint');
+      badge.textContent = t('duplicate');
       row.append(badge);
     }
     if (entry.hasCode) {
@@ -237,7 +239,7 @@ function render(entries, tab, alone) {
     // Edit: in Keyhold's window when the app runs here, otherwise on a page of its own.
     const pencil = document.createElement('button');
     pencil.className = 'pencil';
-    pencil.title = 'Edit';
+    pencil.title = t('edit');
     pencil.textContent = '✎';
     pencil.onclick = async (e) => {
       e.stopPropagation();
@@ -253,7 +255,7 @@ function render(entries, tab, alone) {
     row.onclick = async () => {
       const data = await api.runtime.sendMessage({ type: 'fill', id: entry.id });
       if (!data || data.error) {
-        message('Keyhold did not answer. Is the app running?');
+        message(t('appDidNotAnswer'));
         return;
       }
       const [result] = await api.scripting.executeScript({
@@ -262,7 +264,7 @@ function render(entries, tab, alone) {
         args: [data],
       });
       if (result && result.result === 'none') {
-        message('No login field found on this page.');
+        message(t('noLoginField'));
         return;
       }
       window.close();
@@ -276,7 +278,7 @@ async function load() {
   document.getElementById('never').hidden = true;
   const [tab] = await api.tabs.query({ active: true, currentWindow: true });
   if (!tab || !tab.url || !/^https?:/.test(tab.url)) {
-    message('Open a website first.');
+    message(t('openWebsiteFirst'));
     return;
   }
 
@@ -320,29 +322,29 @@ async function noAppScreen() {
   const hint = document.createElement('p');
   hint.className = 'muted';
   hint.textContent = token
-    ? 'Paired with the Keyhold app on this computer, but it is not running. Start Keyhold and it takes over.'
-    : 'Keyhold is not running on this computer.';
+    ? t('pairedNotRunning')
+    : t('notRunning');
   const drive = document.createElement('button');
-  drive.textContent = 'Use my vault from Google Drive';
+  drive.textContent = t('useDriveVault');
   const note = document.createElement('p');
   note.className = 'muted small';
-  note.textContent = 'It stays encrypted and opens here with your master password.';
+  note.textContent = t('driveVaultHint');
   drive.onclick = async () => {
     drive.disabled = true;
-    drive.textContent = 'Connecting…';
+    drive.textContent = t('connecting');
     const result = await api.runtime.sendMessage({ type: 'alone-connect' });
     if (result && result.ok) {
       unlockScreen();
       return;
     }
     drive.disabled = false;
-    drive.textContent = 'Use my vault from Google Drive';
-    note.textContent = (result && result.error) || 'Google Drive was not connected.';
+    drive.textContent = t('useDriveVault');
+    note.textContent = (result && result.error) || t('driveNotConnected');
   };
   const pair = document.createElement('a');
   pair.href = '#';
   pair.className = 'link';
-  pair.textContent = token ? 'Pair again' : 'The Keyhold app runs here — pair with it';
+  pair.textContent = token ? t('pairAgain') : t('pairWithApp');
   pair.onclick = (e) => {
     e.preventDefault();
     pairingScreen();
@@ -355,7 +357,7 @@ function unlockScreen() {
   content.innerHTML = '';
   const hint = document.createElement('p');
   hint.className = 'muted';
-  hint.textContent = 'Master password of your Keyhold vault';
+  hint.textContent = t('masterPasswordOfVault');
   const input = document.createElement('input');
   input.type = 'password';
   input.autofocus = true;
@@ -364,7 +366,7 @@ function unlockScreen() {
   field.className = 'with-eye';
   const eye = document.createElement('button');
   eye.className = 'eye';
-  eye.title = 'Show';
+  eye.title = t('show');
   eye.textContent = '👁';
   eye.onclick = () => {
     input.type = input.type === 'password' ? 'text' : 'password';
@@ -372,20 +374,20 @@ function unlockScreen() {
   };
   field.append(input, eye);
   const button = document.createElement('button');
-  button.textContent = 'Unlock';
+  button.textContent = t('unlock');
   const note = document.createElement('p');
   note.className = 'muted small';
   const unlock = async () => {
     button.disabled = true;
-    button.textContent = 'Opening…';
+    button.textContent = t('opening');
     const result = await api.runtime.sendMessage({ type: 'alone-unlock', password: input.value });
     if (result && result.ok) {
       load();
       return;
     }
     button.disabled = false;
-    button.textContent = 'Unlock';
-    note.textContent = (result && result.error) || 'The vault did not open.';
+    button.textContent = t('unlock');
+    note.textContent = (result && result.error) || t('vaultDidNotOpen');
     input.select();
   };
   button.onclick = unlock;
@@ -395,7 +397,7 @@ function unlockScreen() {
   const disconnect = document.createElement('a');
   disconnect.href = '#';
   disconnect.className = 'link';
-  disconnect.textContent = 'Disconnect Google Drive';
+  disconnect.textContent = t('disconnectDrive');
   disconnect.onclick = async (e) => {
     e.preventDefault();
     await api.runtime.sendMessage({ type: 'alone-disconnect' });
@@ -409,9 +411,9 @@ function aloneFooter() {
   const row = document.createElement('div');
   row.className = 'alone';
   const text = document.createElement('span');
-  text.textContent = 'Vault from Google Drive';
+  text.textContent = t('vaultFromDrive');
   const lock = document.createElement('button');
-  lock.textContent = 'Lock';
+  lock.textContent = t('lock');
   lock.onclick = async () => {
     await api.runtime.sendMessage({ type: 'alone-lock' });
     load();
@@ -423,13 +425,13 @@ function aloneFooter() {
 function autoSaveSwitch(on) {
   const row = document.createElement('label');
   row.className = 'switch';
-  row.title = 'When a login clearly works, Keyhold keeps it straight away';
+  row.title = t('autoSaveHint');
   const box = document.createElement('input');
   box.type = 'checkbox';
   box.checked = on;
   box.onchange = () => api.runtime.sendMessage({ type: 'autosave', on: box.checked });
   const text = document.createElement('span');
-  text.textContent = 'Save logins without asking';
+  text.textContent = t('autoSave');
   row.append(box, text);
   content.append(row);
 }
@@ -440,7 +442,7 @@ function neverSwitch(never, tab) {
   const host = new URL(tab.url).hostname;
   button.hidden = false;
   button.classList.toggle('on', never);
-  button.title = never ? `Logins are not saved on ${host} — click to allow` : 'Never save logins on this site';
+  button.title = never ? t('neverOn', host) : t('neverOff');
   button.onclick = async () => {
     await api.runtime.sendMessage({ type: 'never', on: !never, url: tab.url });
     load();

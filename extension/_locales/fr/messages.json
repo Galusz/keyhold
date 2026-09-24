@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "Remplit les identifiants et les codes de double authentification depuis votre coffre-fort Keyhold."
+  },
+  "lookingForMatches": {
+    "message": "Recherche de correspondances…"
+  },
+  "permissionHint": {
+    "message": "Keyhold a besoin de votre autorisation pour communiquer avec l’appli sur cet ordinateur et remplir les formulaires de connexion."
+  },
+  "allow": {
+    "message": "Autoriser"
+  },
+  "pairingHint": {
+    "message": "Ouvrez Keyhold, cliquez sur l’icône puzzle et collez ici le jeton d’association."
+  },
+  "pairingToken": {
+    "message": "Jeton d’association"
+  },
+  "connect": {
+    "message": "Connecter"
+  },
+  "offerKnownFailed": {
+    "message": "Le mot de passe enregistré n’a pas fonctionné. Connectez-vous avec le nouveau et Keyhold proposera de le mettre à jour."
+  },
+  "offerFailed": {
+    "message": "Cet identifiant n’a pas fonctionné"
+  },
+  "offerChanged": {
+    "message": "Mettre à jour le mot de passe dans Keyhold ?"
+  },
+  "offerNew": {
+    "message": "Enregistrer cet identifiant dans Keyhold ?"
+  },
+  "saveAnyway": {
+    "message": "Enregistrer quand même"
+  },
+  "update": {
+    "message": "Mettre à jour"
+  },
+  "save": {
+    "message": "Enregistrer"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "forgetIt": {
+    "message": "Oublier"
+  },
+  "twoFactorCode": {
+    "message": "Code de double authentification"
+  },
+  "pinThisCode": {
+    "message": "Épingler ce code sur $HOST$ ?",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "Épingler"
+  },
+  "notNow": {
+    "message": "Pas maintenant"
+  },
+  "noEntryYet": {
+    "message": "Pas encore d’entrée pour ce site. Connectez-vous une fois et Keyhold proposera de l’enregistrer."
+  },
+  "duplicateHint": {
+    "message": "Enregistré plusieurs fois pour ce site et ce nom d’utilisateur"
+  },
+  "duplicate": {
+    "message": "doublon"
+  },
+  "edit": {
+    "message": "Modifier"
+  },
+  "appDidNotAnswer": {
+    "message": "Keyhold n’a pas répondu. L’appli est-elle lancée ?"
+  },
+  "noLoginField": {
+    "message": "Aucun champ de connexion sur cette page."
+  },
+  "openWebsiteFirst": {
+    "message": "Ouvrez d’abord un site."
+  },
+  "pairedNotRunning": {
+    "message": "Associé à l’appli Keyhold de cet ordinateur, mais elle n’est pas lancée. Lancez Keyhold et elle prendra le relais."
+  },
+  "notRunning": {
+    "message": "Keyhold n’est pas lancé sur cet ordinateur."
+  },
+  "useDriveVault": {
+    "message": "Utiliser mon coffre-fort de Google Drive"
+  },
+  "driveVaultHint": {
+    "message": "Il reste chiffré et s’ouvre ici avec votre mot de passe principal."
+  },
+  "connecting": {
+    "message": "Connexion…"
+  },
+  "driveNotConnected": {
+    "message": "Google Drive n’a pas été connecté."
+  },
+  "pairAgain": {
+    "message": "Associer à nouveau"
+  },
+  "pairWithApp": {
+    "message": "L’appli Keyhold est lancée ici — associez-la"
+  },
+  "masterPasswordOfVault": {
+    "message": "Mot de passe principal de votre coffre-fort Keyhold"
+  },
+  "show": {
+    "message": "Afficher"
+  },
+  "unlock": {
+    "message": "Déverrouiller"
+  },
+  "opening": {
+    "message": "Ouverture…"
+  },
+  "vaultDidNotOpen": {
+    "message": "Le coffre-fort ne s’est pas ouvert."
+  },
+  "disconnectDrive": {
+    "message": "Déconnecter Google Drive"
+  },
+  "vaultFromDrive": {
+    "message": "Coffre-fort de Google Drive"
+  },
+  "lock": {
+    "message": "Verrouiller"
+  },
+  "autoSaveHint": {
+    "message": "Quand un identifiant fonctionne clairement, Keyhold l’enregistre aussitôt"
+  },
+  "autoSave": {
+    "message": "Enregistrer les identifiants sans demander"
+  },
+  "neverOn": {
+    "message": "Les identifiants ne sont pas enregistrés sur $HOST$ — cliquez pour autoriser",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "Ne jamais enregistrer d’identifiants sur ce site"
+  },
+  "allCodes": {
+    "message": "Tous les codes…"
+  },
+  "notTiedToSite": {
+    "message": "pas encore lié à un site"
+  },
+  "editLogin": {
+    "message": "Modifier l’identifiant"
+  },
+  "delete": {
+    "message": "Supprimer"
+  },
+  "title": {
+    "message": "Titre"
+  },
+  "username": {
+    "message": "Nom d’utilisateur"
+  },
+  "password": {
+    "message": "Mot de passe"
+  },
+  "key": {
+    "message": "Clé"
+  },
+  "keyHint": {
+    "message": "Collez la clé de configuration ou le lien otpauth:// complet"
+  },
+  "address": {
+    "message": "Adresse"
+  },
+  "none": {
+    "message": "Aucun"
+  },
+  "namesRepeatHint": {
+    "message": "Les noms peuvent se répéter — le code actuel permet de les distinguer"
+  },
+  "group": {
+    "message": "Groupe"
+  },
+  "groupHint": {
+    "message": "Choisissez-en un ou tapez un nouveau nom"
+  },
+  "groupWeb": {
+    "message": "Web"
+  },
+  "notes": {
+    "message": "Notes"
+  },
+  "addresses": {
+    "message": "Adresses"
+  },
+  "addAddress": {
+    "message": "Ajouter une adresse"
+  },
+  "add": {
+    "message": "Ajouter"
+  },
+  "remove": {
+    "message": "Retirer"
+  },
+  "codeNotUsedYet": {
+    "message": "Utilisé nulle part pour l’instant. Il s’épingle tout seul la première fois que vous l’utilisez sur un site, ou épinglez-le depuis un identifiant."
+  },
+  "loginNotInVault": {
+    "message": "Cet identifiant n’est pas dans le coffre-fort ouvert. Déverrouillez Keyhold dans la barre d’outils et réessayez."
+  },
+  "name": {
+    "message": "Nom"
+  },
+  "note": {
+    "message": "Note"
+  },
+  "noName": {
+    "message": "(sans nom)"
+  },
+  "savingToDrive": {
+    "message": "Enregistrement sur Google Drive…"
+  },
+  "notSaved": {
+    "message": "Non enregistré."
+  },
+  "deleteConfirm": {
+    "message": "Supprimer cet identifiant de Keyhold ?"
+  },
+  "deleting": {
+    "message": "Suppression…"
+  },
+  "notDeleted": {
+    "message": "Non supprimé."
+  },
+  "notFound": {
+    "message": "Introuvable"
+  },
+  "googleDidNotSignIn": {
+    "message": "La connexion à Google n’a pas abouti"
+  },
+  "driveAnswered": {
+    "message": "Google Drive a répondu $STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "Il n’y a pas encore de coffre-fort Keyhold dans ce Google Drive"
+  },
+  "driveNotReachable": {
+    "message": "Google Drive est injoignable"
+  },
+  "setPasswordInApp": {
+    "message": "Définissez d’abord un mot de passe principal dans l’appli Keyhold"
+  },
+  "signInWindowOpen": {
+    "message": "Une fenêtre de connexion Google est encore ouverte. Fermez-la et réessayez."
+  },
+  "wrongMasterPassword": {
+    "message": "Mot de passe principal incorrect"
+  }
+}

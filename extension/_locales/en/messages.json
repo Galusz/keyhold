@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "Fills logins and two-factor codes from your Keyhold vault."
+  },
+  "lookingForMatches": {
+    "message": "Looking for matches…"
+  },
+  "permissionHint": {
+    "message": "Keyhold needs your permission to talk to the app on this computer and to fill login forms."
+  },
+  "allow": {
+    "message": "Allow"
+  },
+  "pairingHint": {
+    "message": "Open Keyhold, click the puzzle icon and paste the pairing token here."
+  },
+  "pairingToken": {
+    "message": "Pairing token"
+  },
+  "connect": {
+    "message": "Connect"
+  },
+  "offerKnownFailed": {
+    "message": "The saved password did not work. Sign in with the new one and Keyhold will offer to update it."
+  },
+  "offerFailed": {
+    "message": "This login did not work"
+  },
+  "offerChanged": {
+    "message": "Update the password in Keyhold?"
+  },
+  "offerNew": {
+    "message": "Save this login in Keyhold?"
+  },
+  "saveAnyway": {
+    "message": "Save anyway"
+  },
+  "update": {
+    "message": "Update"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "forgetIt": {
+    "message": "Forget it"
+  },
+  "twoFactorCode": {
+    "message": "Two-factor code"
+  },
+  "pinThisCode": {
+    "message": "Pin this code to $HOST$?",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "Pin it"
+  },
+  "notNow": {
+    "message": "Not now"
+  },
+  "noEntryYet": {
+    "message": "No entry for this site yet. Log in once and Keyhold will offer to save it."
+  },
+  "duplicateHint": {
+    "message": "Kept more than once for this site and username"
+  },
+  "duplicate": {
+    "message": "duplicate"
+  },
+  "edit": {
+    "message": "Edit"
+  },
+  "appDidNotAnswer": {
+    "message": "Keyhold did not answer. Is the app running?"
+  },
+  "noLoginField": {
+    "message": "No login field found on this page."
+  },
+  "openWebsiteFirst": {
+    "message": "Open a website first."
+  },
+  "pairedNotRunning": {
+    "message": "Paired with the Keyhold app on this computer, but it is not running. Start Keyhold and it takes over."
+  },
+  "notRunning": {
+    "message": "Keyhold is not running on this computer."
+  },
+  "useDriveVault": {
+    "message": "Use my vault from Google Drive"
+  },
+  "driveVaultHint": {
+    "message": "It stays encrypted and opens here with your master password."
+  },
+  "connecting": {
+    "message": "Connecting…"
+  },
+  "driveNotConnected": {
+    "message": "Google Drive was not connected."
+  },
+  "pairAgain": {
+    "message": "Pair again"
+  },
+  "pairWithApp": {
+    "message": "The Keyhold app runs here — pair with it"
+  },
+  "masterPasswordOfVault": {
+    "message": "Master password of your Keyhold vault"
+  },
+  "show": {
+    "message": "Show"
+  },
+  "unlock": {
+    "message": "Unlock"
+  },
+  "opening": {
+    "message": "Opening…"
+  },
+  "vaultDidNotOpen": {
+    "message": "The vault did not open."
+  },
+  "disconnectDrive": {
+    "message": "Disconnect Google Drive"
+  },
+  "vaultFromDrive": {
+    "message": "Vault from Google Drive"
+  },
+  "lock": {
+    "message": "Lock"
+  },
+  "autoSaveHint": {
+    "message": "When a login clearly works, Keyhold keeps it straight away"
+  },
+  "autoSave": {
+    "message": "Save logins without asking"
+  },
+  "neverOn": {
+    "message": "Logins are not saved on $HOST$ — click to allow",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "Never save logins on this site"
+  },
+  "allCodes": {
+    "message": "All codes…"
+  },
+  "notTiedToSite": {
+    "message": "not tied to a site yet"
+  },
+  "editLogin": {
+    "message": "Edit login"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "title": {
+    "message": "Title"
+  },
+  "username": {
+    "message": "Username"
+  },
+  "password": {
+    "message": "Password"
+  },
+  "key": {
+    "message": "Key"
+  },
+  "keyHint": {
+    "message": "Paste the setup key or the whole otpauth:// link"
+  },
+  "address": {
+    "message": "Address"
+  },
+  "none": {
+    "message": "None"
+  },
+  "namesRepeatHint": {
+    "message": "Names can repeat — the current code tells them apart"
+  },
+  "group": {
+    "message": "Group"
+  },
+  "groupHint": {
+    "message": "Pick one or type a new name"
+  },
+  "groupWeb": {
+    "message": "Web"
+  },
+  "notes": {
+    "message": "Notes"
+  },
+  "addresses": {
+    "message": "Addresses"
+  },
+  "addAddress": {
+    "message": "Add an address"
+  },
+  "add": {
+    "message": "Add"
+  },
+  "remove": {
+    "message": "Remove"
+  },
+  "codeNotUsedYet": {
+    "message": "Not used anywhere yet. It pins itself the first time you use it on a site, or pin it from a login."
+  },
+  "loginNotInVault": {
+    "message": "This login is not in the open vault. Unlock Keyhold in the toolbar and try again."
+  },
+  "name": {
+    "message": "Name"
+  },
+  "note": {
+    "message": "Note"
+  },
+  "noName": {
+    "message": "(no name)"
+  },
+  "savingToDrive": {
+    "message": "Saving to Google Drive…"
+  },
+  "notSaved": {
+    "message": "Not saved."
+  },
+  "deleteConfirm": {
+    "message": "Delete this login from Keyhold?"
+  },
+  "deleting": {
+    "message": "Deleting…"
+  },
+  "notDeleted": {
+    "message": "Not deleted."
+  },
+  "notFound": {
+    "message": "Not found"
+  },
+  "googleDidNotSignIn": {
+    "message": "Google did not sign in"
+  },
+  "driveAnswered": {
+    "message": "Google Drive answered $STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "There is no Keyhold vault in this Google Drive yet"
+  },
+  "driveNotReachable": {
+    "message": "Google Drive is not reachable"
+  },
+  "setPasswordInApp": {
+    "message": "Set a master password in the Keyhold app first"
+  },
+  "signInWindowOpen": {
+    "message": "A Google sign-in window is still open. Close it and try again."
+  },
+  "wrongMasterPassword": {
+    "message": "Wrong master password"
+  }
+}

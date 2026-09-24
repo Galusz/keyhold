@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/storage.dart';
+import '../l10n/l10n.dart';
 
 class PasswordPage extends StatefulWidget {
   const PasswordPage({super.key, required this.store, required this.unlockMode});
@@ -32,16 +33,16 @@ class _PasswordPageState extends State<PasswordPage> {
     final password = _first.text;
 
     if (password.isEmpty) {
-      setState(() => _error = 'Type your password first');
+      setState(() => _error = t.typePasswordFirst);
       return;
     }
     if (!widget.unlockMode) {
       if (password.length < 8) {
-        setState(() => _error = 'Use at least 8 characters');
+        setState(() => _error = t.atLeast8);
         return;
       }
       if (password != _second.text) {
-        setState(() => _error = 'The two passwords differ');
+        setState(() => _error = t.passwordsDiffer);
         return;
       }
     }
@@ -55,13 +56,13 @@ class _PasswordPageState extends State<PasswordPage> {
       if (widget.unlockMode) {
         final ok = await widget.store.unlockWithPassword(password);
         if (!ok) {
-          setState(() => _error = 'That password does not open this vault');
+          setState(() => _error = t.passwordDoesNotOpen);
           return;
         }
       } else {
         // A change reaches every device, so it takes the password in use now.
         if (!await widget.store.checkPassword(_current.text)) {
-          setState(() => _error = 'The current master password is wrong');
+          setState(() => _error = t.currentPasswordWrong);
           return;
         }
         await widget.store.setPassword(password);
@@ -79,7 +80,7 @@ class _PasswordPageState extends State<PasswordPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(unlock ? 'Unlock vault' : 'Master password'),
+        title: Text(unlock ? t.unlockVault : t.masterPassword),
         automaticallyImplyLeading: !unlock,
       ),
       body: Center(
@@ -92,10 +93,7 @@ class _PasswordPageState extends State<PasswordPage> {
               Icon(Icons.lock_outline, size: 48, color: theme.colorScheme.primary),
               const SizedBox(height: 24),
               Text(
-                unlock
-                    ? 'This vault came from another machine. Type the master password to open it here.'
-                    : 'Windows opens this vault for you automatically. The master password is the '
-                        'way back in after a reinstall, on a new machine, or on your phone.',
+                unlock ? t.unlockHint : t.masterPasswordHint,
                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
               ),
               const SizedBox(height: 24),
@@ -103,9 +101,9 @@ class _PasswordPageState extends State<PasswordPage> {
                 TextField(
                   controller: _current,
                   obscureText: !_show,
-                  decoration: const InputDecoration(
-                    labelText: 'Current master password',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: t.currentMasterPassword,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -116,7 +114,7 @@ class _PasswordPageState extends State<PasswordPage> {
                 obscureText: !_show,
                 onSubmitted: (_) => _submit(),
                 decoration: InputDecoration(
-                  labelText: unlock ? 'Master password' : 'New master password',
+                  labelText: unlock ? t.masterPassword : t.newMasterPassword,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(_show ? Icons.visibility_off : Icons.visibility),
@@ -130,9 +128,9 @@ class _PasswordPageState extends State<PasswordPage> {
                   controller: _second,
                   obscureText: !_show,
                   onSubmitted: (_) => _submit(),
-                  decoration: const InputDecoration(
-                    labelText: 'Repeat it',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: t.repeatIt,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -143,12 +141,12 @@ class _PasswordPageState extends State<PasswordPage> {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _busy ? null : _submit,
-                child: Text(unlock ? 'Open vault' : 'Save password'),
+                child: Text(unlock ? t.openVault : t.savePassword),
               ),
               if (!unlock) ...[
                 const SizedBox(height: 16),
                 Text(
-                  'Nobody can recover it for you — not even this app. Write it down somewhere safe.',
+                  t.nobodyCanRecover,
                   style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
                 ),
               ],

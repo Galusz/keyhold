@@ -3,6 +3,7 @@
 // It answers the same questions the app answers over 127.0.0.1.
 const Standalone = (() => {
   const ext = globalThis.browser ?? chrome;
+  const t = (key, ...subs) => ext.i18n.getMessage(key, subs);
   const local = ext.storage.local;
   const session = ext.storage.session;
 
@@ -101,7 +102,7 @@ const Standalone = (() => {
     });
     const answer = new URLSearchParams(new URL(back).hash.slice(1));
     const value = answer.get('access_token');
-    if (!value) throw new Error(answer.get('error') || 'Google did not sign in');
+    if (!value) throw new Error(answer.get('error') || t('googleDidNotSignIn'));
     await session.set({
       driveToken: { token: value, until: Date.now() + Number(answer.get('expires_in') || 3600) * 1000 },
     });
@@ -114,7 +115,7 @@ const Standalone = (() => {
       headers: { ...(init.headers || {}), Authorization: `Bearer ${await token(interactive)}` },
     });
     if (response.status === 401) await session.remove('driveToken');
-    if (!response.ok) throw new Error(`Google Drive answered ${response.status}`);
+    if (!response.ok) throw new Error(t('driveAnswered', String(response.status)));
     return response;
   }
 
@@ -134,7 +135,7 @@ const Standalone = (() => {
 
   async function download(interactive = false) {
     const id = await fileId(interactive);
-    if (!id) throw new Error('There is no Keyhold vault in this Google Drive yet');
+    if (!id) throw new Error(t('noVaultInDrive'));
     const response = await drive(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, {}, interactive);
     const bytes = new Uint8Array(await response.arrayBuffer());
     await local.set({ vaultFile: toB64(bytes), pulledAt: Date.now() });
@@ -508,7 +509,7 @@ const Standalone = (() => {
 
     async '/fill'(data, body) {
       const e = visible(data).find((x) => x.id === body.id);
-      if (!e) return { error: 'not found' };
+      if (!e) return { error: t('notFound') };
       const secret = secretFor(data, e);
       return { username: e.username, password: e.password, code: secret ? await totp(secret) : null };
     },
@@ -516,7 +517,7 @@ const Standalone = (() => {
     async '/code'(data, body) {
       const e = visible(data).find((x) => x.id === body.id);
       const secret = e && secretFor(data, e);
-      if (!secret) return { error: 'not found' };
+      if (!secret) return { error: t('notFound') };
       return { code: await totp(secret), left: secondsLeft() };
     },
 
@@ -588,7 +589,8 @@ const Standalone = (() => {
             password: offer.password,
             url: offer.url,
             notes: '',
-            group: 'Web',
+            // Like the app: an older vault's English web group keeps its name.
+            group: fresh.entries.some((x) => !x.deleted && x.group === 'Web') ? 'Web' : t('groupWeb'),
             updatedAt: Date.now(),
           });
           return 'saved';
@@ -624,7 +626,7 @@ const Standalone = (() => {
     // each with its current digits, as names can repeat.
     async '/entry'(data, body) {
       const e = visible(data).find((x) => x.id === body.id);
-      if (!e) return { error: 'not found' };
+      if (!e) return { error: t('notFound') };
       const groups = [...new Set(visible(data).map((x) => x.group).filter(Boolean))].sort();
       const codes = [];
       for (const c of codesOf(data)) codes.push({ id: c.id, title: c.title, code: await totp(c.totp) });
@@ -711,7 +713,7 @@ const Standalone = (() => {
       try {
         return await route(data, body || {});
       } catch (e) {
-        return { error: e.message || 'Google Drive is not reachable' };
+        return { error: e.message || t('driveNotReachable') };
       }
     },
 
@@ -731,15 +733,15 @@ const Standalone = (() => {
         const bytes = await download(true);
         if (!parse(bytes).salt) {
           await local.remove('vaultFile');
-          return { error: 'Set a master password in the Keyhold app first' };
+          return { error: t('setPasswordInApp') };
         }
         return { ok: true };
       } catch (e) {
         const text = e.message || '';
         if (/only one web auth flow/i.test(text)) {
-          return { error: 'A Google sign-in window is still open. Close it and try again.' };
+          return { error: t('signInWindowOpen') };
         }
-        return { error: text || 'Google Drive was not connected' };
+        return { error: text || t('driveNotConnected') };
       }
     },
 
@@ -753,7 +755,7 @@ const Standalone = (() => {
         bytes = fromB64(vaultFile);
       }
       const parts = parse(bytes);
-      if (!parts.salt) return { error: 'Set a master password in the Keyhold app first' };
+      if (!parts.salt) return { error: t('setPasswordInApp') };
       try {
         const dek = await unwrap(password, parts.salt, parts.wrapped);
         await session.set({ dek: toB64(dek) });
@@ -763,7 +765,7 @@ const Standalone = (() => {
         for (const e of visible(await vault())) iconFrom(map, e.url);
         return { ok: true };
       } catch (e) {
-        return { error: 'Wrong master password' };
+        return { error: t('wrongMasterPassword') };
       }
     },
 

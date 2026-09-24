@@ -1,0 +1,272 @@
+{
+  "extDescription": {
+    "message": "Rellena inicios de sesión y códigos de dos factores desde tu caja fuerte de Keyhold."
+  },
+  "lookingForMatches": {
+    "message": "Buscando coincidencias…"
+  },
+  "permissionHint": {
+    "message": "Keyhold necesita tu permiso para comunicarse con la app en tu PC y rellenar formularios de inicio de sesión."
+  },
+  "allow": {
+    "message": "Permitir"
+  },
+  "pairingHint": {
+    "message": "Abre Keyhold, haz clic en el icono del rompecabezas y pega aquí el token de vinculación."
+  },
+  "pairingToken": {
+    "message": "Token de vinculación"
+  },
+  "connect": {
+    "message": "Conectar"
+  },
+  "offerKnownFailed": {
+    "message": "La contraseña guardada no funcionó. Inicia sesión con la nueva y Keyhold te ofrecerá actualizarla."
+  },
+  "offerFailed": {
+    "message": "Este inicio de sesión no funcionó"
+  },
+  "offerChanged": {
+    "message": "¿Actualizar la contraseña en Keyhold?"
+  },
+  "offerNew": {
+    "message": "¿Guardar este inicio de sesión en Keyhold?"
+  },
+  "saveAnyway": {
+    "message": "Guardar igualmente"
+  },
+  "update": {
+    "message": "Actualizar"
+  },
+  "save": {
+    "message": "Guardar"
+  },
+  "ok": {
+    "message": "Aceptar"
+  },
+  "forgetIt": {
+    "message": "Descartar"
+  },
+  "twoFactorCode": {
+    "message": "Código de dos factores"
+  },
+  "pinThisCode": {
+    "message": "¿Fijar este código en $HOST$?",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "pinIt": {
+    "message": "Fijar"
+  },
+  "notNow": {
+    "message": "Ahora no"
+  },
+  "noEntryYet": {
+    "message": "Aún no hay ninguna entrada para este sitio. Inicia sesión una vez y Keyhold te ofrecerá guardarla."
+  },
+  "duplicateHint": {
+    "message": "Guardado más de una vez para este sitio y usuario"
+  },
+  "duplicate": {
+    "message": "duplicado"
+  },
+  "edit": {
+    "message": "Editar"
+  },
+  "appDidNotAnswer": {
+    "message": "Keyhold no respondió. ¿Está abierta la app?"
+  },
+  "noLoginField": {
+    "message": "No se encontró ningún campo de inicio de sesión en esta página."
+  },
+  "openWebsiteFirst": {
+    "message": "Primero abre un sitio web."
+  },
+  "pairedNotRunning": {
+    "message": "Vinculada con la app Keyhold de tu PC, pero no está abierta. Abre Keyhold y se encargará de todo."
+  },
+  "notRunning": {
+    "message": "Keyhold no está abierto en tu PC."
+  },
+  "useDriveVault": {
+    "message": "Usar mi caja fuerte de Google Drive"
+  },
+  "driveVaultHint": {
+    "message": "Sigue cifrada y se abre aquí con tu contraseña maestra."
+  },
+  "connecting": {
+    "message": "Conectando…"
+  },
+  "driveNotConnected": {
+    "message": "No se pudo conectar Google Drive."
+  },
+  "pairAgain": {
+    "message": "Volver a vincular"
+  },
+  "pairWithApp": {
+    "message": "La app Keyhold está abierta aquí — vincúlala"
+  },
+  "masterPasswordOfVault": {
+    "message": "Contraseña maestra de tu caja fuerte de Keyhold"
+  },
+  "show": {
+    "message": "Mostrar"
+  },
+  "unlock": {
+    "message": "Desbloquear"
+  },
+  "opening": {
+    "message": "Abriendo…"
+  },
+  "vaultDidNotOpen": {
+    "message": "La caja fuerte no se abrió."
+  },
+  "disconnectDrive": {
+    "message": "Desconectar Google Drive"
+  },
+  "vaultFromDrive": {
+    "message": "Caja fuerte de Google Drive"
+  },
+  "lock": {
+    "message": "Bloquear"
+  },
+  "autoSaveHint": {
+    "message": "Cuando un inicio de sesión funciona sin duda, Keyhold lo guarda al momento"
+  },
+  "autoSave": {
+    "message": "Guardar inicios de sesión sin preguntar"
+  },
+  "neverOn": {
+    "message": "No se guardan inicios de sesión en $HOST$ — haz clic para permitirlo",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "neverOff": {
+    "message": "No guardar nunca inicios de sesión en este sitio"
+  },
+  "allCodes": {
+    "message": "Todos los códigos…"
+  },
+  "notTiedToSite": {
+    "message": "aún sin fijar en ningún sitio"
+  },
+  "editLogin": {
+    "message": "Editar inicio de sesión"
+  },
+  "delete": {
+    "message": "Eliminar"
+  },
+  "title": {
+    "message": "Título"
+  },
+  "username": {
+    "message": "Nombre de usuario"
+  },
+  "password": {
+    "message": "Contraseña"
+  },
+  "key": {
+    "message": "Clave"
+  },
+  "keyHint": {
+    "message": "Pega la clave de configuración o el enlace otpauth:// completo"
+  },
+  "address": {
+    "message": "Dirección"
+  },
+  "none": {
+    "message": "Ninguno"
+  },
+  "namesRepeatHint": {
+    "message": "Los nombres pueden repetirse — el código actual los distingue"
+  },
+  "group": {
+    "message": "Grupo"
+  },
+  "groupHint": {
+    "message": "Elige uno o escribe un nombre nuevo"
+  },
+  "groupWeb": {
+    "message": "Web"
+  },
+  "notes": {
+    "message": "Notas"
+  },
+  "addresses": {
+    "message": "Direcciones"
+  },
+  "addAddress": {
+    "message": "Añadir una dirección"
+  },
+  "add": {
+    "message": "Añadir"
+  },
+  "remove": {
+    "message": "Quitar"
+  },
+  "codeNotUsedYet": {
+    "message": "Aún no se usa en ningún sitio. Se fija solo la primera vez que lo usas en un sitio, o fíjalo desde un inicio de sesión."
+  },
+  "loginNotInVault": {
+    "message": "Este inicio de sesión no está en la caja fuerte abierta. Desbloquea Keyhold en la barra de herramientas y vuelve a intentarlo."
+  },
+  "name": {
+    "message": "Nombre"
+  },
+  "note": {
+    "message": "Nota"
+  },
+  "noName": {
+    "message": "(sin nombre)"
+  },
+  "savingToDrive": {
+    "message": "Guardando en Google Drive…"
+  },
+  "notSaved": {
+    "message": "No se guardó."
+  },
+  "deleteConfirm": {
+    "message": "¿Eliminar este inicio de sesión de Keyhold?"
+  },
+  "deleting": {
+    "message": "Eliminando…"
+  },
+  "notDeleted": {
+    "message": "No se eliminó."
+  },
+  "notFound": {
+    "message": "No encontrado"
+  },
+  "googleDidNotSignIn": {
+    "message": "No se pudo iniciar sesión en Google"
+  },
+  "driveAnswered": {
+    "message": "Google Drive respondió $STATUS$",
+    "placeholders": {
+      "status": {
+        "content": "$1"
+      }
+    }
+  },
+  "noVaultInDrive": {
+    "message": "Aún no hay ninguna caja fuerte de Keyhold en este Google Drive"
+  },
+  "driveNotReachable": {
+    "message": "No se puede conectar con Google Drive"
+  },
+  "setPasswordInApp": {
+    "message": "Primero configura una contraseña maestra en la app Keyhold"
+  },
+  "signInWindowOpen": {
+    "message": "Aún hay una ventana de inicio de sesión de Google abierta. Ciérrala y vuelve a intentarlo."
+  },
+  "wrongMasterPassword": {
+    "message": "Contraseña maestra incorrecta"
+  }
+}

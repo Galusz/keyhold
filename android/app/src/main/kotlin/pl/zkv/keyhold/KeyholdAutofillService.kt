@@ -126,8 +126,8 @@ class KeyholdAutofillService : AutofillService() {
             val code = login["code"] as? String
             // On a two-factor step the suggestion says which code goes in.
             val sub = if (form.usernames.isEmpty() && form.passwords.isEmpty() && code != null) {
-                "2FA code ${code.take(3)} ${code.drop(3)}" +
-                    if (login["unpaired"] == true) " · not tied to a site yet" else ""
+                getString(R.string.code_suggestion, "${code.take(3)} ${code.drop(3)}") +
+                    if (login["unpaired"] == true) " · " + getString(R.string.not_tied_to_site) else ""
             } else {
                 username
             }
@@ -168,7 +168,7 @@ class KeyholdAutofillService : AutofillService() {
         }
 
         // "Keyhold": the whole vault, searchable, on a screen of its own.
-        val search = Dataset.Builder(presentation(this, "Keyhold", "Search all logins", search = true)).apply {
+        val search = Dataset.Builder(presentation(this, "Keyhold", getString(R.string.search_all_logins), search = true)).apply {
             inlinePresentation(inline, shown, "Keyhold", null, pinned = true)?.let { setInlinePresentation(it) }
             for (id in form.ids) setValue(id, null)
             setAuthentication(picker(form, entry = null))

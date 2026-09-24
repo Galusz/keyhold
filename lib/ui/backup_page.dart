@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../core/drive.dart';
 import '../core/remote.dart';
 import '../core/storage.dart';
+import '../l10n/l10n.dart';
 import 'password_page.dart';
 
 class BackupPage extends StatefulWidget {
@@ -73,11 +74,11 @@ class _BackupPageState extends State<BackupPage> {
   }
 
   String? _validate(RemoteConfig config) {
-    if (config.host.isEmpty) return 'Fill in the host first';
-    if (config.user.isEmpty) return 'Fill in the user first';
-    if (config.keyPath.isEmpty) return 'Pick your private key file first';
+    if (config.host.isEmpty) return t.fillHostFirst;
+    if (config.user.isEmpty) return t.fillUserFirst;
+    if (config.keyPath.isEmpty) return t.pickKeyFirst;
     if (!File(config.keyPath).existsSync()) {
-      return 'There is no file at ${config.keyPath}';
+      return t.noFileAt(config.keyPath);
     }
     return null;
   }
@@ -85,18 +86,16 @@ class _BackupPageState extends State<BackupPage> {
   String _friendly(Object error) {
     final text = error.toString();
     if (text.contains('SocketException') || text.contains('TimeoutException')) {
-      return 'Cannot reach ${_host.text} on port ${_port.text}. '
-          'Check the address, the port and whether the server is up.';
+      return t.serverUnreachable(_host.text, _port.text);
     }
     if (text.contains('auth') || text.contains('Auth')) {
-      return 'The server refused this key for user ${_user.text}. '
-          'Make sure the matching public key sits in its authorized_keys.';
+      return t.serverRefusedKey(_user.text);
     }
     if (text.contains('FormatException') || text.contains('pem')) {
-      return 'That file is not a usable private key.';
+      return t.notAPrivateKey;
     }
     if (text.contains('Permission') || text.contains('permission')) {
-      return 'Logged in, but cannot write into "${_dir.text}". Pick another folder.';
+      return t.cannotWriteFolder(_dir.text);
     }
     return text;
   }
@@ -157,9 +156,7 @@ class _BackupPageState extends State<BackupPage> {
     if (result != null && result.needsPassword) {
       final password = await _askPassword();
       if (password == null) {
-        _driveMessage =
-            'Google Drive already holds a Keyhold vault. '
-            'Its master password is needed to join it.';
+        _driveMessage = t.driveHoldsVault;
         return;
       }
       result = await widget.onSync(password: password);
@@ -169,8 +166,8 @@ class _BackupPageState extends State<BackupPage> {
         (result == null
             ? null
             : result.changedHere || result.uploaded
-            ? 'Synced'
-            : 'Already in sync');
+            ? t.synced
+            : t.alreadyInSync);
   }
 
   Future<String?> _askPassword() {
@@ -178,21 +175,21 @@ class _BackupPageState extends State<BackupPage> {
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Master password of the vault in Google Drive'),
+        title: Text(t.masterPasswordOfDriveVault),
         content: SizedBox(
           width: 380,
           child: TextField(
             controller: field,
             obscureText: true,
-            decoration: const InputDecoration(labelText: 'Master password'),
+            decoration: InputDecoration(labelText: t.masterPassword),
             onSubmitted: (v) => Navigator.pop(context, v),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
           FilledButton(
             onPressed: () => Navigator.pop(context, field.text),
-            child: const Text('Join'),
+            child: Text(t.join),
           ),
         ],
       ),
@@ -214,16 +211,14 @@ class _BackupPageState extends State<BackupPage> {
 
     return [
       Text(
-        'Keeps the encrypted vault in a "Keyhold" folder in your own Google Drive, '
-        'so your other devices stay in sync and a lost computer loses nothing. '
-        'Google cannot read it.',
+        t.driveHint,
         style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
       ),
       const SizedBox(height: 12),
       if (!DriveSync.available)
-        const Text('Google Drive is not set up in this build.')
+        Text(t.driveNotInBuild)
       else if (!widget.store.hasPassword) ...[
-        const Text('Set a master password first — a new device needs it to open the vault.'),
+        Text(t.setPasswordFirst),
         const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerLeft,
@@ -237,7 +232,7 @@ class _BackupPageState extends State<BackupPage> {
               if (mounted) setState(() {});
             },
             icon: const Icon(Icons.lock_outline),
-            label: const Text('Set master password'),
+            label: Text(t.setMasterPassword),
           ),
         ),
       ] else if (!drive.connected)
@@ -251,7 +246,7 @@ class _BackupPageState extends State<BackupPage> {
                     await _syncDrive();
                   }),
             icon: const Icon(Icons.add_to_drive),
-            label: const Text('Connect Google Drive'),
+            label: Text(t.connectDrive),
           ),
         )
       else
@@ -260,18 +255,15 @@ class _BackupPageState extends State<BackupPage> {
           runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text(
-              'Connected as ${drive.email}'
-              '${synced == null ? '' : ' — last sync ${_when(synced)}'}',
-            ),
+            Text(synced == null ? t.connectedAs(drive.email) : t.connectedAsSynced(drive.email, _when(synced))),
             OutlinedButton.icon(
               onPressed: _driveBusy ? null : () => _drive(_syncDrive),
               icon: const Icon(Icons.sync),
-              label: const Text('Sync now'),
+              label: Text(t.syncNow),
             ),
             TextButton(
               onPressed: _driveBusy ? null : () => _drive(drive.disconnect),
-              child: const Text('Disconnect'),
+              child: Text(t.disconnect),
             ),
           ],
         ),
@@ -319,9 +311,9 @@ class _BackupPageState extends State<BackupPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Backup'),
+        title: Text(t.backup),
         actions: [
-          TextButton(onPressed: _save, child: const Text('Save')),
+          TextButton(onPressed: _save, child: Text(t.save)),
           const SizedBox(width: 8),
         ],
       ),
@@ -331,23 +323,24 @@ class _BackupPageState extends State<BackupPage> {
           _section(
             icon: Icons.add_to_drive,
             title: 'Google Drive',
-            state: widget.drive.connected ? 'On — ${widget.drive.email}' : 'Off',
+            state: widget.drive.connected ? t.onWith(widget.drive.email) : t.off,
             children: _driveSection(theme),
           ),
           _section(
             icon: Icons.folder_copy_outlined,
-            title: 'Folders on this computer',
+            title: t.foldersOnComputer,
             state: _folders.isEmpty
-                ? 'Off'
-                : '${_folders.length} ${_folders.length == 1 ? 'folder' : 'folders'}'
-                      '${widget.store.backup.status.at == null ? '' : ' — last copy ${_when(widget.store.backup.status.at!)}'}',
+                ? t.off
+                : widget.store.backup.status.at == null
+                    ? t.folderCount(_folders.length)
+                    : t.folderCountCopied(_folders.length, _when(widget.store.backup.status.at!)),
             children: _folderSection(theme),
           ),
           // For those who run their own machine; folded away until set up.
           _section(
             icon: Icons.dns_outlined,
-            title: 'Your server',
-            state: _host.text.trim().isEmpty ? 'Off' : _host.text.trim(),
+            title: t.yourServer,
+            state: _host.text.trim().isEmpty ? t.off : _host.text.trim(),
             open: _host.text.trim().isNotEmpty,
             children: _serverSection(theme),
           ),
@@ -358,7 +351,7 @@ class _BackupPageState extends State<BackupPage> {
 
   List<Widget> _folderSection(ThemeData theme) => [
     Text(
-      'Every save drops a dated copy into each folder and keeps the last 30.',
+      t.foldersHint,
       style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
     ),
     const SizedBox(height: 12),
@@ -366,7 +359,7 @@ class _BackupPageState extends State<BackupPage> {
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Text(
-          'No folders — local copies are off',
+          t.noFolders,
           style: TextStyle(color: theme.colorScheme.error),
         ),
       ),
@@ -375,45 +368,44 @@ class _BackupPageState extends State<BackupPage> {
     OutlinedButton.icon(
       onPressed: _addFolder,
       icon: const Icon(Icons.add),
-      label: const Text('Add folder'),
+      label: Text(t.addFolder),
     ),
   ];
 
   List<Widget> _serverSection(ThemeData theme) => [
     Text(
-      'The same copy goes over SFTP to a machine you own. The file stays encrypted, '
-      'so the server sees bytes and nothing else. Leave the host empty to skip this.',
+      t.serverHint,
       style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
     ),
     const SizedBox(height: 16),
     TextField(
       controller: _host,
-      decoration: const InputDecoration(
-        labelText: 'Host',
+      decoration: InputDecoration(
+        labelText: t.host,
         hintText: 'vps.example.com',
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
     ),
     const SizedBox(height: 16),
     TextField(
       controller: _port,
       keyboardType: TextInputType.number,
-      decoration: const InputDecoration(labelText: 'Port', border: OutlineInputBorder()),
+      decoration: InputDecoration(labelText: t.port, border: const OutlineInputBorder()),
     ),
     const SizedBox(height: 16),
     TextField(
       controller: _user,
-      decoration: const InputDecoration(labelText: 'User', border: OutlineInputBorder()),
+      decoration: InputDecoration(labelText: t.user, border: const OutlineInputBorder()),
     ),
     const SizedBox(height: 16),
     TextField(
       controller: _key,
       decoration: InputDecoration(
-        labelText: 'Private key file',
+        labelText: t.privateKeyFile,
         hintText: r'C:\Users\you\.ssh\id_ed25519',
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
-          tooltip: 'Choose file',
+          tooltip: t.chooseFile,
           icon: const Icon(Icons.folder_open),
           onPressed: _pickKey,
         ),
@@ -422,16 +414,16 @@ class _BackupPageState extends State<BackupPage> {
     const SizedBox(height: 16),
     TextField(
       controller: _dir,
-      decoration: const InputDecoration(
-        labelText: 'Folder on the server',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: t.serverFolder,
+        border: const OutlineInputBorder(),
       ),
     ),
     const SizedBox(height: 24),
     OutlinedButton.icon(
       onPressed: _busy ? null : _test,
       icon: const Icon(Icons.wifi_tethering),
-      label: const Text('Test connection'),
+      label: Text(t.testConnection),
     ),
     if (_message != null) ...[
       const SizedBox(height: 20),
@@ -456,9 +448,9 @@ class _BackupPageState extends State<BackupPage> {
       title: Text(path, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: reachable
           ? null
-          : Text('Not reachable right now', style: TextStyle(color: theme.colorScheme.error)),
+          : Text(t.notReachable, style: TextStyle(color: theme.colorScheme.error)),
       trailing: IconButton(
-        tooltip: 'Remove',
+        tooltip: t.remove,
         icon: const Icon(Icons.close),
         onPressed: () => setState(() => _folders.remove(path)),
       ),

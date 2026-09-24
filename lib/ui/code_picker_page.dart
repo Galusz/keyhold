@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 import '../core/totp.dart';
 import 'entry_page.dart';
 
@@ -87,20 +88,20 @@ class _CodePickerPageState extends State<CodePickerPage> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Two-factor code')),
+      appBar: AppBar(title: Text(t.twoFactorCode)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _newCode,
         icon: const Icon(Icons.add),
-        label: const Text('New code'),
+        label: Text(t.newCodeShort),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: true, label: Text('Free')),
-                ButtonSegment(value: false, label: Text('All')),
+              segments: [
+                ButtonSegment(value: true, label: Text(t.free)),
+                ButtonSegment(value: false, label: Text(t.filterAll)),
               ],
               selected: {_freeOnly},
               onSelectionChanged: (v) => setState(() => _freeOnly = v.first),
@@ -111,10 +112,10 @@ class _CodePickerPageState extends State<CodePickerPage> {
             child: TextField(
               controller: _search,
               autofocus: true,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Search codes',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: t.searchCodes,
+                border: const OutlineInputBorder(),
               ),
               onChanged: (_) => setState(() {}),
             ),
@@ -126,9 +127,7 @@ class _CodePickerPageState extends State<CodePickerPage> {
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Text(
-                      _freeOnly
-                          ? 'Every code is pinned somewhere. Switch to All to see them.'
-                          : 'No codes found.',
+                      _freeOnly ? t.everyCodePinned : t.noCodesFound,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -149,17 +148,15 @@ class _CodePickerPageState extends State<CodePickerPage> {
                           ),
                         ),
                         title: Text(
-                          e.title.isEmpty ? '(no name)' : e.title,
+                          e.title.isEmpty ? t.noName : e.title,
                           style: pinned
                               ? const TextStyle(color: pinnedColor)
                               : null,
                         ),
                         subtitle: Text(
                           [
-                            pinned
-                                ? 'pinned to ${hosts.join(', ')}'
-                                : 'not pinned',
-                            'changed ${DateTime.fromMillisecondsSinceEpoch(e.updatedAt).toIso8601String().substring(0, 10)}',
+                            pinned ? t.pinnedTo(hosts.join(', ')) : t.notPinned,
+                            t.changedOn(DateTime.fromMillisecondsSinceEpoch(e.updatedAt).toIso8601String().substring(0, 10)),
                           ].join(' · '),
                         ),
                         trailing: Text(

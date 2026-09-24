@@ -49,48 +49,48 @@
   <body>
     <main>
       <header>
-        <h1 id="heading">Edit login</h1>
-        <button class="delete" id="delete">Delete</button>
-        <button class="save" id="save">Save</button>
+        <h1 id="heading" data-i18n="editLogin">Edit login</h1>
+        <button class="delete" id="delete" data-i18n="delete">Delete</button>
+        <button class="save" id="save" data-i18n="save">Save</button>
       </header>
-      <label for="title" id="title-label">Title</label>
+      <label for="title" id="title-label" data-i18n="title">Title</label>
       <input id="title" />
       <div class="login">
-        <label for="username">Username</label>
+        <label for="username" data-i18n="username">Username</label>
         <input id="username" autocomplete="off" />
-        <label for="password">Password</label>
+        <label for="password" data-i18n="password">Password</label>
         <div class="with-eye">
           <input id="password" type="password" autocomplete="off" />
-          <button class="eye" id="eye" title="Show">👁</button>
+          <button class="eye" id="eye" title="Show" data-i18n-title="show">👁</button>
         </div>
       </div>
       <div class="code">
-        <label for="totp">Key</label>
+        <label for="totp" data-i18n="key">Key</label>
         <div class="with-eye">
           <input id="totp" type="password" autocomplete="off" />
-          <button class="eye" id="key-eye" title="Show">👁</button>
+          <button class="eye" id="key-eye" title="Show" data-i18n-title="show">👁</button>
         </div>
-        <div class="help">Paste the setup key or the whole otpauth:// link</div>
+        <div class="help" data-i18n="keyHint">Paste the setup key or the whole otpauth:// link</div>
       </div>
       <div class="login">
-        <label for="url">Address</label>
+        <label for="url" data-i18n="address">Address</label>
         <input id="url" />
         <label for="twoFactor">2FA</label>
-        <select id="twoFactor"><option value="">None</option></select>
-        <div class="help">Names can repeat — the current code tells them apart</div>
-        <label for="group">Group</label>
+        <select id="twoFactor"><option value="" data-i18n="none">None</option></select>
+        <div class="help" data-i18n="namesRepeatHint">Names can repeat — the current code tells them apart</div>
+        <label for="group" data-i18n="group">Group</label>
         <input id="group" list="groups" />
         <datalist id="groups"></datalist>
-        <div class="help">Pick one or type a new name</div>
+        <div class="help" data-i18n="groupHint">Pick one or type a new name</div>
       </div>
-      <label for="notes" id="notes-label">Notes</label>
+      <label for="notes" id="notes-label" data-i18n="notes">Notes</label>
       <textarea id="notes" rows="5"></textarea>
       <div class="code">
-        <label>Addresses</label>
+        <label data-i18n="addresses">Addresses</label>
         <div id="sites"></div>
         <div class="add">
-          <input id="new-site" placeholder="Add an address" />
-          <button class="save" id="add-site">Add</button>
+          <input id="new-site" placeholder="Add an address" data-i18n-placeholder="addAddress" />
+          <button class="save" id="add-site" data-i18n="add">Add</button>
         </div>
       </div>
       <div id="status"></div>

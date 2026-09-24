@@ -15,6 +15,7 @@ import '../core/favicons.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../core/watch.dart';
+import '../l10n/l10n.dart';
 import 'entry_page.dart';
 import 'extension_page.dart';
 import 'import_page.dart';
@@ -123,7 +124,7 @@ class _VaultPageState extends State<VaultPage> {
       username: username,
       password: password,
       url: url,
-      group: 'Web',
+      group: _vault.defaultGroup('Web', t.groupWeb),
     ));
     await _persist();
     return 'saved';
@@ -163,10 +164,10 @@ class _VaultPageState extends State<VaultPage> {
     for (final e in entries) {
       final host = hostOf(e.url.isNotEmpty ? e.url : e.title);
       e.group = _isLocal(host)
-          ? 'Local network'
+          ? t.groupLocal
           : _ipPattern.hasMatch(host)
-              ? 'Servers'
-              : 'Web';
+              ? t.groupServers
+              : t.groupWeb;
       _vault.put(e);
     }
     return true;
@@ -351,7 +352,7 @@ class _VaultPageState extends State<VaultPage> {
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
-        content: Text('$label copied'),
+        content: Text(t.copied(label)),
         duration: const Duration(seconds: 2),
       ));
   }
@@ -513,23 +514,23 @@ class _VaultPageState extends State<VaultPage> {
       child: ListView(
         padding: const EdgeInsets.all(8),
         children: [
-          filter(Icons.all_inbox_outlined, 'All', visible.length, EntryFilter.all),
-          filter(Icons.pin_outlined, '2FA', withCode, EntryFilter.twoFactor),
-          filter(Icons.key_outlined, 'Passwords', visible.length - withCode,
+          filter(Icons.all_inbox_outlined, t.filterAll, visible.length, EntryFilter.all),
+          filter(Icons.pin_outlined, t.filter2fa, withCode, EntryFilter.twoFactor),
+          filter(Icons.key_outlined, t.filterPasswords, visible.length - withCode,
               EntryFilter.plain),
-          filter(Icons.attach_file, 'Files', _vault.visibleFiles.length,
+          filter(Icons.attach_file, t.filterFiles, _vault.visibleFiles.length,
               EntryFilter.files),
           if (duplicates > 0 || _filter == EntryFilter.duplicates)
-            filter(Icons.content_copy_outlined, 'Duplicates', duplicates, EntryFilter.duplicates),
+            filter(Icons.content_copy_outlined, t.duplicates, duplicates, EntryFilter.duplicates),
           if (groups.isNotEmpty) ...[
             const Divider(height: 24),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
-              child: Text('Groups',
+              child: Text(t.groups,
                   style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor)),
             ),
             for (final name in groups) group(Icons.folder_outlined, name, name),
-            if ((counts[''] ?? 0) > 0) group(Icons.folder_off_outlined, 'No group', ''),
+            if ((counts[''] ?? 0) > 0) group(Icons.folder_off_outlined, t.noGroup, ''),
           ],
         ],
       ),
@@ -561,7 +562,7 @@ class _VaultPageState extends State<VaultPage> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Move ${_selected.length} to group'),
+        title: Text(t.moveCountToGroup(_selected.length)),
         content: SizedBox(
           width: 380,
           child: Column(
@@ -585,9 +586,9 @@ class _VaultPageState extends State<VaultPage> {
               ],
               TextField(
                 controller: name,
-                decoration: const InputDecoration(
-                  labelText: 'New group',
-                  helperText: 'Leave empty to take them out of any group',
+                decoration: InputDecoration(
+                  labelText: t.newGroup,
+                  helperText: t.newGroupHint,
                 ),
                 onSubmitted: (v) => Navigator.pop(context, v.trim()),
               ),
@@ -595,10 +596,10 @@ class _VaultPageState extends State<VaultPage> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
           FilledButton(
             onPressed: () => Navigator.pop(context, name.text.trim()),
-            child: const Text('Move'),
+            child: Text(t.move),
           ),
         ],
       ),
@@ -620,29 +621,29 @@ class _VaultPageState extends State<VaultPage> {
       appBar: AppBar(
         leading: selecting
             ? IconButton(
-                tooltip: 'Clear selection',
+                tooltip: t.clearSelection,
                 icon: const Icon(Icons.close),
                 onPressed: () => setState(_selected.clear),
               )
             : null,
-        title: Text(selecting ? '${_selected.length} selected' : 'Keyhold'),
+        title: Text(selecting ? t.selectedCount(_selected.length) : 'Keyhold'),
         actions: selecting
             ? [
                 FilledButton.icon(
                   onPressed: _moveSelected,
                   icon: const Icon(Icons.drive_file_move_outlined),
-                  label: const Text('Move to group'),
+                  label: Text(t.moveToGroup),
                 ),
                 const SizedBox(width: 16),
               ]
             : [
           IconButton(
-            tooltip: 'Add two-factor codes from a QR code',
+            tooltip: t.addCodesFromQr,
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: _scanQr,
           ),
           IconButton(
-            tooltip: 'Browser extension',
+            tooltip: t.browserExtension,
             icon: const Icon(Icons.extension_outlined),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -655,7 +656,7 @@ class _VaultPageState extends State<VaultPage> {
             ),
           ),
           IconButton(
-            tooltip: 'Backup',
+            tooltip: t.backup,
             icon: const Icon(Icons.backup_outlined),
             onPressed: () async {
               await Navigator.of(context).push(
@@ -667,12 +668,12 @@ class _VaultPageState extends State<VaultPage> {
             },
           ),
           IconButton(
-            tooltip: 'Import from CSV',
+            tooltip: t.importCsv,
             icon: const Icon(Icons.download_outlined),
             onPressed: _import,
           ),
           IconButton(
-            tooltip: _store.hasPassword ? 'Change master password' : 'Set master password',
+            tooltip: _store.hasPassword ? t.changeMasterPassword : t.setMasterPassword,
             icon: Icon(_store.hasPassword ? Icons.lock_outline : Icons.lock_open_outlined),
             onPressed: _setPassword,
           ),
@@ -685,11 +686,11 @@ class _VaultPageState extends State<VaultPage> {
             child: TextField(
               controller: _search,
               onChanged: (_) => setState(() {}),
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Search',
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: t.search,
                 isDense: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
           ),
@@ -699,7 +700,7 @@ class _VaultPageState extends State<VaultPage> {
           ? FloatingActionButton.extended(
               onPressed: _addFile,
               icon: const Icon(Icons.attach_file),
-              label: const Text('Add file'),
+              label: Text(t.addFile),
             )
           : FloatingActionButton.extended(
               onPressed: () => _open(
@@ -707,7 +708,7 @@ class _VaultPageState extends State<VaultPage> {
                   isNew: true,
                   code: _filter == EntryFilter.twoFactor),
               icon: const Icon(Icons.add),
-              label: const Text('New'),
+              label: Text(t.newEntry),
             ),
       bottomNavigationBar: _backupBar(items.length),
       body: Row(
@@ -781,17 +782,17 @@ class _VaultPageState extends State<VaultPage> {
 
     String status;
     if (_scanning) {
-      status = 'Checking…';
+      status = t.checking;
     } else if (scan == null) {
-      status = 'Not checked yet';
+      status = t.notCheckedYet;
     } else {
       final when = _ago(_lastScanAt!);
       final parts = [
-        if (scan.added > 0) '${scan.added} new',
-        if (scan.updated > 0) '${scan.updated} changed',
-        if (scan.skipped.isNotEmpty) '${scan.skipped.length} skipped',
+        if (scan.added > 0) t.filesNew(scan.added),
+        if (scan.updated > 0) t.filesChanged(scan.updated),
+        if (scan.skipped.isNotEmpty) t.filesSkipped(scan.skipped.length),
       ];
-      status = 'Checked $when${parts.isEmpty ? ' — nothing changed' : ' — ${parts.join(', ')}'}';
+      status = parts.isEmpty ? t.checkedNothingChanged(when) : t.checkedWith(when, parts.join(', '));
     }
 
     return Container(
@@ -801,13 +802,13 @@ class _VaultPageState extends State<VaultPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Watched — copied into the vault whenever they change, every 15 minutes',
+          Text(t.watchedHint,
               style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor)),
           const SizedBox(height: 6),
           if (_watched.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Text('Nothing watched yet', style: theme.textTheme.bodyMedium),
+              child: Text(t.nothingWatched, style: theme.textTheme.bodyMedium),
             ),
           ..._watched.map((path) {
             final missing = scan?.missing.contains(path) ?? false;
@@ -825,14 +826,14 @@ class _VaultPageState extends State<VaultPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    missing ? '$path — not found' : '$path  (${countFor[path] ?? 0})',
+                    missing ? t.pathNotFound(path) : '$path  (${countFor[path] ?? 0})',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: missing ? theme.colorScheme.error : null),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Stop watching',
+                  tooltip: t.stopWatching,
                   iconSize: 18,
                   visualDensity: VisualDensity.compact,
                   icon: const Icon(Icons.close),
@@ -850,17 +851,17 @@ class _VaultPageState extends State<VaultPage> {
               OutlinedButton.icon(
                 onPressed: () => _watch(folder: true),
                 icon: const Icon(Icons.create_new_folder_outlined, size: 18),
-                label: const Text('Watch folder'),
+                label: Text(t.watchFolder),
               ),
               OutlinedButton.icon(
                 onPressed: () => _watch(folder: false),
                 icon: const Icon(Icons.note_add_outlined, size: 18),
-                label: const Text('Watch file'),
+                label: Text(t.watchFile),
               ),
               TextButton.icon(
                 onPressed: _scanning ? null : _scan,
                 icon: const Icon(Icons.refresh, size: 18),
-                label: const Text('Check now'),
+                label: Text(t.checkNow),
               ),
               Text(status, style: theme.textTheme.bodySmall),
             ],
@@ -890,7 +891,7 @@ class _VaultPageState extends State<VaultPage> {
 
     final bytes = await picked.readAsBytes();
     if (bytes.length > _maxFileBytes) {
-      _toast('${picked.name} is ${_humanSize(bytes.length)} — the limit is 25 MB');
+      _toast(t.fileTooBig(picked.name, _humanSize(bytes.length)));
       return;
     }
 
@@ -901,25 +902,25 @@ class _VaultPageState extends State<VaultPage> {
       size: bytes.length,
     ));
     await _persist();
-    _toast('${picked.name} is now in the vault');
+    _toast(t.fileAdded(picked.name));
   }
 
   Future<void> _saveFile(VaultFile f) async {
     final target = await getSaveLocation(suggestedName: f.name);
     if (target == null) return;
     await File(target.path).writeAsBytes(f.bytes, flush: true);
-    _toast('Saved to ${target.path}');
+    _toast(t.savedTo(target.path));
   }
 
   Future<void> _deleteEntry(VaultEntry e) async {
     final sure = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete ${e.title.isEmpty ? 'this login' : e.title}?'),
+        title: Text(e.title.isEmpty ? t.deleteThisLogin : t.deleteNamed(e.title)),
         content: Text(_duplicateNotes[e.id] ?? e.username),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.delete)),
         ],
       ),
     );
@@ -933,11 +934,11 @@ class _VaultPageState extends State<VaultPage> {
     final sure = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Remove ${f.name}?'),
-        content: const Text('It disappears from the vault. Older backups still hold it.'),
+        title: Text(t.removeNamed(f.name)),
+        content: Text(t.removeFileHint),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Remove')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.remove)),
         ],
       ),
     );
@@ -953,7 +954,7 @@ class _VaultPageState extends State<VaultPage> {
         .toList();
 
     final list = files.isEmpty
-        ? const Center(child: Text('No files yet — add recovery codes, keys or scans'))
+        ? Center(child: Text(t.noFilesYet))
         : _filesList(files);
 
     return Column(
@@ -985,12 +986,12 @@ class _VaultPageState extends State<VaultPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                tooltip: 'Save to disk',
+                tooltip: t.saveToDisk,
                 icon: const Icon(Icons.save_alt),
                 onPressed: () => _saveFile(f),
               ),
               IconButton(
-                tooltip: 'Remove',
+                tooltip: t.remove,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () => _deleteFile(f),
               ),
@@ -1007,7 +1008,7 @@ class _VaultPageState extends State<VaultPage> {
     final rest = items.where((e) => !ids.contains(e.id)).toList();
 
     if (suggested.isEmpty && rest.isEmpty) {
-      return const Center(child: Text('Nothing here yet'));
+      return Center(child: Text(t.nothingYet));
     }
 
     final highlight =
@@ -1015,7 +1016,7 @@ class _VaultPageState extends State<VaultPage> {
 
     final rows = <Object>[];
     if (suggested.isNotEmpty) {
-      rows.add('For "${AutoTypeTarget.title}"');
+      rows.add(t.forWindow(AutoTypeTarget.title));
       rows.addAll(suggested);
     }
     rows.addAll(rest);
@@ -1067,7 +1068,7 @@ class _VaultPageState extends State<VaultPage> {
           ),
           if (onDismiss != null)
             IconButton(
-              tooltip: 'Dismiss',
+              tooltip: t.dismiss,
               iconSize: 16,
               visualDensity: VisualDensity.compact,
               icon: const Icon(Icons.close),
@@ -1080,10 +1081,10 @@ class _VaultPageState extends State<VaultPage> {
 
   String _ago(DateTime when) {
     final diff = DateTime.now().difference(when);
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
-    if (diff.inHours < 24) return '${diff.inHours} h ago';
-    return '${diff.inDays} days ago';
+    if (diff.inMinutes < 1) return t.justNow;
+    if (diff.inMinutes < 60) return t.minutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return t.hoursAgo(diff.inHours);
+    return t.daysAgo(diff.inDays);
   }
 
   Widget _backupBar(int count) {
@@ -1094,22 +1095,22 @@ class _VaultPageState extends State<VaultPage> {
       _ when status.errors.isNotEmpty => (
           Icons.error_outline,
           theme.colorScheme.error,
-          'Backup failed: ${status.errors.first}',
+          t.backupFailed(status.errors.first),
         ),
       _ when status.at == null => (
           Icons.cloud_off_outlined,
           theme.hintColor,
-          'No backup yet — it runs on the first save',
+          t.noBackupYet,
         ),
       _ when status.stale => (
           Icons.warning_amber_outlined,
           theme.colorScheme.tertiary,
-          'Last backup ${_ago(status.at!)}',
+          t.lastBackup(_ago(status.at!)),
         ),
       _ => (
           Icons.cloud_done_outlined,
           theme.colorScheme.primary,
-          'Backed up ${_ago(status.at!)} — ${status.targets.join(', ')}',
+          t.backedUpTo(_ago(status.at!), status.targets.join(', ')),
         ),
     };
 
@@ -1117,12 +1118,12 @@ class _VaultPageState extends State<VaultPage> {
     final drive = !_drive.connected
         ? null
         : _driveNeedsPassword
-            ? 'Google Drive: open Backup and enter the master password'
+            ? t.driveNeedsPassword
             : _drive.lastError != null
-                ? 'Google Drive: ${_drive.lastError}'
+                ? t.driveProblem(_drive.lastError!)
                 : syncedAt == null
                     ? null
-                    : 'Google Drive: synced ${_ago(syncedAt)}';
+                    : t.driveSynced(_ago(syncedAt));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -1155,7 +1156,7 @@ class _VaultPageState extends State<VaultPage> {
             Text(drive, style: theme.textTheme.bodySmall),
             const SizedBox(width: 16),
           ],
-          Text('$count items', style: theme.textTheme.bodySmall),
+          Text(t.itemCount(count), style: theme.textTheme.bodySmall),
         ],
       ),
     );
@@ -1170,7 +1171,7 @@ class _VaultPageState extends State<VaultPage> {
       selected: selected,
       onTap: () => _selected.isEmpty ? _open(e, isNew: false) : _toggle(e),
       leading: Tooltip(
-        message: 'Select',
+        message: t.select,
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: () => _toggle(e),
@@ -1183,7 +1184,7 @@ class _VaultPageState extends State<VaultPage> {
         ),
       ),
       title: Text(
-        e.title.isEmpty ? '(no title)' : e.title,
+        e.title.isEmpty ? t.noTitle : e.title,
       ),
       subtitle: e.isCode
           ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
@@ -1197,13 +1198,13 @@ class _VaultPageState extends State<VaultPage> {
         children: [
           if (_filter == EntryFilter.duplicates)
             IconButton(
-              tooltip: 'Delete',
+              tooltip: t.delete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _deleteEntry(e),
             ),
           if (code != null) ...[
             InkWell(
-              onTap: () => _copy('Code', code),
+              onTap: () => _copy(t.code, code),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1232,21 +1233,21 @@ class _VaultPageState extends State<VaultPage> {
           ],
           if (code != null)
             IconButton(
-              tooltip: 'Type the code into the previous window',
+              tooltip: t.typeCode,
               icon: const Icon(Icons.pin_outlined),
               onPressed: () => _autoType(e, codeOnly: true),
             ),
           // A code on its own has no username or password to type or copy.
           if (!e.isCode) ...[
             IconButton(
-              tooltip: 'Type username and password',
+              tooltip: t.typeLogin,
               icon: const Icon(Icons.keyboard_outlined),
               onPressed: () => _autoType(e),
             ),
             IconButton(
-              tooltip: 'Copy password',
+              tooltip: t.copyPassword,
               icon: const Icon(Icons.copy_outlined),
-              onPressed: () => _copy('Password', e.password),
+              onPressed: () => _copy(t.password, e.password),
             ),
           ],
         ],

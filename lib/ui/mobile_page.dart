@@ -8,15 +8,18 @@ import '../core/favicons.dart';
 import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
+import '../l10n/l10n.dart';
 import 'entry_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
 import 'vault_page.dart' show SiteAvatar;
 
 /// A fingerprint, or the phone's own PIN or pattern when that fails.
-Future<bool> askFingerprint([String hint = 'Unlock to see your passwords and codes']) async {
+Future<bool> askFingerprint([String? hint]) async {
   try {
-    return await const MethodChannel('keyhold/fingerprint').invokeMethod<bool>('ask', {'hint': hint}) ?? false;
+    return await const MethodChannel('keyhold/fingerprint')
+            .invokeMethod<bool>('ask', {'title': t.fingerprintTitle, 'hint': hint ?? t.fingerprintUnlockHint}) ??
+        false;
   } catch (_) {
     return false;
   }
@@ -186,7 +189,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     try {
       await _drive.connect();
     } catch (e) {
-      _toast('Google Drive was not connected: $e');
+      _toast(t.driveNotConnected('$e'));
       return;
     }
     var result = await _sync();
@@ -207,19 +210,19 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Master password'),
+        title: Text(t.masterPassword),
         content: TextField(
           controller: field,
           obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Master password of your vault',
-            helperText: 'The one you set in Keyhold on your computer',
+          decoration: InputDecoration(
+            labelText: t.masterPasswordOfVault,
+            helperText: t.masterPasswordFromComputer,
           ),
           onSubmitted: (v) => Navigator.pop(context, v),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, field.text), child: const Text('Open')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, field.text), child: Text(t.open)),
         ],
       ),
     ).whenComplete(field.dispose);
@@ -237,7 +240,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   void _copy(String label, String value) {
     if (value.isEmpty) return;
     Clipboard.setData(ClipboardData(text: value));
-    _toast('$label copied');
+    _toast(t.copied(label));
   }
 
   Future<void> _add() async {
@@ -249,19 +252,19 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
           children: [
             ListTile(
               leading: const Icon(Icons.qr_code_scanner),
-              title: const Text('Scan a QR code'),
-              subtitle: const Text('Two-factor code of a website or a Google Authenticator export'),
+              title: Text(t.scanQr),
+              subtitle: Text(t.scanQrHint),
               onTap: () => Navigator.pop(context, 'qr'),
             ),
             ListTile(
               leading: const Icon(Icons.pin_outlined),
-              title: const Text('New two-factor code'),
-              subtitle: const Text('Type the setup key yourself'),
+              title: Text(t.newCode),
+              subtitle: Text(t.newCodeHint),
               onTap: () => Navigator.pop(context, 'code'),
             ),
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('New login'),
+              title: Text(t.newLogin),
               onTap: () => Navigator.pop(context, 'new'),
             ),
           ],
@@ -360,12 +363,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             children: [
               const Icon(Icons.lock_outline, size: 64),
               const SizedBox(height: 16),
-              Text('Keyhold is locked', style: Theme.of(context).textTheme.titleLarge),
+              Text(t.locked, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: _unlock,
                 icon: const Icon(Icons.fingerprint),
-                label: const Text('Unlock'),
+                label: Text(t.unlock),
               ),
             ],
           ),
@@ -398,7 +401,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             ),
           if (_vault.duplicates.isNotEmpty)
             IconButton(
-              tooltip: 'Duplicates',
+              tooltip: t.duplicates,
               icon: Badge(
                 label: Text('${_vault.duplicates.fold<int>(0, (n, g) => n + g.length)}'),
                 child: const Icon(Icons.content_copy_outlined),
@@ -406,7 +409,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
               onPressed: _duplicates,
             ),
           IconButton(
-            tooltip: 'Settings',
+            tooltip: t.settings,
             icon: const Icon(Icons.settings_outlined),
             onPressed: _settings,
           ),
@@ -414,7 +417,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       ),
       bottomNavigationBar: _backupBar(),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add',
+        tooltip: t.add,
         onPressed: _add,
         child: const Icon(Icons.add),
       ),
@@ -425,20 +428,20 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             child: TextField(
               controller: _search,
               onChanged: (_) => setState(() {}),
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Search',
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: t.search,
                 isDense: true,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: true, label: Text('Codes'), icon: Icon(Icons.pin_outlined)),
-                ButtonSegment(value: false, label: Text('Everything'), icon: Icon(Icons.key_outlined)),
+              segments: [
+                ButtonSegment(value: true, label: Text(t.codes), icon: const Icon(Icons.pin_outlined)),
+                ButtonSegment(value: false, label: Text(t.everything), icon: const Icon(Icons.key_outlined)),
               ],
               selected: {_codesOnly},
               onSelectionChanged: (s) => setState(() => _codesOnly = s.first),
@@ -452,9 +455,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
                   ? ListView(children: [
                       const SizedBox(height: 80),
                       Center(
-                        child: Text(_codesOnly
-                            ? 'No two-factor codes yet — tap + to scan one'
-                            : 'Nothing here yet'),
+                        child: Text(_codesOnly ? t.noCodesYet : t.nothingYet),
                       ),
                     ])
                   : ListView.separated(
@@ -471,10 +472,10 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   String _ago(DateTime when) {
     final diff = DateTime.now().difference(when);
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
-    if (diff.inHours < 24) return '${diff.inHours} h ago';
-    return '${diff.inDays} days ago';
+    if (diff.inMinutes < 1) return t.justNow;
+    if (diff.inMinutes < 60) return t.minutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return t.hoursAgo(diff.inHours);
+    return t.daysAgo(diff.inDays);
   }
 
   /// Always on screen: losing the phone must never mean losing the codes.
@@ -485,16 +486,16 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       _ when !_drive.connected => (
           Icons.cloud_off_outlined,
           theme.colorScheme.error,
-          'Not backed up — tap to connect Google Drive',
+          t.notBackedUp,
         ),
-      _ when _syncing => (Icons.cloud_sync_outlined, theme.hintColor, 'Backing up…'),
+      _ when _syncing => (Icons.cloud_sync_outlined, theme.hintColor, t.backingUp),
       _ when _drive.lastError != null => (
           Icons.sync_problem,
           theme.colorScheme.error,
-          'Backup failed: ${_drive.lastError}',
+          t.backupFailed(_drive.lastError!),
         ),
-      _ when synced == null => (Icons.cloud_upload_outlined, theme.hintColor, 'Waiting for the first backup'),
-      _ => (Icons.cloud_done_outlined, theme.colorScheme.primary, 'Backed up to Google Drive ${_ago(synced)}'),
+      _ when synced == null => (Icons.cloud_upload_outlined, theme.hintColor, t.waitingFirstBackup),
+      _ => (Icons.cloud_done_outlined, theme.colorScheme.primary, t.backedUpToDrive(_ago(synced))),
     };
 
     return Material(
@@ -523,7 +524,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     final warn = _left <= 5 ? Theme.of(context).colorScheme.error : null;
     return ListTile(
-      onTap: () => code != null ? _copy('Code', code) : _details(e),
+      onTap: () => code != null ? _copy(t.code, code) : _details(e),
       onLongPress: () => _details(e),
       leading: SiteAvatar(
         entry: e,
@@ -531,7 +532,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
         address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
       ),
       title: Text(
-        e.title.isEmpty ? '(no title)' : e.title,
+        e.title.isEmpty ? t.noTitle : e.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -577,8 +578,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
               Text('Keyhold', textAlign: TextAlign.center, style: theme.textTheme.headlineMedium),
               const SizedBox(height: 12),
               Text(
-                'Your passwords and two-factor codes — the same vault as on your computer, '
-                'kept in step through your own Google Drive.',
+                t.phoneWelcome,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
               ),
@@ -586,12 +586,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
               FilledButton.icon(
                 onPressed: _connect,
                 icon: const Icon(Icons.add_to_drive),
-                label: const Text('Connect Google Drive'),
+                label: Text(t.connectDrive),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => setState(() => _welcome = false),
-                child: const Text('Start with an empty vault'),
+                child: Text(t.startEmpty),
               ),
             ],
           ),
@@ -654,7 +654,7 @@ class _DetailsState extends State<_Details> {
               onPressed: () => setState(() => _showPassword = !_showPassword),
             ),
           IconButton(
-            tooltip: 'Copy',
+            tooltip: t.copy,
             icon: const Icon(Icons.copy_outlined),
             onPressed: () => widget.onCopy(label, value),
           ),
@@ -669,10 +669,10 @@ class _DetailsState extends State<_Details> {
     final code = widget.code();
     return Scaffold(
       appBar: AppBar(
-        title: Text(e.title.isEmpty ? '(no title)' : e.title),
+        title: Text(e.title.isEmpty ? t.noTitle : e.title),
         actions: [
           IconButton(
-            tooltip: 'Edit',
+            tooltip: t.edit,
             icon: const Icon(Icons.edit_outlined),
             onPressed: () async {
               final deleted = await widget.onEdit();
@@ -690,11 +690,11 @@ class _DetailsState extends State<_Details> {
       body: ListView(
         children: [
           if (code != null)
-            _field('Code (${widget.left()} s)', '${code.substring(0, 3)} ${code.substring(3)}'),
-          _field('Username', e.username),
-          _field('Password', e.password, secret: true),
-          _field('Address', e.url),
-          _field('Notes', e.notes),
+            _field(t.codeSeconds(widget.left()), '${code.substring(0, 3)} ${code.substring(3)}'),
+          _field(t.username, e.username),
+          _field(t.password, e.password, secret: true),
+          _field(t.address, e.url),
+          _field(t.notes, e.notes),
         ],
       ),
     );
@@ -766,16 +766,18 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
     final synced = drive.syncedAt;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(t.settings)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           Text('Google Drive', style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            drive.connected
-                ? 'Connected as ${drive.email}${synced == null ? '' : ' — last sync ${TimeOfDay.fromDateTime(synced).format(context)}'}'
-                : 'Not connected — the vault lives only on this phone.',
+            !drive.connected
+                ? t.driveOnlyPhone
+                : synced == null
+                    ? t.connectedAs(drive.email)
+                    : t.connectedAsSynced(drive.email, TimeOfDay.fromDateTime(synced).format(context)),
             style: theme.textTheme.bodyMedium,
           ),
           if (drive.lastError != null) ...[
@@ -790,36 +792,33 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
                 FilledButton.icon(
                   onPressed: _busy ? null : () => _run(widget.onConnect),
                   icon: const Icon(Icons.add_to_drive),
-                  label: const Text('Connect'),
+                  label: Text(t.connect),
                 )
               else ...[
                 OutlinedButton.icon(
                   onPressed: _busy ? null : () => _run(() async => widget.onSync()),
                   icon: const Icon(Icons.sync),
-                  label: const Text('Sync now'),
+                  label: Text(t.syncNow),
                 ),
                 TextButton(
                   onPressed: _busy ? null : () => _run(drive.disconnect),
-                  child: const Text('Disconnect'),
+                  child: Text(t.disconnect),
                 ),
               ],
             ],
           ),
           if (_busy) const Padding(padding: EdgeInsets.only(top: 12), child: LinearProgressIndicator()),
           const Divider(height: 40),
-          Text('Fingerprint lock', style: theme.textTheme.titleMedium),
+          Text(t.fingerprintLock, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             value: widget.store.backup.fingerprintLock,
-            title: const Text('Open Keyhold with a fingerprint'),
-            subtitle: const Text(
-              'Locks when the screen goes dark or after a minute away. '
-              'Suggestions under login fields keep working.',
-            ),
+            title: Text(t.fingerprintSwitch),
+            subtitle: Text(t.fingerprintSwitchHint),
             onChanged: (on) async {
               // Turning it on or off both need the owner's finger.
-              if (!await askFingerprint('Confirm with your fingerprint')) return;
+              if (!await askFingerprint(t.fingerprintConfirmHint)) return;
               widget.store.backup
                 ..fingerprintLock = on
                 ..saveSettings();
@@ -828,13 +827,10 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
           ),
           if (_filler != 'unsupported') ...[
             const Divider(height: 40),
-            Text('Filling passwords', style: theme.textTheme.titleMedium),
+            Text(t.fillingPasswords, style: theme.textTheme.titleMedium),
             const SizedBox(height: 4),
             Text(
-              _filler == 'on'
-                  ? 'Keyhold fills logins in apps and browsers: tap "Keyhold" under a login field. '
-                      'In Chrome also switch on Settings → Autofill services → Autofill using another service.'
-                  : 'Let Keyhold fill logins and two-factor codes in apps and browsers.',
+              _filler == 'on' ? t.fillerOn : t.fillerOff,
               style: theme.textTheme.bodyMedium,
             ),
             if (_filler != 'on') ...[
@@ -844,18 +840,16 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
                 child: FilledButton.icon(
                   onPressed: () => _autofill.invokeMethod('enable'),
                   icon: const Icon(Icons.password),
-                  label: const Text('Fill passwords with Keyhold'),
+                  label: Text(t.fillWithKeyhold),
                 ),
               ),
             ],
           ],
           const Divider(height: 40),
-          Text('Master password', style: theme.textTheme.titleMedium),
+          Text(t.masterPassword, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            widget.store.hasPassword
-                ? 'Set. It opens this vault on a new device.'
-                : 'Not set. Without it a new device cannot open the vault.',
+            widget.store.hasPassword ? t.passwordSetPhone : t.passwordNotSetPhone,
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
@@ -871,7 +865,7 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
                 if (mounted) setState(() {});
               },
               icon: const Icon(Icons.lock_outline),
-              label: Text(widget.store.hasPassword ? 'Change' : 'Set master password'),
+              label: Text(widget.store.hasPassword ? t.change : t.setMasterPassword),
             ),
           ),
         ],
@@ -897,11 +891,11 @@ class _DuplicatesState extends State<_Duplicates> {
     final sure = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete ${e.title.isEmpty ? 'this login' : e.title}?'),
+        title: Text(e.title.isEmpty ? t.deleteThisLogin : t.deleteNamed(e.title)),
         content: Text(note),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.delete)),
         ],
       ),
     );
@@ -915,19 +909,19 @@ class _DuplicatesState extends State<_Duplicates> {
     final groups = widget.vault.duplicates;
     final notes = Vault.duplicateNotes(groups);
     return Scaffold(
-      appBar: AppBar(title: const Text('Duplicates')),
+      appBar: AppBar(title: Text(t.duplicates)),
       body: groups.isEmpty
-          ? const Center(child: Text('No duplicates left.'))
+          ? Center(child: Text(t.noDuplicatesLeft))
           : ListView(
               children: [
                 for (final group in groups) ...[
                   for (final e in group)
                     ListTile(
                       leading: SiteAvatar(entry: e, icons: widget.icons),
-                      title: Text(e.title.isEmpty ? '(no title)' : e.title),
+                      title: Text(e.title.isEmpty ? t.noTitle : e.title),
                       subtitle: Text(notes[e.id] ?? ''),
                       trailing: IconButton(
-                        tooltip: 'Delete',
+                        tooltip: t.delete,
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () => _delete(e, notes[e.id] ?? ''),
                       ),

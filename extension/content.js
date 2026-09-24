@@ -1,6 +1,7 @@
 // Shows Keyhold logins and two-factor codes right under the field, and hands
 // logins to Keyhold as soon as a form with a password is sent.
 const api = globalThis.browser ?? chrome;
+const t = (key, ...subs) => api.i18n.getMessage(key, subs);
 
 const ICON =
   'data:image/svg+xml;utf8,' +
@@ -210,7 +211,7 @@ async function openMenu(field, allCodes) {
     // No code of this site's own: the codes not tied to any site yet, and
     // the whole list at the bottom in case the right one is paired elsewhere.
     if (!allCodes && items.length === 0) items = (result.unpaired || []).map((e) => ({ ...e, unpaired: true }));
-    if (!allCodes && (result.codeCount || 0) > items.length) items = [...items, { all: true, title: 'All codes…' }];
+    if (!allCodes && (result.codeCount || 0) > items.length) items = [...items, { all: true, title: t('allCodes') }];
   }
   if (items.length === 0) return;
 
@@ -254,7 +255,7 @@ async function openMenu(field, allCodes) {
     title.textContent = entry.title;
     const sub = document.createElement('div');
     sub.className = 'sub';
-    sub.textContent = entry.unpaired ? `${entry.username || ''} · not tied to a site yet` : entry.username || '';
+    sub.textContent = entry.unpaired ? `${entry.username || ''} · ${t('notTiedToSite')}` : entry.username || '';
     text.append(title, sub);
     row.append(text);
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../core/qr.dart';
+import '../l10n/l10n.dart';
 import 'camera_scan_page.dart';
 
 /// Scans two-factor QR codes. Each code becomes its own entry; it is paired
@@ -41,9 +42,8 @@ class _QrPageState extends State<QrPage> {
     }
     final parts = [
       if (result.error != null) result.error!,
-      if (_found.length > 1) '${_found.length} found',
-      if (result.unsupported > 0)
-        '${result.unsupported} use a code type Keyhold cannot generate yet',
+      if (_found.length > 1) t.codesFound(_found.length),
+      if (result.unsupported > 0) t.codesUnsupported(result.unsupported),
     ];
     setState(() => _message = parts.isEmpty ? null : parts.join(' — '));
   }
@@ -52,7 +52,7 @@ class _QrPageState extends State<QrPage> {
     final name = await widget.onSave(code);
     setState(() {
       _saved.add(code.secret);
-      _message = 'Saved as $name';
+      _message = t.savedAs(name);
     });
   }
 
@@ -64,7 +64,7 @@ class _QrPageState extends State<QrPage> {
       _saved.add(code.secret);
       count++;
     }
-    setState(() => _message = 'Saved $count ${count == 1 ? 'code' : 'codes'}');
+    setState(() => _message = t.savedCodes(count));
   }
 
   Future<void> _scanScreen() async {
@@ -86,8 +86,8 @@ class _QrPageState extends State<QrPage> {
   }
 
   Future<void> _scanImage() async {
-    const type = XTypeGroup(label: 'Images', extensions: ['png', 'jpg', 'jpeg', 'bmp', 'webp']);
-    final file = await openFile(acceptedTypeGroups: const [type]);
+    final type = XTypeGroup(label: t.images, extensions: const ['png', 'jpg', 'jpeg', 'bmp', 'webp']);
+    final file = await openFile(acceptedTypeGroups: [type]);
     if (file == null) return;
     setState(() => _busy = true);
     try {
@@ -103,10 +103,10 @@ class _QrPageState extends State<QrPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add two-factor codes'),
+        title: Text(t.addCodes),
         actions: [
           if (_export && _found.any((c) => !_known(c)))
-            TextButton(onPressed: _saveAll, child: const Text('Save all')),
+            TextButton(onPressed: _saveAll, child: Text(t.saveAll)),
           const SizedBox(width: 8),
         ],
       ),
@@ -114,18 +114,12 @@ class _QrPageState extends State<QrPage> {
         padding: const EdgeInsets.all(24),
         children: [
           Text(
-            Platform.isAndroid
-                ? 'Point the camera at the QR code a website shows when you turn on two-factor '
-                    'login, or at the export from Google Authenticator (Transfer accounts → Export).'
-                : 'Show the QR code on the screen and scan it. It can be the code a website shows '
-                    'when you turn on two-factor login, or the export from Google Authenticator '
-                    '(Transfer accounts → Export). A photo of the code works too.',
+            Platform.isAndroid ? t.qrHintPhone : t.qrHintComputer,
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
           ),
           const SizedBox(height: 8),
           Text(
-            'Microsoft Authenticator cannot export its codes — turn two-factor login off and on '
-            'again on each site and scan the new code here.',
+            t.qrMicrosoftHint,
             style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
           ),
           const SizedBox(height: 20),
@@ -137,18 +131,18 @@ class _QrPageState extends State<QrPage> {
                 FilledButton.icon(
                   onPressed: _busy ? null : _scanCamera,
                   icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Scan with the camera'),
+                  label: Text(t.scanCamera),
                 )
               else
                 FilledButton.icon(
                   onPressed: _busy ? null : _scanScreen,
                   icon: const Icon(Icons.screenshot_monitor_outlined),
-                  label: const Text('Scan the screen'),
+                  label: Text(t.scanScreen),
                 ),
               OutlinedButton.icon(
                 onPressed: _busy ? null : _scanImage,
                 icon: const Icon(Icons.image_outlined),
-                label: const Text('Open an image'),
+                label: Text(t.openImage),
               ),
               if (_busy)
                 const Padding(
@@ -196,17 +190,17 @@ class _QrPageState extends State<QrPage> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-            _saved.contains(code.secret) ? 'Saved' : 'Already in Keyhold',
+            _saved.contains(code.secret) ? t.saved : t.alreadyInKeyhold,
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
           ),
           if (!_saved.contains(code.secret) && name != null)
-            Text('as "${name.isEmpty ? '(no name)' : name}"', style: theme.textTheme.bodySmall),
+            Text(t.asName(name.isEmpty ? t.noName : name), style: theme.textTheme.bodySmall),
         ],
       );
     } else if (_export) {
       action = const SizedBox.shrink();
     } else {
-      action = FilledButton(onPressed: () => _save(code), child: const Text('Save'));
+      action = FilledButton(onPressed: () => _save(code), child: Text(t.save));
     }
 
     return Padding(
@@ -218,8 +212,8 @@ class _QrPageState extends State<QrPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                line('Title', title, style: theme.textTheme.titleMedium),
-                line('Username', code.issuer.isNotEmpty ? code.account : ''),
+                line(t.title, title, style: theme.textTheme.titleMedium),
+                line(t.username, code.issuer.isNotEmpty ? code.account : ''),
               ],
             ),
           ),

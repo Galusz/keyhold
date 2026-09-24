@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../l10n/l10n.dart';
+
 /// Points the camera at a QR code and returns its text.
 class CameraScanPage extends StatefulWidget {
   const CameraScanPage({super.key});
@@ -33,7 +35,7 @@ class _CameraScanPageState extends State<CameraScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan a QR code')),
+      appBar: AppBar(title: Text(t.scanQr)),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -44,10 +46,10 @@ class _CameraScanPageState extends State<CameraScanPage> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               color: Colors.black54,
-              child: const Text(
-                'Point at the two-factor QR code of a website, or at the export from Google Authenticator.',
+              child: Text(
+                t.cameraHint,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),

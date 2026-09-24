@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/models.dart';
 import '../core/totp.dart';
+import '../l10n/l10n.dart';
 import 'code_picker_page.dart';
 
 /// Edits a login, or a two-factor code of its own: name, key, note, address.
@@ -119,7 +120,7 @@ class _EntryPageState extends State<EntryPage> {
       final secret = totpSecretFromUri(raw) ?? raw.replaceAll(' ', '');
       if (secret.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enter the key of the two-factor code')),
+          SnackBar(content: Text(t.enterCodeKey)),
         );
         return;
       }
@@ -148,9 +149,9 @@ class _EntryPageState extends State<EntryPage> {
   Widget build(BuildContext context) {
     final String heading;
     if (_isCode) {
-      heading = widget.isNew ? 'New two-factor code' : 'Two-factor code';
+      heading = widget.isNew ? t.newCode : t.twoFactorCode;
     } else {
-      heading = widget.isNew ? 'New entry' : 'Edit entry';
+      heading = widget.isNew ? t.newEntryTitle : t.editEntry;
     }
     return Scaffold(
       appBar: AppBar(
@@ -158,11 +159,11 @@ class _EntryPageState extends State<EntryPage> {
         actions: [
           if (!widget.isNew)
             IconButton(
-              tooltip: 'Delete',
+              tooltip: t.delete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => Navigator.of(context).pop('delete'),
             ),
-          TextButton(onPressed: _save, child: const Text('Save')),
+          TextButton(onPressed: _save, child: Text(t.save)),
           const SizedBox(width: 8),
         ],
       ),
@@ -179,15 +180,15 @@ class _EntryPageState extends State<EntryPage> {
       TextField(
         controller: _title,
         autofocus: widget.isNew,
-        decoration: const InputDecoration(labelText: 'Name'),
+        decoration: InputDecoration(labelText: t.name),
       ),
       const SizedBox(height: 16),
       TextField(
         controller: _totp,
         obscureText: !_showKey,
         decoration: InputDecoration(
-          labelText: 'Key',
-          helperText: 'Paste the setup key or the whole otpauth:// link',
+          labelText: t.key,
+          helperText: t.keyHint,
           suffixIcon: IconButton(
             icon: Icon(_showKey ? Icons.visibility_off : Icons.visibility),
             onPressed: () => setState(() => _showKey = !_showKey),
@@ -198,15 +199,14 @@ class _EntryPageState extends State<EntryPage> {
       TextField(
         controller: _notes,
         maxLines: 3,
-        decoration: const InputDecoration(labelText: 'Note'),
+        decoration: InputDecoration(labelText: t.note),
       ),
       const SizedBox(height: 24),
-      Text('Addresses', style: Theme.of(context).textTheme.titleSmall),
+      Text(t.addresses, style: Theme.of(context).textTheme.titleSmall),
       const SizedBox(height: 4),
       if (logins.every((l) => _unpinned.contains(l.id)) && _sites.isEmpty)
         Text(
-          'Not used anywhere yet. It pins itself the first time you use it on a site, '
-          'or pin it from a login.',
+          t.codeNotUsedYet,
           style: Theme.of(context).textTheme.bodySmall,
         ),
       // From logins pinned to this code: let go here or on the login.
@@ -215,10 +215,10 @@ class _EntryPageState extends State<EntryPage> {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.push_pin_outlined),
-            title: Text('${l.title.isEmpty ? '(no title)' : l.title} — ${l.username}'),
-            subtitle: Text(l.url.isEmpty ? 'no address' : l.url),
+            title: Text('${l.title.isEmpty ? t.noTitle : l.title} — ${l.username}'),
+            subtitle: Text(l.url.isEmpty ? t.noAddress : l.url),
             trailing: IconButton(
-              tooltip: 'Unpin',
+              tooltip: t.unpin,
               icon: const Icon(Icons.close),
               onPressed: () => setState(() => _unpinned.add(l.id)),
             ),
@@ -230,7 +230,7 @@ class _EntryPageState extends State<EntryPage> {
           leading: const Icon(Icons.language),
           title: Text(site),
           trailing: IconButton(
-            tooltip: 'Remove',
+            tooltip: t.remove,
             icon: const Icon(Icons.close),
             onPressed: () => setState(() => _sites.remove(site)),
           ),
@@ -240,11 +240,11 @@ class _EntryPageState extends State<EntryPage> {
           Expanded(
             child: TextField(
               controller: _newSite,
-              decoration: const InputDecoration(hintText: 'Add an address'),
+              decoration: InputDecoration(hintText: t.addAddress),
               onSubmitted: (_) => _addSite(),
             ),
           ),
-          IconButton(tooltip: 'Add', icon: const Icon(Icons.add), onPressed: _addSite),
+          IconButton(tooltip: t.add, icon: const Icon(Icons.add), onPressed: _addSite),
         ],
       ),
     ];
@@ -257,19 +257,19 @@ class _EntryPageState extends State<EntryPage> {
       TextField(
         controller: _title,
         autofocus: widget.isNew,
-        decoration: const InputDecoration(labelText: 'Title'),
+        decoration: InputDecoration(labelText: t.title),
       ),
       const SizedBox(height: 16),
       TextField(
         controller: _username,
-        decoration: const InputDecoration(labelText: 'Username'),
+        decoration: InputDecoration(labelText: t.username),
       ),
       const SizedBox(height: 16),
       TextField(
         controller: _password,
         obscureText: !_showPassword,
         decoration: InputDecoration(
-          labelText: 'Password',
+          labelText: t.password,
           suffixIcon: IconButton(
             icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
             onPressed: () => setState(() => _showPassword = !_showPassword),
@@ -279,29 +279,29 @@ class _EntryPageState extends State<EntryPage> {
       const SizedBox(height: 16),
       TextField(
         controller: _url,
-        decoration: const InputDecoration(labelText: 'Address'),
+        decoration: InputDecoration(labelText: t.address),
       ),
       const SizedBox(height: 16),
       InputDecorator(
-        decoration: const InputDecoration(labelText: '2FA'),
+        decoration: InputDecoration(labelText: t.filter2fa),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 linked
-                    ? '${code.title.isEmpty ? '(no name)' : code.title}'
+                    ? '${code.title.isEmpty ? t.noName : code.title}'
                         '${_linkedCode == null ? '' : '  ·  ${_linkedCode!.substring(0, 3)} ${_linkedCode!.substring(3)}'}'
-                    : 'None',
+                    : t.none,
               ),
             ),
-            TextButton(onPressed: _pickCode, child: Text(linked ? 'Change' : 'Choose')),
+            TextButton(onPressed: _pickCode, child: Text(linked ? t.change : t.choose)),
             if (linked)
               TextButton(
                 onPressed: () => setState(() {
                   _twoFactor = '';
                   _linkedCode = null;
                 }),
-                child: const Text('Remove'),
+                child: Text(t.remove),
               ),
           ],
         ),
@@ -312,8 +312,8 @@ class _EntryPageState extends State<EntryPage> {
         requestFocusOnTap: true,
         enableFilter: true,
         expandedInsets: EdgeInsets.zero,
-        label: const Text('Group'),
-        helperText: 'Pick one or type a new name',
+        label: Text(t.group),
+        helperText: t.groupHint,
         dropdownMenuEntries: [
           for (final g in widget.vault.groups) DropdownMenuEntry(value: g, label: g),
         ],
@@ -322,7 +322,7 @@ class _EntryPageState extends State<EntryPage> {
       TextField(
         controller: _notes,
         maxLines: 5,
-        decoration: const InputDecoration(labelText: 'Notes'),
+        decoration: InputDecoration(labelText: t.notes),
       ),
     ];
   }
