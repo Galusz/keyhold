@@ -7,15 +7,15 @@ import android.view.autofill.AutofillId
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import androidx.annotation.RequiresApi
-import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterActivityLaunchConfigs
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 /// The small Keyhold screen behind the "Keyhold" suggestion: the user picks a
 /// login (or it keeps one Android offered to save), then it closes.
 @RequiresApi(Build.VERSION_CODES.O)
-open class AutofillActivity : FlutterActivity() {
+open class AutofillActivity : FlutterFragmentActivity() {
     override fun getDartEntrypointFunctionName() = "autofillMain"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

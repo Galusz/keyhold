@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 
 import '../core/drive.dart';
 import '../core/favicons.dart';
@@ -12,6 +13,18 @@ import 'entry_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
 import 'vault_page.dart' show SiteAvatar;
+
+/// A fingerprint, or the phone's own PIN or pattern when that fails.
+Future<bool> askFingerprint(String reason) async {
+  try {
+    return await LocalAuthentication().authenticate(
+      localizedReason: reason,
+      persistAcrossBackgrounding: true,
+    );
+  } catch (_) {
+    return false;
+  }
+}
 
 /// Keyhold on a phone: mostly an authenticator, with the same vault as the
 /// computer kept in step through the user's Google Drive.
@@ -39,10 +52,20 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   bool _syncing = false;
   bool _syncAgain = false;
 
+  /// Fingerprint lock: shown over everything until unlocked; set again when
+  /// the screen goes dark or the app was left for more than a minute.
+  bool _locked = false;
+  bool _unlocking = false;
+  DateTime? _leftAt;
+  static const _lockChannel = MethodChannel('keyhold/lock');
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _lockChannel.setMethodCallHandler((call) async {
+      if (call.method == 'screenOff') _lock();
+    });
     _boot();
   }
 
@@ -57,7 +80,26 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) unawaited(_resume());
+    if (state == AppLifecycleState.paused) _leftAt = DateTime.now();
+    if (state != AppLifecycleState.resumed) return;
+    final away = _leftAt == null ? Duration.zero : DateTime.now().difference(_leftAt!);
+    _leftAt = null;
+    if (away > const Duration(minutes: 1)) _lock();
+    if (_locked) unawaited(_unlock());
+    unawaited(_resume());
+  }
+
+  void _lock() {
+    if (!_store.backup.fingerprintLock || _locked) return;
+    setState(() => _locked = true);
+  }
+
+  Future<void> _unlock() async {
+    if (_unlocking) return;
+    _unlocking = true;
+    final ok = await askFingerprint('Unlock Keyhold');
+    _unlocking = false;
+    if (ok && mounted) setState(() => _locked = false);
   }
 
   Future<void> _resume() async {
@@ -79,6 +121,10 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     }
     _vault = await _store.load();
     if (_vault.splitCodes()) await _store.save(_vault);
+    if (_store.backup.fingerprintLock) {
+      _locked = true;
+      unawaited(_unlock());
+    }
     _store.icons.fetchAll(_vault.visible);
     _welcome = _vault.visible.isEmpty && !_drive.connected;
     setState(() => _loading = false);
@@ -311,6 +357,26 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    if (_locked) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.lock_outline, size: 64),
+              const SizedBox(height: 16),
+              Text('Keyhold is locked', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _unlock,
+                icon: const Icon(Icons.fingerprint),
+                label: const Text('Unlock'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -745,6 +811,26 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
             ],
           ),
           if (_busy) const Padding(padding: EdgeInsets.only(top: 12), child: LinearProgressIndicator()),
+          const Divider(height: 40),
+          Text('Fingerprint lock', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 4),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: widget.store.backup.fingerprintLock,
+            title: const Text('Open Keyhold with a fingerprint'),
+            subtitle: const Text(
+              'Locks when the screen goes dark or after a minute away. '
+              'Suggestions under login fields keep working.',
+            ),
+            onChanged: (on) async {
+              // Turning it on or off both need the owner's finger.
+              if (!await askFingerprint(on ? 'Turn on the fingerprint lock' : 'Turn off the fingerprint lock')) return;
+              widget.store.backup
+                ..fingerprintLock = on
+                ..saveSettings();
+              if (mounted) setState(() {});
+            },
+          ),
           if (_filler != 'unsupported') ...[
             const Divider(height: 40),
             Text('Filling passwords', style: theme.textTheme.titleMedium),

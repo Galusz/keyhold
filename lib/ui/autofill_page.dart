@@ -8,6 +8,7 @@ import '../core/drive.dart';
 import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
+import 'mobile_page.dart' show askFingerprint;
 import 'vault_page.dart' show SiteAvatar;
 
 /// Logins for a web page ([site]) or an app ([app]). An app has no address:
@@ -121,6 +122,11 @@ class _AutofillPageState extends State<AutofillPage> {
     final entry = _request['entry'] as String?;
     if (entry != null) {
       await _fillCode(entry);
+      return;
+    }
+    // The whole vault on show: the fingerprint lock applies here too.
+    if (_store.backup.fingerprintLock && !await askFingerprint('Show your logins')) {
+      await _channel.invokeMethod('close');
       return;
     }
     setState(() => _loading = false);

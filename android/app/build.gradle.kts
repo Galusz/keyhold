@@ -69,4 +69,6 @@ flutter {
 dependencies {
     // Autofill suggestions shown in the keyboard's strip.
     implementation("androidx.autofill:autofill:1.1.0")
+    // Themes the fingerprint prompt needs on older phones.
+    implementation("androidx.appcompat:appcompat:1.7.0")
 }
