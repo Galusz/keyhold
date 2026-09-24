@@ -171,6 +171,9 @@ class KeyholdAutofillService : AutofillService() {
                 (if (form.usernames.isNotEmpty()) SaveInfo.SAVE_DATA_TYPE_USERNAME else 0)
             val save = SaveInfo.Builder(type, form.passwords.toTypedArray())
             if (form.usernames.isNotEmpty()) save.setOptionalIds(form.usernames.toTypedArray())
+            // Browsers and many apps never say "form sent"; the login fields
+            // going away after the user typed in them is the sign instead.
+            save.setFlags(SaveInfo.FLAG_SAVE_ON_ALL_VIEWS_INVISIBLE)
             response.setSaveInfo(save.build())
         }
         return response.build()
