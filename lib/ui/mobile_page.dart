@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:local_auth/local_auth.dart';
+import 'package:local_auth_android/local_auth_android.dart';
+import 'package:local_auth_platform_interface/local_auth_platform_interface.dart';
 
 import '../core/drive.dart';
 import '../core/favicons.dart';
@@ -17,9 +18,11 @@ import 'vault_page.dart' show SiteAvatar;
 /// A fingerprint, or the phone's own PIN or pattern when that fails.
 Future<bool> askFingerprint(String reason) async {
   try {
-    return await LocalAuthentication().authenticate(
+    // Only the Android part of local_auth: the phone needs it, the PC does not.
+    return await LocalAuthPlatform.instance.authenticate(
       localizedReason: reason,
-      persistAcrossBackgrounding: true,
+      authMessages: const [AndroidAuthMessages()],
+      options: const AuthenticationOptions(stickyAuth: true, useErrorDialogs: false),
     );
   } catch (_) {
     return false;
