@@ -7,7 +7,7 @@ const Standalone = (() => {
   const session = ext.storage.session;
 
   // "Web application" client of the Keyhold Google project; not a secret.
-  const GOOGLE_CLIENT_ID = '';
+  const GOOGLE_CLIENT_ID = '95881372863-ajkuag5vst7l6re7c7cvj000j4dq4gcn.apps.googleusercontent.com';
   const SCOPE = 'https://www.googleapis.com/auth/drive.file';
   const FILE = 'vault.khd';
   const MAGIC = [0x4b, 0x48, 0x4c, 0x44, 0x31];
