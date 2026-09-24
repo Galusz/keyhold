@@ -216,6 +216,7 @@ function render(entries, tab) {
 }
 
 async function load() {
+  document.getElementById('never').hidden = true;
   const [tab] = await api.tabs.query({ active: true, currentWindow: true });
   if (!tab || !tab.url || !/^https?:/.test(tab.url)) {
     message('Open a website first.');
@@ -362,29 +363,17 @@ function autoSaveSwitch(on) {
   content.append(row);
 }
 
-// Stop sign: switches saving off (or back on) for the site in this tab.
+// The struck-through lock by the title: saving off (or back on) for this site.
 function neverSwitch(never, tab) {
+  const button = document.getElementById('never');
   const host = new URL(tab.url).hostname;
-  const row = document.createElement('div');
-  row.className = never ? 'never on' : 'never';
-  const text = document.createElement('span');
-  text.textContent = never ? `⛔ Logins are not saved on ${host}` : '⛔ Never save logins on this site';
-  row.append(text);
-  if (never) {
-    const allow = document.createElement('button');
-    allow.textContent = 'Allow';
-    allow.onclick = async () => {
-      await api.runtime.sendMessage({ type: 'never', on: false, url: tab.url });
-      load();
-    };
-    row.append(allow);
-  } else {
-    row.onclick = async () => {
-      await api.runtime.sendMessage({ type: 'never', on: true, url: tab.url });
-      load();
-    };
-  }
-  content.append(row);
+  button.hidden = false;
+  button.classList.toggle('on', never);
+  button.title = never ? `Logins are not saved on ${host} — click to allow` : 'Never save logins on this site';
+  button.onclick = async () => {
+    await api.runtime.sendMessage({ type: 'never', on: !never, url: tab.url });
+    load();
+  };
 }
 
 load();
