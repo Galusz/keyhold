@@ -1,3 +1,6 @@
+// Chrome and Edge run this alone as a service worker; Firefox loads these first itself.
+if (typeof importScripts === 'function') importScripts('lib/argon2.umd.min.js', 'vault.js');
+
 const api = globalThis.browser ?? chrome;
 const BRIDGE = 'http://127.0.0.1:19919';
 const session = api.storage.session;
@@ -5,7 +8,18 @@ const USER_TTL = 10 * 60 * 1000;
 const VERDICT_WAIT = 8 * 1000;
 const FAILED_SHOW = 30 * 1000;
 
+// The Keyhold app on this computer when it runs; otherwise the vault this
+// extension opened from Google Drive, if any.
 async function call(path, body) {
+  const result = await callApp(path, body);
+  if (result.error === 'app offline' || result.error === 'no token') {
+    const alone = await Standalone.handle(path, body);
+    if (alone) return alone;
+  }
+  return result;
+}
+
+async function callApp(path, body) {
   const { token } = await api.storage.local.get('token');
   if (!token) return { error: 'no token' };
 
@@ -208,6 +222,11 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
       review: () => review(message),
       never: () => never(message),
       autosave: () => call('/autosave', { on: message.on }),
+      alone: () => Standalone.state(),
+      'alone-connect': () => Standalone.connect(),
+      'alone-unlock': () => Standalone.unlock(message.password || ''),
+      'alone-lock': () => Standalone.lock(),
+      'alone-disconnect': () => Standalone.disconnect(),
     });
   }
   const route = routes[message.type];

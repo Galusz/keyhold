@@ -228,12 +228,18 @@ async function load() {
   }
 
   const result = await api.runtime.sendMessage({ type: 'lookup', url: tab.url });
-  if (!result || result.error === 'no token' || result.error === 'bad token') {
+  if (!result || result.error === 'bad token') {
     pairingScreen();
     return;
   }
+  if (result.error === 'no token' || result.error === 'app offline') {
+    const alone = await api.runtime.sendMessage({ type: 'alone' });
+    if (alone && alone.state === 'locked') unlockScreen();
+    else noAppScreen();
+    return;
+  }
   if (result.error) {
-    message('Keyhold is not running on this computer.');
+    message(result.error);
     return;
   }
   const offers = await api.runtime.sendMessage({ type: 'offers' });
@@ -243,6 +249,98 @@ async function load() {
   render(result.entries || [], tab);
   neverSwitch(result.never === true, tab);
   autoSaveSwitch(result.autoSave === true);
+  if (result.alone) aloneFooter();
+}
+
+// No Keyhold app on this computer: the vault can come from Google Drive instead.
+function noAppScreen() {
+  content.className = '';
+  content.innerHTML = '';
+  const hint = document.createElement('p');
+  hint.className = 'muted';
+  hint.textContent = 'Keyhold is not running on this computer.';
+  const drive = document.createElement('button');
+  drive.textContent = 'Use my vault from Google Drive';
+  const note = document.createElement('p');
+  note.className = 'muted small';
+  note.textContent = 'It stays encrypted and opens here with your master password.';
+  drive.onclick = async () => {
+    drive.disabled = true;
+    drive.textContent = 'Connecting…';
+    const result = await api.runtime.sendMessage({ type: 'alone-connect' });
+    if (result && result.ok) {
+      unlockScreen();
+      return;
+    }
+    drive.disabled = false;
+    drive.textContent = 'Use my vault from Google Drive';
+    note.textContent = (result && result.error) || 'Google Drive was not connected.';
+  };
+  const pair = document.createElement('a');
+  pair.href = '#';
+  pair.className = 'link';
+  pair.textContent = 'The Keyhold app runs here — pair with it';
+  pair.onclick = (e) => {
+    e.preventDefault();
+    pairingScreen();
+  };
+  content.append(hint, drive, note, pair);
+}
+
+function unlockScreen() {
+  content.className = '';
+  content.innerHTML = '';
+  const hint = document.createElement('p');
+  hint.className = 'muted';
+  hint.textContent = 'Master password of your Keyhold vault';
+  const input = document.createElement('input');
+  input.type = 'password';
+  input.autofocus = true;
+  const button = document.createElement('button');
+  button.textContent = 'Unlock';
+  const note = document.createElement('p');
+  note.className = 'muted small';
+  const unlock = async () => {
+    button.disabled = true;
+    button.textContent = 'Opening…';
+    const result = await api.runtime.sendMessage({ type: 'alone-unlock', password: input.value });
+    if (result && result.ok) {
+      load();
+      return;
+    }
+    button.disabled = false;
+    button.textContent = 'Unlock';
+    note.textContent = (result && result.error) || 'The vault did not open.';
+    input.select();
+  };
+  button.onclick = unlock;
+  input.onkeydown = (e) => e.key === 'Enter' && unlock();
+  const disconnect = document.createElement('a');
+  disconnect.href = '#';
+  disconnect.className = 'link';
+  disconnect.textContent = 'Disconnect Google Drive';
+  disconnect.onclick = async (e) => {
+    e.preventDefault();
+    await api.runtime.sendMessage({ type: 'alone-disconnect' });
+    load();
+  };
+  content.append(hint, input, button, note, disconnect);
+  input.focus();
+}
+
+function aloneFooter() {
+  const row = document.createElement('div');
+  row.className = 'alone';
+  const text = document.createElement('span');
+  text.textContent = 'Vault from Google Drive';
+  const lock = document.createElement('button');
+  lock.textContent = 'Lock';
+  lock.onclick = async () => {
+    await api.runtime.sendMessage({ type: 'alone-lock' });
+    load();
+  };
+  row.append(text, lock);
+  content.append(row);
 }
 
 function autoSaveSwitch(on) {
