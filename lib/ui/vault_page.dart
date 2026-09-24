@@ -1236,16 +1236,19 @@ class _VaultPageState extends State<VaultPage> {
               icon: const Icon(Icons.pin_outlined),
               onPressed: () => _autoType(e, codeOnly: true),
             ),
-          IconButton(
-            tooltip: 'Type username and password',
-            icon: const Icon(Icons.keyboard_outlined),
-            onPressed: () => _autoType(e),
-          ),
-          IconButton(
-            tooltip: 'Copy password',
-            icon: const Icon(Icons.copy_outlined),
-            onPressed: () => _copy('Password', e.password),
-          ),
+          // A code on its own has no username or password to type or copy.
+          if (!e.isCode) ...[
+            IconButton(
+              tooltip: 'Type username and password',
+              icon: const Icon(Icons.keyboard_outlined),
+              onPressed: () => _autoType(e),
+            ),
+            IconButton(
+              tooltip: 'Copy password',
+              icon: const Icon(Icons.copy_outlined),
+              onPressed: () => _copy('Password', e.password),
+            ),
+          ],
         ],
       ),
     );
