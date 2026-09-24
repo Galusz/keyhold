@@ -23,6 +23,10 @@ class VaultEntry {
   /// On a login: the id of its two-factor code entry, '' for none. The id,
   /// not the name — two codes may be called the same.
   String twoFactor;
+
+  /// On a two-factor code: addresses added by hand. The addresses of logins
+  /// pinned to it count too, but live on those logins.
+  List<String> sites;
   int updatedAt;
   bool deleted;
 
@@ -36,9 +40,11 @@ class VaultEntry {
     this.group = '',
     this.totpSecret,
     this.twoFactor = '',
+    List<String>? sites,
     int? updatedAt,
     this.deleted = false,
-  }) : updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
+  })  : sites = sites ?? [],
+        updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -50,6 +56,7 @@ class VaultEntry {
         if (group.isNotEmpty) 'group': group,
         if (totpSecret != null) 'totp': totpSecret,
         if (twoFactor.isNotEmpty) 'twoFactor': twoFactor,
+        if (sites.isNotEmpty) 'sites': sites,
         'updatedAt': updatedAt,
         if (deleted) 'deleted': true,
       };
@@ -64,6 +71,7 @@ class VaultEntry {
         group: (j['group'] ?? '') as String,
         totpSecret: j['totp'] as String?,
         twoFactor: (j['twoFactor'] ?? '') as String,
+        sites: (j['sites'] as List<dynamic>?)?.cast<String>().toList(),
         updatedAt: (j['updatedAt'] ?? 0) as int,
         deleted: (j['deleted'] ?? false) as bool,
       );
@@ -208,11 +216,31 @@ class Vault {
   /// Every two-factor code in the vault.
   List<VaultEntry> get codes => visible.where((e) => e.isCode).toList();
 
-  /// Codes not tied to any site yet: no address and no login pointing at
-  /// them. On a code field with no code of its own these are offered.
-  List<VaultEntry> get unpairedCodes {
-    final linked = {for (final e in visible) if (e.twoFactor.isNotEmpty) e.twoFactor};
-    return codes.where((e) => hostOf(e.url).isEmpty && !linked.contains(e.id)).toList();
+  /// Codes not tied to any site yet. On a code field with no code of its own
+  /// these are offered.
+  List<VaultEntry> get unpairedCodes => codes.where((e) => sitesOf(e).isEmpty).toList();
+
+  /// Where a code is used: its own addresses and those of the logins pinned to it.
+  List<String> sitesOf(VaultEntry code) => [
+        ...code.sites,
+        for (final login in loginsOf(code))
+          if (login.url.trim().isNotEmpty) login.url.trim(),
+      ];
+
+  /// Codes for a page, by their addresses — the same rule as for logins:
+  /// this very host first, its parent domain or a subdomain otherwise.
+  List<VaultEntry> codesForSite(String address) {
+    final host = hostOf(address);
+    if (host.isEmpty) return [];
+    final port = _portOf(address);
+    bool exact(String site) => hostOf(site) == host && (port == null || _portOf(site) == port);
+    bool related(String site) {
+      final h = hostOf(site);
+      return h.isNotEmpty && (h == host || host.endsWith('.$h') || h.endsWith('.$host'));
+    }
+
+    final found = codes.where((c) => sitesOf(c).any(exact)).toList();
+    return found.isNotEmpty ? found : codes.where((c) => sitesOf(c).any(related)).toList();
   }
 
   /// The key a login's code comes from: its own (older entries) or its linked code's.
@@ -226,21 +254,13 @@ class Vault {
   List<VaultEntry> loginsOf(VaultEntry code) =>
       visible.where((e) => e.twoFactor == code.id).toList();
 
-  /// Ties [login] to a code, or to none with ''. The code takes the login's
-  /// address; the one let go loses it, unless another login still holds it.
-  void setCode(VaultEntry login, String codeId) {
-    final previous = entries[login.twoFactor];
-    login.twoFactor = codeId;
-    if (previous != null && previous.id != codeId && previous.url == login.url &&
-        loginsOf(previous).every((e) => e.id == login.id)) {
-      previous.url = '';
-      put(previous);
-    }
-    final code = entries[codeId];
-    if (code != null && code.url != login.url) {
-      code.url = login.url;
-      put(code);
-    }
+  /// A code first used on [pageUrl]: that site joins its addresses.
+  void addSite(VaultEntry code, String pageUrl) {
+    final page = Uri.tryParse(pageUrl);
+    final site = page != null && page.hasAuthority ? page.origin : pageUrl.trim();
+    if (site.isEmpty || code.sites.any((s) => hostOf(s) == hostOf(site))) return;
+    code.sites.add(site);
+    put(code);
   }
 
   /// Once: codes kept inside logins become codes of their own, tied to the
@@ -275,7 +295,6 @@ class Vault {
               ? login.title
               : '${login.title} (${login.username})',
           totpSecret: secret,
-          url: login.url,
         );
         put(code);
         bySecret[secret] = code;
@@ -283,6 +302,17 @@ class Vault {
       login.totpSecret = null;
       login.twoFactor = code.id;
       put(login);
+      changed = true;
+    }
+
+    // A code's single address becomes the first of its list — unless it only
+    // repeats the address of a login pinned to it.
+    for (final code in codes) {
+      final url = code.url.trim();
+      if (url.isEmpty) continue;
+      if (!loginsOf(code).any((l) => l.url.trim() == url) && !code.sites.contains(url)) code.sites.add(url);
+      code.url = '';
+      put(code);
       changed = true;
     }
 

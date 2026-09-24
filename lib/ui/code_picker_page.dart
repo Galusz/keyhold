@@ -22,6 +22,9 @@ class CodePickerPage extends StatefulWidget {
 class _CodePickerPageState extends State<CodePickerPage> {
   final _search = TextEditingController();
   final _codes = <String, String>{};
+
+  /// Only codes not used anywhere yet, or all of them.
+  bool _freeOnly = true;
   int _window = -1;
   Timer? _ticker;
 
@@ -52,9 +55,16 @@ class _CodePickerPageState extends State<CodePickerPage> {
 
   Future<void> _newCode() async {
     final code = VaultEntry(id: UniqueKey().toString());
-    final saved = await Navigator.of(context).push(MaterialPageRoute<Object?>(
-      builder: (_) => EntryPage(entry: code, isNew: true, vault: widget.vault, code: true),
-    ));
+    final saved = await Navigator.of(context).push(
+      MaterialPageRoute<Object?>(
+        builder: (_) => EntryPage(
+          entry: code,
+          isNew: true,
+          vault: widget.vault,
+          code: true,
+        ),
+      ),
+    );
     if (saved != true || !mounted) return;
     widget.vault.put(code);
     Navigator.of(context).pop(code.id);
@@ -63,10 +73,18 @@ class _CodePickerPageState extends State<CodePickerPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    const pinnedColor = Color(0xFFF29A2E);
     final query = _search.text.trim().toLowerCase();
-    final codes = widget.vault.codes
-        .where((e) => query.isEmpty || '${e.title} ${e.url} ${e.notes}'.toLowerCase().contains(query))
-        .toList();
+    final codes = widget.vault.codes.where((e) {
+      final sites = widget.vault.sitesOf(e);
+      if (_freeOnly && sites.isNotEmpty && e.id != widget.selected) {
+        return false;
+      }
+      return query.isEmpty ||
+          '${e.title} ${sites.join(' ')} ${e.notes}'.toLowerCase().contains(
+            query,
+          );
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Two-factor code')),
@@ -77,6 +95,17 @@ class _CodePickerPageState extends State<CodePickerPage> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment(value: true, label: Text('Free')),
+                ButtonSegment(value: false, label: Text('All')),
+              ],
+              selected: {_freeOnly},
+              onSelectionChanged: (v) => setState(() => _freeOnly = v.first),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
@@ -93,22 +122,58 @@ class _CodePickerPageState extends State<CodePickerPage> {
           Expanded(
             child: ListView(
               children: [
+                if (codes.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      _freeOnly
+                          ? 'Every code is pinned somewhere. Switch to All to see them.'
+                          : 'No codes found.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 for (final e in codes)
-                  ListTile(
-                    selected: e.id == widget.selected,
-                    leading: const CircleAvatar(child: Icon(Icons.pin_outlined)),
-                    title: Text(e.title.isEmpty ? '(no name)' : e.title),
-                    subtitle: Text(
-                      [
-                        hostOf(e.url).isEmpty ? 'not pinned' : 'pinned to ${hostOf(e.url)}',
-                        'changed ${DateTime.fromMillisecondsSinceEpoch(e.updatedAt).toIso8601String().substring(0, 10)}',
-                      ].join(' · '),
-                    ),
-                    trailing: Text(
-                      _codes[e.id] == null ? '' : '${_codes[e.id]!.substring(0, 3)} ${_codes[e.id]!.substring(3)}',
-                      style: theme.textTheme.titleMedium?.copyWith(fontFamily: 'monospace', letterSpacing: 1),
-                    ),
-                    onTap: () => Navigator.of(context).pop(e.id),
+                  Builder(
+                    builder: (context) {
+                      // Already used elsewhere: orange, with where.
+                      final hosts = {
+                        for (final s in widget.vault.sitesOf(e)) hostOf(s),
+                      }.where((h) => h.isNotEmpty);
+                      final pinned = hosts.isNotEmpty;
+                      return ListTile(
+                        selected: e.id == widget.selected,
+                        leading: CircleAvatar(
+                          child: Icon(
+                            Icons.pin_outlined,
+                            color: pinned ? pinnedColor : null,
+                          ),
+                        ),
+                        title: Text(
+                          e.title.isEmpty ? '(no name)' : e.title,
+                          style: pinned
+                              ? const TextStyle(color: pinnedColor)
+                              : null,
+                        ),
+                        subtitle: Text(
+                          [
+                            pinned
+                                ? 'pinned to ${hosts.join(', ')}'
+                                : 'not pinned',
+                            'changed ${DateTime.fromMillisecondsSinceEpoch(e.updatedAt).toIso8601String().substring(0, 10)}',
+                          ].join(' · '),
+                        ),
+                        trailing: Text(
+                          _codes[e.id] == null
+                              ? ''
+                              : '${_codes[e.id]!.substring(0, 3)} ${_codes[e.id]!.substring(3)}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontFamily: 'monospace',
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        onTap: () => Navigator.of(context).pop(e.id),
+                      );
+                    },
                   ),
               ],
             ),

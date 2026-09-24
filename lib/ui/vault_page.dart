@@ -200,10 +200,8 @@ class _VaultPageState extends State<VaultPage> {
       }
       ..onPair = (id, pageUrl) async {
         final entry = _vault.entries[id];
-        final page = Uri.tryParse(pageUrl);
-        if (entry == null || page == null || !page.hasAuthority) return;
-        entry.url = page.origin;
-        _vault.put(entry);
+        if (entry == null || entry.deleted) return;
+        _vault.addSite(entry, pageUrl);
         await _persist();
         if (mounted) setState(() {});
       }
@@ -1164,8 +1162,10 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Widget _row(VaultEntry e) {
-    final code = _codes[e.id];
+    // A login shows the code pinned to it, like the code's own row.
+    final code = _codes[e.id] ?? _codes[e.twoFactor];
     final selected = _selected.contains(e.id);
+    final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     return ListTile(
       selected: selected,
       onTap: () => _selected.isEmpty ? _open(e, isNew: false) : _toggle(e),
@@ -1177,6 +1177,7 @@ class _VaultPageState extends State<VaultPage> {
           child: SiteAvatar(
             entry: e,
             icons: _store.icons,
+            address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
             child: selected ? const Icon(Icons.check) : null,
           ),
         ),
@@ -1184,11 +1185,13 @@ class _VaultPageState extends State<VaultPage> {
       title: Text(
         e.title.isEmpty ? '(no title)' : e.title,
       ),
-      subtitle: Text(
-        _duplicateNotes[e.id] ?? e.username,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      subtitle: e.isCode
+          ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
+          : Text(
+              _duplicateNotes[e.id] ?? e.username,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1251,10 +1254,14 @@ class _VaultPageState extends State<VaultPage> {
 
 /// The site's own icon when Keyhold has one, otherwise its first letter.
 class SiteAvatar extends StatelessWidget {
-  const SiteAvatar({super.key, required this.entry, required this.icons, this.child});
+  const SiteAvatar({super.key, required this.entry, required this.icons, this.child, this.address});
 
   final VaultEntry entry;
   final Favicons icons;
+
+  /// Where the icon comes from when the entry's own address is not it — a
+  /// two-factor code shows the site it is pinned to.
+  final String? address;
 
   /// Shown instead of either, such as the tick of a selected row.
   final Widget? child;
@@ -1265,7 +1272,7 @@ class SiteAvatar extends StatelessWidget {
     return ValueListenableBuilder<int>(
       valueListenable: icons.changed,
       builder: (context, _, _) {
-        final icon = icons.of(Favicons.addressOf(entry));
+        final icon = icons.of(address ?? Favicons.addressOf(entry));
         if (icon == null) {
           return CircleAvatar(
             child: Text(entry.title.isEmpty ? '?' : entry.title.characters.first.toUpperCase()),

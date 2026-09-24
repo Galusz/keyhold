@@ -43,6 +43,11 @@ class _EntryPageState extends State<EntryPage> {
   String? _linkedCode;
   Timer? _ticker;
 
+  /// A code's own addresses, and the logins to let go of on save.
+  late final List<String> _sites;
+  final _unpinned = <String>{};
+  final _newSite = TextEditingController();
+
   bool get _isCode => widget.code || widget.entry.isCode;
 
   @override
@@ -57,6 +62,7 @@ class _EntryPageState extends State<EntryPage> {
     _notes = TextEditingController(text: e.notes);
     _group = TextEditingController(text: e.group);
     _twoFactor = e.twoFactor;
+    _sites = [...e.sites];
     if (!_isCode) {
       _showLinkedCode();
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _showLinkedCode());
@@ -73,7 +79,17 @@ class _EntryPageState extends State<EntryPage> {
     _totp.dispose();
     _notes.dispose();
     _group.dispose();
+    _newSite.dispose();
     super.dispose();
+  }
+
+  void _addSite() {
+    final site = _newSite.text.trim();
+    if (site.isEmpty) return;
+    setState(() {
+      if (!_sites.contains(site)) _sites.add(site);
+      _newSite.clear();
+    });
   }
 
   Future<void> _showLinkedCode() async {
@@ -95,10 +111,10 @@ class _EntryPageState extends State<EntryPage> {
   void _save() {
     final e = widget.entry;
     e.title = _title.text.trim();
-    e.url = _url.text.trim();
     e.notes = _notes.text;
 
     if (_isCode) {
+      _addSite();
       final raw = _totp.text.trim();
       final secret = totpSecretFromUri(raw) ?? raw.replaceAll(' ', '');
       if (secret.isEmpty) {
@@ -110,11 +126,19 @@ class _EntryPageState extends State<EntryPage> {
       e.totpSecret = secret;
       e.username = '';
       e.password = '';
+      e.url = '';
+      e.sites = _sites;
+      for (final login in widget.vault.loginsOf(e)) {
+        if (!_unpinned.contains(login.id)) continue;
+        login.twoFactor = '';
+        widget.vault.put(login);
+      }
     } else {
+      e.url = _url.text.trim();
       e.username = _username.text.trim();
       e.password = _password.text;
       e.group = _group.text.trim();
-      widget.vault.setCode(e, _twoFactor);
+      e.twoFactor = _twoFactor;
     }
 
     Navigator.of(context).pop(true);
@@ -176,25 +200,53 @@ class _EntryPageState extends State<EntryPage> {
         maxLines: 3,
         decoration: const InputDecoration(labelText: 'Note'),
       ),
-      const SizedBox(height: 16),
-      TextField(
-        controller: _url,
-        decoration: const InputDecoration(
-          labelText: 'Address',
-          helperText: 'The site it is used on. Fills itself when you pin it to a login or use it on a site.',
+      const SizedBox(height: 24),
+      Text('Addresses', style: Theme.of(context).textTheme.titleSmall),
+      const SizedBox(height: 4),
+      if (logins.every((l) => _unpinned.contains(l.id)) && _sites.isEmpty)
+        Text(
+          'Not used anywhere yet. It pins itself the first time you use it on a site, '
+          'or pin it from a login.',
+          style: Theme.of(context).textTheme.bodySmall,
         ),
-      ),
-      if (logins.isNotEmpty) ...[
-        const SizedBox(height: 20),
-        Text('Pinned to', style: Theme.of(context).textTheme.bodySmall),
-        for (final l in logins)
+      // From logins pinned to this code: let go here or on the login.
+      for (final l in logins)
+        if (!_unpinned.contains(l.id))
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.key_outlined),
-            title: Text(l.title.isEmpty ? '(no title)' : l.title),
-            subtitle: Text(l.username),
+            leading: const Icon(Icons.push_pin_outlined),
+            title: Text('${l.title.isEmpty ? '(no title)' : l.title} — ${l.username}'),
+            subtitle: Text(l.url.isEmpty ? 'no address' : l.url),
+            trailing: IconButton(
+              tooltip: 'Unpin',
+              icon: const Icon(Icons.close),
+              onPressed: () => setState(() => _unpinned.add(l.id)),
+            ),
           ),
-      ],
+      // Added by hand: stay with the code only.
+      for (final site in _sites)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.language),
+          title: Text(site),
+          trailing: IconButton(
+            tooltip: 'Remove',
+            icon: const Icon(Icons.close),
+            onPressed: () => setState(() => _sites.remove(site)),
+          ),
+        ),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _newSite,
+              decoration: const InputDecoration(hintText: 'Add an address'),
+              onSubmitted: (_) => _addSite(),
+            ),
+          ),
+          IconButton(tooltip: 'Add', icon: const Icon(Icons.add), onPressed: _addSite),
+        ],
+      ),
     ];
   }
 

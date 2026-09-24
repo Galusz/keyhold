@@ -458,22 +458,29 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   }
 
   Widget _row(VaultEntry e) {
-    final code = _codes[e.id];
+    final code = _codes[e.id] ?? _codes[e.twoFactor];
+    final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     final warn = _left <= 5 ? Theme.of(context).colorScheme.error : null;
     return ListTile(
       onTap: () => code != null ? _copy('Code', code) : _details(e),
       onLongPress: () => _details(e),
-      leading: SiteAvatar(entry: e, icons: _store.icons),
+      leading: SiteAvatar(
+        entry: e,
+        icons: _store.icons,
+        address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
+      ),
       title: Text(
         e.title.isEmpty ? '(no title)' : e.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Text(
-        e.username,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      subtitle: e.isCode
+          ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
+          : Text(
+              e.username,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
       trailing: code == null
           ? const Icon(Icons.chevron_right)
           : Column(

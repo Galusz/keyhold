@@ -6,6 +6,53 @@ const field = (name) => document.getElementById(name);
 const status = (text) => (field('status').textContent = text);
 const FIELDS = ['title', 'username', 'password', 'url', 'totp', 'group', 'notes', 'twoFactor'];
 
+// A code's addresses: its own ones, and the logins pinned to it (📌).
+let sites = [];
+let pinned = [];
+const unpin = new Set();
+
+function renderSites() {
+  const box = field('sites');
+  box.innerHTML = '';
+  const row = (icon, text, url, remove) => {
+    const line = document.createElement('div');
+    line.className = 'site';
+    const what = document.createElement('div');
+    what.className = 'what';
+    what.textContent = `${icon} ${text}`;
+    if (url) {
+      const small = document.createElement('div');
+      small.className = 'url';
+      small.textContent = url;
+      what.append(small);
+    }
+    const x = document.createElement('button');
+    x.textContent = '✕';
+    x.title = 'Remove';
+    x.onclick = () => {
+      remove();
+      renderSites();
+    };
+    line.append(what, x);
+    box.append(line);
+  };
+  for (const p of pinned) if (!unpin.has(p.id)) row('📌', p.label, p.url, () => unpin.add(p.id));
+  for (const s of sites) row('🌐', s, '', () => (sites = sites.filter((x) => x !== s)));
+  if (!box.children.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = 'Not used anywhere yet. It pins itself the first time you use it on a site, or pin it from a login.';
+    box.append(empty);
+  }
+}
+
+function addSite() {
+  const value = field('new-site').value.trim();
+  if (value && !sites.includes(value)) sites.push(value);
+  field('new-site').value = '';
+  renderSites();
+}
+
 // Like the app: the key from an otpauth:// link, or the pasted key without spaces.
 function secretOf(text) {
   const value = text.trim();
@@ -32,7 +79,9 @@ async function open() {
     document.body.classList.add('is-code');
     field('title-label').textContent = 'Name';
     field('notes-label').textContent = 'Note';
-    if (result.pinnedTo && result.pinnedTo.length) field('pinned').textContent = `Pinned to: ${result.pinnedTo.join(', ')}`;
+    sites = [...(result.sites || [])];
+    pinned = result.pinned || [];
+    renderSites();
   }
   for (const code of result.codes || []) {
     const option = document.createElement('option');
@@ -64,6 +113,9 @@ field('save').onclick = async () => {
   entry.url = entry.url.trim();
   entry.group = entry.group.trim();
   entry.totp = secretOf(entry.totp);
+  addSite();
+  entry.sites = sites;
+  entry.unpin = [...unpin];
   status('Saving to Google Drive…');
   const result = await api.runtime.sendMessage({ type: 'put', entry });
   if (result && result.result === 'saved') window.close();
@@ -76,6 +128,11 @@ field('delete').onclick = async () => {
   const result = await api.runtime.sendMessage({ type: 'delete', id });
   if (result && result.result === 'deleted') window.close();
   else status((result && result.error) || 'Not deleted.');
+};
+
+field('add-site').onclick = addSite;
+field('new-site').onkeydown = (e) => {
+  if (e.key === 'Enter') addSite();
 };
 
 open();

@@ -16,7 +16,13 @@
         border-radius: 8px; padding: 10px 12px; font: 15px system-ui, sans-serif;
       }
       body.is-code .login, body:not(.is-code) .code { display: none; }
-      #pinned { margin-top: 18px; font-size: 13px; color: #8aa79f; }
+      .site { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1f332d; }
+      .site .what { flex: 1; min-width: 0; }
+      .site .url { font-size: 12px; color: #8aa79f; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .site button { background: transparent; border: 0; color: #8aa79f; font-size: 16px; cursor: pointer; }
+      .site button:hover { color: #ff8a80; }
+      .add { display: flex; gap: 8px; margin-top: 10px; }
+      .empty { font-size: 13px; color: #6f8a83; }
       input, textarea {
         width: 100%; box-sizing: border-box; background: #0c1714; border: 1px solid #2c4740; color: #e8f5f1;
         border-radius: 8px; padding: 10px 12px; font: 15px system-ui, sans-serif;
@@ -66,10 +72,9 @@
         </div>
         <div class="help">Paste the setup key or the whole otpauth:// link</div>
       </div>
-      <label for="url">Address</label>
-      <input id="url" />
-      <div class="help code">The site it is used on. Fills itself when you pin it to a login or use it on a site.</div>
       <div class="login">
+        <label for="url">Address</label>
+        <input id="url" />
         <label for="twoFactor">2FA</label>
         <select id="twoFactor"><option value="">None</option></select>
         <div class="help">Names can repeat — the current code tells them apart</div>
@@ -80,7 +85,14 @@
       </div>
       <label for="notes" id="notes-label">Notes</label>
       <textarea id="notes" rows="5"></textarea>
-      <div class="code" id="pinned"></div>
+      <div class="code">
+        <label>Addresses</label>
+        <div id="sites"></div>
+        <div class="add">
+          <input id="new-site" placeholder="Add an address" />
+          <button class="save" id="add-site">Add</button>
+        </div>
+      </div>
       <div id="status"></div>
     </main>
     <script src="edit.js"></script>

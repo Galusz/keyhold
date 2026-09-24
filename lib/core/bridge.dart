@@ -127,7 +127,7 @@ class BrowserBridge {
         case '/pair':
           final id = payload['id'] as String? ?? '';
           final entry = vault().entries[id];
-          final unpaired = entry != null && !entry.deleted && hostOf(entry.url).isEmpty;
+          final unpaired = entry != null && !entry.deleted && vault().sitesOf(entry).isEmpty;
           if (unpaired) onPair?.call(id, payload['url'] as String? ?? '');
           await _json(response, HttpStatus.ok, {'result': unpaired ? 'paired' : 'kept'});
         case '/open':
@@ -235,7 +235,11 @@ class BrowserBridge {
   Map<String, dynamic> _lookup(String pageUrl) {
     final host = hostOf(pageUrl);
     if (host.isEmpty) return {'entries': <dynamic>[]};
-    final matches = vault().forSite(pageUrl);
+    // Logins by their address, codes by theirs (and their pinned logins').
+    final matches = [
+      ...vault().forSite(pageUrl).where((e) => !e.isCode),
+      ...vault().codesForSite(pageUrl),
+    ];
     final duplicates = {
       for (final group in vault().duplicates)
         for (final e in group) e.id,
@@ -253,7 +257,7 @@ class BrowserBridge {
                 'username': e.username,
                 'group': e.group,
                 'duplicate': duplicates.contains(e.id),
-                'icon': _icon(e.url),
+                'icon': _icon(e.isCode ? (vault().sitesOf(e).firstOrNull ?? '') : e.url),
                 'hasCode': (vault().secretFor(e) ?? '').isNotEmpty,
                 'isCode': e.isCode,
                 'linked': e.twoFactor.isNotEmpty,
@@ -267,8 +271,8 @@ class BrowserBridge {
         'title': e.title,
         'username': e.username,
         'hasCode': true,
-        'paired': hostOf(e.url).isNotEmpty || vault().loginsOf(e).isNotEmpty,
-        'icon': _icon(e.url),
+        'paired': vault().sitesOf(e).isNotEmpty,
+        'icon': _icon(vault().sitesOf(e).firstOrNull ?? ''),
       };
 
   String? _icon(String url) {

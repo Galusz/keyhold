@@ -14,11 +14,15 @@ import 'vault_page.dart' show SiteAvatar;
 /// its logins are kept under `androidapp://package`, or found under its
 /// website — pl.mbank.android → mbank.pl.
 List<VaultEntry> autofillMatches(Vault vault, String site, String app) {
-  if (site.isNotEmpty) return vault.forSite(site);
-  final found = vault.forSite('androidapp://$app');
+  List<VaultEntry> at(String address) => [
+        ...vault.forSite(address).where((e) => !e.isCode),
+        ...vault.codesForSite(address),
+      ];
+  if (site.isNotEmpty) return at(site);
+  final found = at('androidapp://$app');
   final parts = app.split('.');
   if (parts.length >= 2) {
-    for (final e in vault.forSite('${parts[1]}.${parts[0]}')) {
+    for (final e in at('${parts[1]}.${parts[0]}')) {
       if (!found.contains(e)) found.add(e);
     }
   }
@@ -140,7 +144,7 @@ class _AutofillPageState extends State<AutofillPage> {
   /// A code with no site yet: asks from the bottom of the screen whether it
   /// belongs to this site or app from now on.
   Future<void> _offerPin(VaultEntry e) async {
-    if (!e.isCode || hostOf(e.url).isNotEmpty || _vault.loginsOf(e).isNotEmpty) return;
+    if (!e.isCode || _vault.sitesOf(e).isNotEmpty) return;
     if (_store.backup.noPinAsk.contains(e.id)) return;
     final place = _site.isNotEmpty ? _site : ((_request['label'] as String?) ?? _app);
     var never = false;
@@ -183,8 +187,7 @@ class _AutofillPageState extends State<AutofillPage> {
       _store.backup.saveSettings();
     }
     if (pin != true) return;
-    e.url = _site.isNotEmpty ? 'https://$_site' : _address;
-    _vault.put(e);
+    _vault.addSite(e, _site.isNotEmpty ? 'https://$_site' : _address);
     await _store.save(_vault);
   }
 

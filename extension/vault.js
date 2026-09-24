@@ -378,7 +378,22 @@ const Standalone = (() => {
   const isCode = (e) => !!e.totp && !e.password;
   const codesOf = (data) => visible(data).filter(isCode);
   const loginsOf = (data, code) => visible(data).filter((e) => e.twoFactor === code.id);
-  const paired = (data, code) => !!hostOf(code.url) || loginsOf(data, code).length > 0;
+  // Where a code is used: its own addresses and those of the logins pinned to it.
+  const sitesOf = (data, code) => [...(code.sites || []), ...loginsOf(data, code).map((l) => (l.url || '').trim()).filter(Boolean)];
+  const paired = (data, code) => sitesOf(data, code).length > 0;
+
+  function codesForSite(data, address) {
+    const host = hostOf(address);
+    if (!host) return [];
+    const port = portOf(address);
+    const exact = (site) => hostOf(site) === host && (!port || portOf(site) === port);
+    const related = (site) => {
+      const h = hostOf(site);
+      return !!h && (h === host || host.endsWith(`.${h}`) || h.endsWith(`.${host}`));
+    };
+    const found = codesOf(data).filter((c) => sitesOf(data, c).some(exact));
+    return found.length ? found : codesOf(data).filter((c) => sitesOf(data, c).some(related));
+  }
   const secretFor = (data, e) => {
     if (e.totp) return e.totp;
     const code = (data.entries || []).find((x) => x.id === e.twoFactor && !x.deleted);
@@ -390,27 +405,8 @@ const Standalone = (() => {
     username: e.username || '',
     hasCode: true,
     paired: paired(data, e),
-    icon: iconFrom(map, e.url),
+    icon: iconFrom(map, sitesOf(data, e)[0] || ''),
   });
-
-  // A login's code takes the login's address; the one let go loses it,
-  // unless another login still holds it.
-  function setCode(data, login, codeId) {
-    const find = (id) => (data.entries || []).find((x) => x.id === id && !x.deleted);
-    const previous = find(login.twoFactor);
-    if (codeId) login.twoFactor = codeId;
-    else delete login.twoFactor;
-    const others = (code) => (data.entries || []).some((x) => !x.deleted && x.id !== login.id && x.twoFactor === code.id);
-    if (previous && previous.id !== codeId && previous.url === login.url && !others(previous)) {
-      previous.url = '';
-      previous.updatedAt = Date.now();
-    }
-    const code = find(codeId);
-    if (code && code.url !== login.url) {
-      code.url = login.url;
-      code.updatedAt = Date.now();
-    }
-  }
 
   // ---------- two-factor codes ----------
 
@@ -478,7 +474,7 @@ const Standalone = (() => {
         autoSave,
         unpaired: codes.filter((e) => !paired(data, e)).map((e) => codeOf(data, e, map)),
         codeCount: codes.length,
-        entries: forSite(data, body.url).map((e) => ({
+        entries: [...forSite(data, body.url).filter((e) => !isCode(e)), ...codesForSite(data, body.url)].map((e) => ({
           id: e.id,
           title: e.title,
           username: e.username,
@@ -487,7 +483,7 @@ const Standalone = (() => {
           isCode: isCode(e),
           linked: !!e.twoFactor,
           duplicate: duplicates.has(e.id),
-          icon: iconFrom(map, e.url),
+          icon: iconFrom(map, isCode(e) ? sitesOf(data, e)[0] || '' : e.url),
         })),
       };
     },
@@ -502,8 +498,8 @@ const Standalone = (() => {
       return {
         result: await write((fresh) => {
           const e = (fresh.entries || []).find((x) => x.id === body.id && !x.deleted);
-          if (!e || hostOf(e.url)) return 'kept';
-          e.url = new URL(body.url).origin;
+          if (!e || paired(fresh, e)) return 'kept';
+          e.sites = [...(e.sites || []), new URL(body.url).origin];
           e.updatedAt = Date.now();
           return 'paired';
         }),
@@ -645,7 +641,8 @@ const Standalone = (() => {
           notes: e.notes || '',
           twoFactor: e.twoFactor || '',
         },
-        pinnedTo: isCode(e) ? loginsOf(data, e).map((l) => `${l.title} — ${l.username}`) : [],
+        sites: e.sites || [],
+        pinned: isCode(e) ? loginsOf(data, e).map((l) => ({ id: l.id, label: `${l.title} — ${l.username}`, url: l.url || '' })) : [],
         codes,
         groups,
       };
@@ -662,11 +659,19 @@ const Standalone = (() => {
           e.notes = changed.notes || '';
           if (isCode(e)) {
             if (changed.totp) e.totp = changed.totp;
+            e.url = '';
+            e.sites = changed.sites || [];
+            // Logins let go of here lose the pin on their side too.
+            for (const login of (fresh.entries || []).filter((x) => (changed.unpin || []).includes(x.id))) {
+              delete login.twoFactor;
+              login.updatedAt = Date.now();
+            }
           } else {
             e.username = changed.username || '';
             e.password = changed.password || '';
             e.group = changed.group || '';
-            setCode(fresh, e, changed.twoFactor || '');
+            if (changed.twoFactor) e.twoFactor = changed.twoFactor;
+            else delete e.twoFactor;
           }
           e.updatedAt = Date.now();
           return 'saved';
