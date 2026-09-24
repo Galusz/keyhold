@@ -25,6 +25,7 @@ class MainActivity : FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         Keystore.register(flutterEngine)
+        Fingerprint.register(this, flutterEngine)
 
         // The screen going dark locks Keyhold, when the fingerprint lock is on.
         val lock = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/lock")

@@ -21,6 +21,7 @@ open class AutofillActivity : FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         Keystore.register(flutterEngine)
+        Fingerprint.register(this, flutterEngine)
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/autofill")
             .setMethodCallHandler { call, result ->

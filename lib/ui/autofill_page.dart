@@ -125,7 +125,7 @@ class _AutofillPageState extends State<AutofillPage> {
       return;
     }
     // The whole vault on show: the fingerprint lock applies here too.
-    if (_store.backup.fingerprintLock && !await askFingerprint('Show your logins')) {
+    if (_store.backup.fingerprintLock && !await askFingerprint()) {
       await _channel.invokeMethod('close');
       return;
     }

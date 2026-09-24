@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:local_auth_android/local_auth_android.dart';
-import 'package:local_auth_platform_interface/local_auth_platform_interface.dart';
 
 import '../core/drive.dart';
 import '../core/favicons.dart';
@@ -16,14 +14,9 @@ import 'qr_page.dart';
 import 'vault_page.dart' show SiteAvatar;
 
 /// A fingerprint, or the phone's own PIN or pattern when that fails.
-Future<bool> askFingerprint(String reason) async {
+Future<bool> askFingerprint([String hint = 'Unlock to see your passwords and codes']) async {
   try {
-    // Only the Android part of local_auth: the phone needs it, the PC does not.
-    return await LocalAuthPlatform.instance.authenticate(
-      localizedReason: reason,
-      authMessages: const [AndroidAuthMessages()],
-      options: const AuthenticationOptions(stickyAuth: true, useErrorDialogs: false),
-    );
+    return await const MethodChannel('keyhold/fingerprint').invokeMethod<bool>('ask', {'hint': hint}) ?? false;
   } catch (_) {
     return false;
   }
@@ -83,12 +76,13 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // The fingerprint panel covering Keyhold is not leaving it.
+    if (_unlocking) return;
     if (state == AppLifecycleState.paused) _leftAt = DateTime.now();
     if (state != AppLifecycleState.resumed) return;
-    final away = _leftAt == null ? Duration.zero : DateTime.now().difference(_leftAt!);
+    final left = _leftAt;
     _leftAt = null;
-    if (away > const Duration(minutes: 1)) _lock();
-    if (_locked) unawaited(_unlock());
+    if (left != null && DateTime.now().difference(left) > const Duration(minutes: 1)) _lock();
     unawaited(_resume());
   }
 
@@ -100,7 +94,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   Future<void> _unlock() async {
     if (_unlocking) return;
     _unlocking = true;
-    final ok = await askFingerprint('Unlock Keyhold');
+    final ok = await askFingerprint();
     _unlocking = false;
     if (ok && mounted) setState(() => _locked = false);
   }
@@ -124,10 +118,8 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     }
     _vault = await _store.load();
     if (_vault.splitCodes()) await _store.save(_vault);
-    if (_store.backup.fingerprintLock) {
-      _locked = true;
-      unawaited(_unlock());
-    }
+    // The fingerprint panel comes up only from the Unlock button.
+    _locked = _store.backup.fingerprintLock;
     _store.icons.fetchAll(_vault.visible);
     _welcome = _vault.visible.isEmpty && !_drive.connected;
     setState(() => _loading = false);
@@ -827,7 +819,7 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
             ),
             onChanged: (on) async {
               // Turning it on or off both need the owner's finger.
-              if (!await askFingerprint(on ? 'Turn on the fingerprint lock' : 'Turn off the fingerprint lock')) return;
+              if (!await askFingerprint('Confirm with your fingerprint')) return;
               widget.store.backup
                 ..fingerprintLock = on
                 ..saveSettings();
