@@ -317,7 +317,9 @@ function unlockScreen() {
     input.select();
   };
   button.onclick = unlock;
-  input.onkeydown = (e) => e.key === 'Enter' && unlock();
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') unlock();
+  };
   const disconnect = document.createElement('a');
   disconnect.href = '#';
   disconnect.className = 'link';
