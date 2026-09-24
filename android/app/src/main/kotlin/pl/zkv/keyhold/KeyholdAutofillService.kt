@@ -122,8 +122,15 @@ class KeyholdAutofillService : AutofillService() {
         for (login in logins.take(6)) {
             val title = login["title"] as? String ?: ""
             val username = login["username"] as? String
-            val dataset = Dataset.Builder(presentation(this, title, username))
-            inlinePresentation(inline, shown, title, username, pinned = false)?.let { dataset.setInlinePresentation(it) }
+            val code = login["code"] as? String
+            // On a two-factor step the suggestion says which code goes in.
+            val sub = if (form.usernames.isEmpty() && form.passwords.isEmpty() && code != null) {
+                "2FA code ${code.take(3)} ${code.drop(3)}"
+            } else {
+                username
+            }
+            val dataset = Dataset.Builder(presentation(this, title, sub))
+            inlinePresentation(inline, shown, title, sub, pinned = false)?.let { dataset.setInlinePresentation(it) }
             var any = false
             fun put(ids: List<AutofillId>, value: String?) {
                 if (value.isNullOrEmpty()) return
@@ -140,7 +147,7 @@ class KeyholdAutofillService : AutofillService() {
             }
             put(form.usernames, username)
             put(form.passwords, login["password"] as? String)
-            put(form.codes, login["code"] as? String)
+            put(form.codes, code)
             if (any) {
                 response.addDataset(dataset.build())
                 shown++
