@@ -45,6 +45,14 @@ Future<void> autofillMain() async {
   runApp(const KeyholdApp(home: AutofillPage()));
 }
 
+/// Started without a screen by Android's autofill service, to find the logins
+/// it shows right under a field.
+@pragma('vm:entry-point')
+Future<void> autofillLookupMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await serveAutofillLookups();
+}
+
 class KeyholdApp extends StatelessWidget {
   const KeyholdApp({super.key, required this.home});
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,48 @@ import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import 'vault_page.dart' show SiteAvatar;
+
+/// Logins for a web page ([site]) or an app ([app]). An app has no address:
+/// its logins are kept under `androidapp://package`, or found under its
+/// website — pl.mbank.android → mbank.pl.
+List<VaultEntry> autofillMatches(Vault vault, String site, String app) {
+  if (site.isNotEmpty) return vault.forSite(site);
+  final found = vault.forSite('androidapp://$app');
+  final parts = app.split('.');
+  if (parts.length >= 2) {
+    for (final e in vault.forSite('${parts[1]}.${parts[0]}')) {
+      if (!found.contains(e)) found.add(e);
+    }
+  }
+  return found;
+}
+
+/// Answers the phone's autofill service, which runs this without a screen to
+/// put the logins right under the field.
+Future<void> serveAutofillLookups() async {
+  DartPluginRegistrant.ensureInitialized();
+  const channel = MethodChannel('keyhold/autofill-lookup');
+  final store = VaultStore();
+  final opened = store.init();
+
+  channel.setMethodCallHandler((call) async {
+    if (call.method != 'lookup' || !await opened) return <Object>[];
+    final args = call.arguments as Map;
+    // Read afresh every time: the app or a sync may have changed the vault.
+    final vault = await store.load();
+    final wantsCode = args['wantsCode'] == true;
+    return [
+      for (final e in autofillMatches(vault, args['domain'] as String? ?? '', args['app'] as String? ?? ''))
+        {
+          'title': e.title,
+          'username': e.username,
+          'password': e.password,
+          'code': wantsCode && (e.totpSecret ?? '').isNotEmpty ? await totpCode(e.totpSecret!) : null,
+        },
+    ];
+  });
+  await channel.invokeMethod('ready');
+}
 
 /// Behind the "Keyhold" suggestion Android shows under a login field: pick
 /// the login to fill, or keep one Android offered to save.
@@ -63,21 +106,9 @@ class _AutofillPageState extends State<AutofillPage> {
     setState(() => _loading = false);
   }
 
-  List<VaultEntry> get _matches {
-    final found = _vault.forSite(_address);
-    // An app's login is often kept under its website: pl.mbank.android → mbank.pl.
-    final parts = _app.split('.');
-    if (_site.isEmpty && parts.length >= 2) {
-      for (final e in _vault.forSite('${parts[1]}.${parts[0]}')) {
-        if (!found.contains(e)) found.add(e);
-      }
-    }
-    return found;
-  }
-
   List<VaultEntry> get _shown {
     final query = _search.text.trim().toLowerCase();
-    if (query.isEmpty) return _matches;
+    if (query.isEmpty) return autofillMatches(_vault, _site, _app);
     return _vault.visible
         .where((e) => '${e.title} ${e.username} ${e.url}'.toLowerCase().contains(query))
         .toList();
