@@ -1,62 +1,46 @@
 package pl.zkv.keyhold
 
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.view.autofill.AutofillManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import java.security.KeyStore
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.GCMParameterSpec
 
-/// Keeps the vault key sealed by a key that never leaves the Android Keystore —
-/// the phone's counterpart of Windows DPAPI.
 class MainActivity : FlutterActivity() {
-    private val alias = "keyhold-vault-key"
-
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/keystore")
+        Keystore.register(flutterEngine)
+
+        // Settings: is Keyhold the phone's password filler, and the system switch to make it one.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/autofill-settings")
             .setMethodCallHandler { call, result ->
-                try {
-                    val input = call.arguments as ByteArray
-                    when (call.method) {
-                        "protect" -> result.success(protect(input))
-                        "unprotect" -> result.success(unprotect(input))
-                        else -> result.notImplemented()
+                val manager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    getSystemService(AutofillManager::class.java)
+                } else {
+                    null
+                }
+                when (call.method) {
+                    "state" -> result.success(
+                        when {
+                            manager == null || !manager.isAutofillSupported -> "unsupported"
+                            manager.hasEnabledAutofillServices() -> "on"
+                            else -> "off"
+                        }
+                    )
+                    "enable" -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startActivity(
+                                Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE)
+                                    .setData(Uri.parse("package:$packageName"))
+                            )
+                        }
+                        result.success(null)
                     }
-                } catch (e: Exception) {
-                    result.error("keystore", e.message, null)
+                    else -> result.notImplemented()
                 }
             }
-    }
-
-    private fun key(): SecretKey {
-        val store = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        (store.getKey(alias, null) as? SecretKey)?.let { return it }
-        val generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-        generator.init(
-            KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .setKeySize(256)
-                .build()
-        )
-        return generator.generateKey()
-    }
-
-    // Output: 12-byte IV followed by the ciphertext with its tag.
-    private fun protect(plain: ByteArray): ByteArray {
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.ENCRYPT_MODE, key())
-        return cipher.iv + cipher.doFinal(plain)
-    }
-
-    private fun unprotect(sealed: ByteArray): ByteArray {
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, sealed.copyOfRange(0, 12)))
-        return cipher.doFinal(sealed.copyOfRange(12, sealed.size))
     }
 }

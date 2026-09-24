@@ -8,6 +8,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/autotype.dart';
 import 'tray.dart';
+import 'ui/autofill_page.dart';
 import 'ui/mobile_page.dart';
 import 'ui/vault_page.dart';
 
@@ -35,6 +36,13 @@ Future<void> main() async {
   await hotKeyManager.unregisterAll();
 
   runApp(const KeyholdApp(home: TrayShell(child: VaultPage())));
+}
+
+/// Started by Android behind the "Keyhold" suggestion under a login field.
+@pragma('vm:entry-point')
+Future<void> autofillMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const KeyholdApp(home: AutofillPage()));
 }
 
 class KeyholdApp extends StatelessWidget {

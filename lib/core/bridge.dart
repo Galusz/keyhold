@@ -109,7 +109,7 @@ class BrowserBridge {
         case '/code':
           await _json(response, HttpStatus.ok, await _code(payload['id'] as String? ?? ''));
         case '/never':
-          final host = _hostOf(payload['url'] as String? ?? '');
+          final host = hostOf(payload['url'] as String? ?? '');
           final never = payload['never'] == true;
           if (host.isNotEmpty) onNever?.call(host, never);
           if (never) _drop((o) => o.host == host);
@@ -170,7 +170,7 @@ class BrowserBridge {
     final url = payload['url'] as String? ?? '';
     final username = payload['username'] as String? ?? '';
     final password = payload['password'] as String? ?? '';
-    final host = _hostOf(url);
+    final host = hostOf(url);
     if (password.isEmpty || host.isEmpty) return {'result': 'ignored'};
     if (neverSave().contains(host)) return {'result': 'blocked'};
 
@@ -212,17 +212,9 @@ class BrowserBridge {
       origin.startsWith('moz-extension://');
 
   Map<String, dynamic> _lookup(String pageUrl) {
-    final host = _hostOf(pageUrl);
+    final host = hostOf(pageUrl);
     if (host.isEmpty) return {'entries': <dynamic>[]};
-
-    final matches = vault().visible.where((e) {
-      final entryHost = _hostOf(e.url);
-      if (entryHost.isEmpty) return false;
-      return entryHost == host ||
-          host.endsWith('.$entryHost') ||
-          entryHost.endsWith('.$host');
-    }).toList()
-      ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    final matches = vault().forSite(host);
 
     return {
       'never': neverSave().contains(host),
@@ -264,14 +256,6 @@ class BrowserBridge {
       return {'error': 'not found'};
     }
     return {'code': await totpCode(secret), 'left': secondsLeft()};
-  }
-
-  String _hostOf(String url) {
-    var text = url.trim();
-    if (text.isEmpty) return '';
-    if (!text.contains('://')) text = 'https://$text';
-    final host = Uri.tryParse(text)?.host.toLowerCase() ?? '';
-    return host.startsWith('www.') ? host.substring(4) : host;
   }
 
   Future<void> _json(HttpResponse response, int status, Object body) async {

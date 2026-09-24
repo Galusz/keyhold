@@ -1,0 +1,208 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../core/drive.dart';
+import '../core/models.dart';
+import '../core/storage.dart';
+import '../core/totp.dart';
+import 'vault_page.dart' show SiteAvatar;
+
+/// Behind the "Keyhold" suggestion Android shows under a login field: pick
+/// the login to fill, or keep one Android offered to save.
+class AutofillPage extends StatefulWidget {
+  const AutofillPage({super.key});
+
+  @override
+  State<AutofillPage> createState() => _AutofillPageState();
+}
+
+class _AutofillPageState extends State<AutofillPage> {
+  static const _channel = MethodChannel('keyhold/autofill');
+
+  final _store = VaultStore();
+  final _search = TextEditingController();
+  Map<String, dynamic> _request = {};
+  Vault _vault = Vault();
+  bool _loading = true;
+  String? _message;
+
+  String get _site => _request['domain'] as String? ?? '';
+  String get _app => _request['app'] as String? ?? '';
+
+  /// Apps have no address; their logins are kept under `androidapp://package`.
+  String get _address => _site.isNotEmpty ? _site : 'androidapp://$_app';
+
+  @override
+  void initState() {
+    super.initState();
+    _start();
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  Future<void> _start() async {
+    _request = await _channel.invokeMapMethod<String, dynamic>('request') ?? {};
+    if (!await _store.init()) {
+      setState(() {
+        _message = 'Open Keyhold once and enter the master password, then try again.';
+        _loading = false;
+      });
+      return;
+    }
+    _vault = await _store.load();
+    if (_request['mode'] == 'save') {
+      await _keep();
+      return;
+    }
+    setState(() => _loading = false);
+  }
+
+  List<VaultEntry> get _matches {
+    final found = _vault.forSite(_address);
+    // An app's login is often kept under its website: pl.mbank.android → mbank.pl.
+    final parts = _app.split('.');
+    if (_site.isEmpty && parts.length >= 2) {
+      for (final e in _vault.forSite('${parts[1]}.${parts[0]}')) {
+        if (!found.contains(e)) found.add(e);
+      }
+    }
+    return found;
+  }
+
+  List<VaultEntry> get _shown {
+    final query = _search.text.trim().toLowerCase();
+    if (query.isEmpty) return _matches;
+    return _vault.visible
+        .where((e) => '${e.title} ${e.username} ${e.url}'.toLowerCase().contains(query))
+        .toList();
+  }
+
+  Future<void> _pick(VaultEntry e) async {
+    final secret = e.totpSecret;
+    final code = _request['wantsCode'] == true && secret != null && secret.isNotEmpty
+        ? await totpCode(secret)
+        : null;
+    await _channel.invokeMethod('fill', {
+      'username': e.username,
+      'password': e.password,
+      'code': code,
+    });
+  }
+
+  /// Android asked "Save to Keyhold?" and the user agreed.
+  Future<void> _keep() async {
+    final username = _request['username'] as String? ?? '';
+    final password = _request['password'] as String? ?? '';
+    final label = _request['label'] as String? ?? '';
+
+    final existing = _vault.forSite(_address).where((e) => e.username == username).firstOrNull;
+    if (existing != null) {
+      if (existing.password != password) {
+        existing.password = password;
+        _vault.put(existing);
+      }
+    } else {
+      _vault.put(VaultEntry(
+        id: UniqueKey().toString(),
+        title: _site.isNotEmpty ? _site : (label.isNotEmpty ? label : _app),
+        username: username,
+        password: password,
+        url: _site.isNotEmpty ? 'https://$_site' : _address,
+        group: _site.isNotEmpty ? 'Web' : 'Apps',
+      ));
+    }
+    await _store.save(_vault);
+    setState(() {
+      _message = existing == null ? 'Saved to Keyhold' : 'Password updated in Keyhold';
+      _loading = false;
+    });
+
+    // Straight on to the computer, not only when the app is opened next.
+    final drive = DriveSync(_store);
+    if (drive.connected) {
+      try {
+        final result = await drive.sync(_vault);
+        final theirs = result.vault;
+        if (theirs != null) await _store.save(Vault.merge(_vault, theirs));
+      } catch (_) {
+        // the app syncs again when it is opened
+      }
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    await _channel.invokeMethod('close');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = _site.isNotEmpty ? _site : (_request['label'] as String? ?? 'Keyhold');
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title.isEmpty ? 'Keyhold' : title),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => _channel.invokeMethod('close'),
+        ),
+      ),
+      body: _body(context),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_message != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Text(_message!, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
+        ),
+      );
+    }
+
+    final shown = _shown;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: TextField(
+            controller: _search,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.search),
+              hintText: 'Search all logins',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+        ),
+        Expanded(
+          child: shown.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(
+                    _search.text.isEmpty
+                        ? 'No login for this ${_site.isNotEmpty ? 'site' : 'app'} yet. Search above, or log in and Android will offer to save it.'
+                        : 'Nothing found.',
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : ListView(
+                  children: [
+                    for (final e in shown)
+                      ListTile(
+                        leading: SiteAvatar(entry: e, icons: _store.icons),
+                        title: Text(e.title.isEmpty ? '(no title)' : e.title),
+                        subtitle: Text(e.username),
+                        onTap: () => _pick(e),
+                      ),
+                  ],
+                ),
+        ),
+      ],
+    );
+  }
+}

@@ -56,7 +56,17 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) unawaited(_sync());
+    if (state == AppLifecycleState.resumed) unawaited(_resume());
+  }
+
+  Future<void> _resume() async {
+    // The autofill screen may have saved a login to the vault file meanwhile.
+    if (!_loading) {
+      _vault = Vault.merge(_vault, await _store.load());
+      _codeWindow = -1;
+      await _refreshCodes();
+    }
+    await _sync();
   }
 
   Future<void> _boot() async {
@@ -594,8 +604,37 @@ class _Settings extends StatefulWidget {
   State<_Settings> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<_Settings> {
+class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
+  static const _autofill = MethodChannel('keyhold/autofill-settings');
+
   bool _busy = false;
+
+  /// "on", "off" or "unsupported" — whether Keyhold is the phone's password filler.
+  String _filler = 'unsupported';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _checkFiller();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Back from the system screen where the filler is chosen.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _checkFiller();
+  }
+
+  Future<void> _checkFiller() async {
+    final state = await _autofill.invokeMethod<String>('state') ?? 'unsupported';
+    if (mounted) setState(() => _filler = state);
+  }
 
   Future<void> _run(Future<void> Function() action) async {
     setState(() => _busy = true);
@@ -653,6 +692,29 @@ class _SettingsState extends State<_Settings> {
             ],
           ),
           if (_busy) const Padding(padding: EdgeInsets.only(top: 12), child: LinearProgressIndicator()),
+          if (_filler != 'unsupported') ...[
+            const Divider(height: 40),
+            Text('Filling passwords', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(
+              _filler == 'on'
+                  ? 'Keyhold fills logins in apps and browsers: tap "Keyhold" under a login field. '
+                      'In Chrome also switch on Settings → Autofill services → Autofill using another service.'
+                  : 'Let Keyhold fill logins and two-factor codes in apps and browsers.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            if (_filler != 'on') ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton.icon(
+                  onPressed: () => _autofill.invokeMethod('enable'),
+                  icon: const Icon(Icons.password),
+                  label: const Text('Fill passwords with Keyhold'),
+                ),
+              ),
+            ],
+          ],
           const Divider(height: 40),
           Text('Master password', style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),

@@ -1,6 +1,15 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+/// "example.com" from any address, without "www.".
+String hostOf(String url) {
+  var text = url.trim();
+  if (text.isEmpty) return '';
+  if (!text.contains('://')) text = 'https://$text';
+  final host = Uri.tryParse(text)?.host.toLowerCase() ?? '';
+  return host.startsWith('www.') ? host.substring(4) : host;
+}
+
 class VaultEntry {
   final String id;
   String title;
@@ -164,6 +173,17 @@ class Vault {
     final list = entries.values.where((e) => !e.deleted).toList();
     list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return list;
+  }
+
+  /// Logins for a site: the same host, or one a subdomain of the other.
+  List<VaultEntry> forSite(String address) {
+    final host = hostOf(address);
+    if (host.isEmpty) return [];
+    return visible.where((e) {
+      final entryHost = hostOf(e.url);
+      if (entryHost.isEmpty) return false;
+      return entryHost == host || host.endsWith('.$entryHost') || entryHost.endsWith('.$host');
+    }).toList();
   }
 
   List<String> get groups {

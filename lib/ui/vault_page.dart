@@ -115,7 +115,7 @@ class _VaultPageState extends State<VaultPage> {
     }
     _vault.put(VaultEntry(
       id: UniqueKey().toString(),
-      title: _hostOf(url),
+      title: hostOf(url),
       username: username,
       password: password,
       url: url,
@@ -129,11 +129,11 @@ class _VaultPageState extends State<VaultPage> {
   /// is no address) and the same username.
   VaultEntry? _findLogin(
       List<VaultEntry> entries, String url, String title, String username) {
-    final host = _hostOf(url);
+    final host = hostOf(url);
     final name = title.trim().toLowerCase();
     for (final e in entries) {
       if (e.username != username) continue;
-      if (host.isNotEmpty ? _hostOf(e.url) == host : e.title.toLowerCase() == name) {
+      if (host.isNotEmpty ? hostOf(e.url) == host : e.title.toLowerCase() == name) {
         return e;
       }
     }
@@ -157,7 +157,7 @@ class _VaultPageState extends State<VaultPage> {
     final entries = _vault.visible;
     if (entries.isEmpty || entries.any((e) => e.group.isNotEmpty)) return false;
     for (final e in entries) {
-      final host = _hostOf(e.url.isNotEmpty ? e.url : e.title);
+      final host = hostOf(e.url.isNotEmpty ? e.url : e.title);
       e.group = _isLocal(host)
           ? 'Local network'
           : _ipPattern.hasMatch(host)
@@ -354,17 +354,9 @@ class _VaultPageState extends State<VaultPage> {
   static final _hostPattern =
       RegExp(r'[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)+(?::\d+)?');
 
-  String _hostOf(String url) {
-    var text = url.trim().toLowerCase();
-    if (text.isEmpty) return '';
-    if (!text.contains('://')) text = 'https://$text';
-    final host = Uri.tryParse(text)?.host ?? '';
-    return host.startsWith('www.') ? host.substring(4) : host;
-  }
-
   /// Words worth matching a window title against: the site name and the entry title.
   Iterable<String> _keywordsOf(VaultEntry e) sync* {
-    final host = _hostOf(e.url);
+    final host = hostOf(e.url);
     if (host.isNotEmpty) {
       final name = host.split('.').first;
       if (name.length >= 3) yield name;
@@ -406,7 +398,7 @@ class _VaultPageState extends State<VaultPage> {
 
     var hits = hosts.isEmpty
         ? <VaultEntry>[]
-        : entries.where((e) => hosts.contains(_hostOf(e.url))).toList();
+        : entries.where((e) => hosts.contains(hostOf(e.url))).toList();
 
     // Nothing addressed directly — fall back to the site name and the title.
     if (hits.isEmpty) {
