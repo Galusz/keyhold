@@ -417,6 +417,58 @@ const Standalone = (() => {
       return { never: neverSave.includes(host) };
     },
 
+    // The edit page: one whole entry, and the group names to pick from.
+    async '/entry'(data, body) {
+      const e = visible(data).find((x) => x.id === body.id);
+      if (!e) return { error: 'not found' };
+      const groups = [...new Set(visible(data).map((x) => x.group).filter(Boolean))].sort();
+      return {
+        entry: {
+          id: e.id,
+          title: e.title || '',
+          username: e.username || '',
+          password: e.password || '',
+          url: e.url || '',
+          totp: e.totp || '',
+          group: e.group || '',
+          notes: e.notes || '',
+        },
+        groups,
+      };
+    },
+
+    async '/put'(data, body) {
+      const changed = body.entry || {};
+      return {
+        result: await write((fresh) => {
+          const e = (fresh.entries || []).find((x) => x.id === changed.id && !x.deleted);
+          if (!e) return 'missing';
+          for (const field of ['title', 'username', 'password', 'url', 'group', 'notes']) {
+            e[field] = changed[field] || '';
+          }
+          if (changed.totp) e.totp = changed.totp;
+          else delete e.totp;
+          e.updatedAt = Date.now();
+          return 'saved';
+        }),
+      };
+    },
+
+    // As in the app: the entry stays as a marker so the deletion reaches other devices.
+    async '/delete'(data, body) {
+      return {
+        result: await write((fresh) => {
+          const e = (fresh.entries || []).find((x) => x.id === body.id);
+          if (!e) return 'missing';
+          e.deleted = true;
+          e.password = '';
+          delete e.totp;
+          e.updatedAt = Date.now();
+          return 'deleted';
+        }),
+      };
+    },
+
     async '/autosave'(data, body) {
       const current = await settings();
       await local.set({ aloneSettings: { ...current, autoSave: body.on === true } });

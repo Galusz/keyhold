@@ -162,7 +162,7 @@ function siteIcon(row, icon, name) {
   row.append(box);
 }
 
-function render(entries, tab) {
+function render(entries, tab, alone) {
   if (entries.length === 0) {
     const hint = document.createElement('p');
     hint.className = 'muted';
@@ -192,6 +192,22 @@ function render(entries, tab) {
       badge.textContent = '2FA';
       row.append(badge);
     }
+
+    // Edit: in Keyhold's window when the app runs here, otherwise on a page of its own.
+    const pencil = document.createElement('button');
+    pencil.className = 'pencil';
+    pencil.title = 'Edit';
+    pencil.textContent = '✎';
+    pencil.onclick = async (e) => {
+      e.stopPropagation();
+      if (alone) {
+        await api.tabs.create({ url: api.runtime.getURL(`edit.html?id=${encodeURIComponent(entry.id)}`) });
+      } else {
+        await api.runtime.sendMessage({ type: 'open', id: entry.id });
+      }
+      window.close();
+    };
+    row.append(pencil);
 
     row.onclick = async () => {
       const data = await api.runtime.sendMessage({ type: 'fill', id: entry.id });
@@ -247,7 +263,7 @@ async function load() {
   content.className = '';
   content.innerHTML = '';
   renderOffers(offers || []);
-  render(result.entries || [], tab);
+  render(result.entries || [], tab, result.alone === true);
   neverSwitch(result.never === true, tab);
   autoSaveSwitch(result.autoSave === true);
   if (result.alone) aloneFooter();

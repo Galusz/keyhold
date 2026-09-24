@@ -193,6 +193,14 @@ class _VaultPageState extends State<VaultPage> {
       ..onAutoSave = (on) {
         _store.backup.autoSave = on;
         _store.backup.saveSettings();
+      }
+      ..onOpen = (id) async {
+        final entry = _vault.entries[id];
+        if (entry == null) return;
+        if (await windowManager.isMinimized()) await windowManager.restore();
+        await windowManager.show();
+        await windowManager.focus();
+        if (mounted) await _open(entry, isNew: false);
       };
     try {
       await bridge.start();

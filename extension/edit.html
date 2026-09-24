@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Keyhold — edit</title>
+    <style>
+      :root { color-scheme: dark; }
+      body { margin: 0; background: #12201c; color: #e8f5f1; font: 15px system-ui, sans-serif; }
+      main { max-width: 560px; margin: 0 auto; padding: 28px 24px 48px; }
+      header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+      h1 { flex: 1; font-size: 20px; font-weight: 500; margin: 0; }
+      label { display: block; margin: 18px 0 6px; font-size: 13px; color: #8aa79f; }
+      .help { font-size: 12px; color: #6f8a83; margin-top: 4px; }
+      input, textarea {
+        width: 100%; box-sizing: border-box; background: #0c1714; border: 1px solid #2c4740; color: #e8f5f1;
+        border-radius: 8px; padding: 10px 12px; font: 15px system-ui, sans-serif;
+      }
+      input:focus, textarea:focus { outline: none; border-color: #1fcfb4; }
+      .with-eye { position: relative; }
+      .with-eye input { padding-right: 46px; }
+      .eye {
+        position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: transparent;
+        border: 0; color: #8aa79f; font-size: 16px; cursor: pointer; padding: 6px;
+      }
+      button.save {
+        background: #1fcfb4; color: #0c1714; border: 0; border-radius: 8px; padding: 9px 18px;
+        font: 600 14px system-ui, sans-serif; cursor: pointer;
+      }
+      button.delete {
+        background: transparent; color: #ff8a80; border: 1px solid #c62828; border-radius: 8px;
+        padding: 8px 14px; font: 14px system-ui, sans-serif; cursor: pointer;
+      }
+      #status { margin-top: 20px; font-size: 13px; color: #8aa79f; min-height: 1em; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1 id="heading">Edit login</h1>
+        <button class="delete" id="delete">Delete</button>
+        <button class="save" id="save">Save</button>
+      </header>
+      <label for="title">Title</label>
+      <input id="title" />
+      <label for="username">Username</label>
+      <input id="username" autocomplete="off" />
+      <label for="password">Password</label>
+      <div class="with-eye">
+        <input id="password" type="password" autocomplete="off" />
+        <button class="eye" id="eye" title="Show">👁</button>
+      </div>
+      <label for="url">Address</label>
+      <input id="url" />
+      <label for="totp">Two-factor secret</label>
+      <input id="totp" autocomplete="off" />
+      <div class="help">Paste the setup key or the whole otpauth:// link</div>
+      <label for="group">Group</label>
+      <input id="group" list="groups" />
+      <datalist id="groups"></datalist>
+      <div class="help">Pick one or type a new name</div>
+      <label for="notes">Notes</label>
+      <textarea id="notes" rows="5"></textarea>
+      <div id="status"></div>
+    </main>
+    <script src="edit.js"></script>
+  </body>
+</html>

@@ -215,8 +215,10 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
     user: () => session.set({ [`user:${sender.tab?.id}`]: { username: message.username, at: Date.now() } }),
     outcome: () => outcome(message, sender),
   };
-  // Answering what Keyhold caught is for the popup only, never for a page.
-  if (!sender.tab) {
+  // Answering what Keyhold caught, and editing, is for the extension's own
+  // pages (popup, edit page) only, never for a website.
+  const ownPage = !sender.tab || (sender.url || '').startsWith(api.runtime.getURL(''));
+  if (ownPage) {
     Object.assign(routes, {
       offers: () => syncOffers(),
       review: () => review(message),
@@ -227,6 +229,10 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
       'alone-unlock': () => Standalone.unlock(message.password || ''),
       'alone-lock': () => Standalone.lock(),
       'alone-disconnect': () => Standalone.disconnect(),
+      open: () => call('/open', { id: message.id }),
+      entry: () => call('/entry', { id: message.id }),
+      put: () => call('/put', { entry: message.entry }),
+      delete: () => call('/delete', { id: message.id }),
     });
   }
   const route = routes[message.type];

@@ -46,6 +46,9 @@ class BrowserBridge {
   final bool Function() autoSave;
   void Function(bool on)? onAutoSave;
 
+  /// Shows Keyhold's window with this entry open for editing.
+  void Function(String id)? onOpen;
+
   /// PNG of a site's icon when Keyhold already has one.
   final Uint8List? Function(String address) iconOf;
 
@@ -114,6 +117,11 @@ class BrowserBridge {
           if (host.isNotEmpty) onNever?.call(host, never);
           if (never) _drop((o) => o.host == host);
           await _json(response, HttpStatus.ok, {'never': neverSave().contains(host)});
+        case '/open':
+          final id = payload['id'] as String? ?? '';
+          final entry = vault().entries[id];
+          if (entry != null && !entry.deleted) onOpen?.call(id);
+          await _json(response, HttpStatus.ok, {'result': entry == null ? 'missing' : 'opened'});
         case '/autosave':
           onAutoSave?.call(payload['on'] == true);
           await _json(response, HttpStatus.ok, {'autoSave': autoSave()});
