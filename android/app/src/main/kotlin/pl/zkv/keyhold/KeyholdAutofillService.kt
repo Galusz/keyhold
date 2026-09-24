@@ -166,7 +166,7 @@ class KeyholdAutofillService : AutofillService() {
             this, nextRequest++, intent,
             PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_CANCEL_CURRENT,
         )
-        val search = Dataset.Builder(presentation(this, "Keyhold", "Search all logins")).apply {
+        val search = Dataset.Builder(presentation(this, "Keyhold", "Search all logins", search = true)).apply {
             inlinePresentation(inline, shown, "Keyhold", null, pinned = true)?.let { setInlinePresentation(it) }
             for (id in form.ids) setValue(id, null)
             setAuthentication(pending.intentSender)
@@ -248,8 +248,8 @@ class KeyholdAutofillService : AutofillService() {
     }
 
     companion object {
-        fun presentation(context: Context, text: String, sub: String? = null) =
-            RemoteViews(context.packageName, R.layout.autofill_item).apply {
+        fun presentation(context: Context, text: String, sub: String? = null, search: Boolean = false) =
+            RemoteViews(context.packageName, if (search) R.layout.autofill_search else R.layout.autofill_item).apply {
                 setTextViewText(R.id.text, text)
                 if (sub.isNullOrEmpty()) {
                     setViewVisibility(R.id.sub, View.GONE)
