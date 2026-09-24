@@ -122,12 +122,15 @@ class BrowserBridge {
         case '/offers':
           final now = DateTime.now();
           await _json(response, HttpStatus.ok, {
+            // A saved password only shows up once the site refused it.
             'offers': _offers.entries
+                .where((o) => !o.value.known || o.value.failed)
                 .map((o) => {
                       'id': o.key,
                       'host': o.value.host,
                       'username': o.value.username,
                       'changed': o.value.changed,
+                      'known': o.value.known,
                       'failed': o.value.failed,
                       'left': o.value.until.difference(now).inSeconds,
                       'icon': _icon(o.value.url),
@@ -149,7 +152,7 @@ class BrowserBridge {
           final String outcome;
           if (offer == null) {
             outcome = 'missing';
-          } else if (payload['keep'] == true) {
+          } else if (payload['keep'] == true && !offer.known) {
             outcome = await storeLogin(offer.url, offer.username, offer.password);
           } else {
             outcome = 'dropped';
@@ -171,8 +174,9 @@ class BrowserBridge {
     if (password.isEmpty || host.isEmpty) return {'result': 'ignored'};
     if (neverSave().contains(host)) return {'result': 'blocked'};
 
+    // A password the vault already has is watched too: if the site refuses
+    // it, it went stale and the user hears about it.
     final state = loginState(url, username, password);
-    if (state == 'same') return {'result': 'same'};
 
     // A retry on the same site replaces the earlier attempt.
     _drop((o) => o.host == host && o.username == username);
@@ -183,10 +187,11 @@ class BrowserBridge {
       username: username,
       password: password,
       changed: state == 'changed',
+      known: state == 'same',
       until: DateTime.now().add(offerTime),
       expiry: Timer(offerTime, () => _offers.remove(id)),
     );
-    return {'result': 'offered', 'id': id, 'autoSave': autoSave()};
+    return {'result': 'offered', 'id': id, 'known': state == 'same', 'autoSave': autoSave()};
   }
 
   void _drop(bool Function(_Offer offer) test) {
@@ -285,6 +290,7 @@ class _Offer {
     required this.username,
     required this.password,
     required this.changed,
+    required this.known,
     required this.until,
     required this.expiry,
   });
@@ -296,6 +302,9 @@ class _Offer {
 
   /// A new password for a login the vault already has.
   final bool changed;
+
+  /// Exactly what the vault holds already.
+  final bool known;
 
   /// The page refused it.
   bool failed = false;

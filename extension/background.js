@@ -60,6 +60,7 @@ async function save(message, sender) {
       host: new URL(sender.url).hostname,
       frameId: sender.frameId,
       autoSave: result.autoSave === true,
+      known: result.known === true,
       at: Date.now(),
     },
   });
@@ -94,6 +95,9 @@ async function decide(tabId, id, verdict) {
     await session.set({ [`failed:${tabId}`]: Date.now() + FAILED_SHOW });
     paint(tabId);
     setTimeout(() => session.remove(`failed:${tabId}`).then(() => paint(tabId)), FAILED_SHOW);
+  } else if (attempt.known) {
+    // The saved password did its job (or nothing tells otherwise): nothing to ask.
+    await call('/review', { id, keep: false });
   } else if (verdict === 'worked' && attempt.autoSave) {
     await call('/review', { id, keep: true });
   }

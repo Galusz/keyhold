@@ -108,19 +108,22 @@ function renderOffers(offers) {
     user.textContent = offer.username;
     const note = document.createElement('div');
     note.className = 'note';
-    note.textContent = offer.failed
-      ? 'This login did not work'
-      : offer.changed
-        ? 'Update the password in Keyhold?'
-        : 'Save this login in Keyhold?';
+    note.textContent = offer.known
+      ? 'The saved password did not work. Sign in with the new one and Keyhold will offer to update it.'
+      : offer.failed
+        ? 'This login did not work'
+        : offer.changed
+          ? 'Update the password in Keyhold?'
+          : 'Save this login in Keyhold?';
     box.append(title, user, note);
 
     const review = document.createElement('div');
     review.className = 'review';
-    for (const [label, keep, cls, tip] of [
+    const answers = [
       ['✓', true, 'yes', offer.failed ? 'Save anyway' : offer.changed ? 'Update' : 'Save'],
-      ['✕', false, 'no', 'Forget it'],
-    ]) {
+      ['✕', false, 'no', offer.known ? 'OK' : 'Forget it'],
+    ];
+    for (const [label, keep, cls, tip] of offer.known ? answers.slice(1) : answers) {
       const b = document.createElement('button');
       b.textContent = label;
       b.className = cls;
