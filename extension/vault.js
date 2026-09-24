@@ -458,7 +458,11 @@ const Standalone = (() => {
         }
         return { ok: true };
       } catch (e) {
-        return { error: e.message || 'Google Drive was not connected' };
+        const text = e.message || '';
+        if (/only one web auth flow/i.test(text)) {
+          return { error: 'A Google sign-in window is still open. Close it and try again.' };
+        }
+        return { error: text || 'Google Drive was not connected' };
       }
     },
 
