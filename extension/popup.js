@@ -253,12 +253,15 @@ async function load() {
 }
 
 // No Keyhold app on this computer: the vault can come from Google Drive instead.
-function noAppScreen() {
+async function noAppScreen() {
+  const { token } = await api.storage.local.get('token');
   content.className = '';
   content.innerHTML = '';
   const hint = document.createElement('p');
   hint.className = 'muted';
-  hint.textContent = 'Keyhold is not running on this computer.';
+  hint.textContent = token
+    ? 'Paired with the Keyhold app on this computer, but it is not running. Start Keyhold and it takes over.'
+    : 'Keyhold is not running on this computer.';
   const drive = document.createElement('button');
   drive.textContent = 'Use my vault from Google Drive';
   const note = document.createElement('p');
@@ -279,7 +282,7 @@ function noAppScreen() {
   const pair = document.createElement('a');
   pair.href = '#';
   pair.className = 'link';
-  pair.textContent = 'The Keyhold app runs here — pair with it';
+  pair.textContent = token ? 'Pair again' : 'The Keyhold app runs here — pair with it';
   pair.onclick = (e) => {
     e.preventDefault();
     pairingScreen();
