@@ -235,9 +235,9 @@ class _VaultPageState extends State<VaultPage> {
   Future<void> _scanQr() async {
     await Navigator.of(context).push(MaterialPageRoute<void>(
       builder: (_) => QrPage(
-        knownSecrets: {
+        known: {
           for (final e in _vault.visible)
-            if ((e.totpSecret ?? '').isNotEmpty) e.totpSecret!,
+            if ((e.totpSecret ?? '').isNotEmpty) e.totpSecret!: e.title,
         },
         onSave: (code) async {
           // Named like in Google Authenticator: the service and the account.

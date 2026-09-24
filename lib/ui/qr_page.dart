@@ -10,10 +10,11 @@ import 'camera_scan_page.dart';
 /// Scans two-factor QR codes. Each code becomes its own entry; it is paired
 /// with a site later — on first use, or by giving it the site's address.
 class QrPage extends StatefulWidget {
-  const QrPage({super.key, required this.knownSecrets, required this.onSave});
+  const QrPage({super.key, required this.known, required this.onSave});
 
-  /// Codes already in the vault, which are not saved twice.
-  final Set<String> knownSecrets;
+  /// Codes already in the vault by their key, with the entry's name: not
+  /// saved twice, and the list says where they already are.
+  final Map<String, String> known;
 
   /// Keeps one code; returns the entry's name for the message.
   final Future<String> Function(ScannedCode code) onSave;
@@ -30,7 +31,7 @@ class _QrPageState extends State<QrPage> {
   bool _busy = false;
 
   bool _known(ScannedCode code) =>
-      widget.knownSecrets.contains(code.secret) || _saved.contains(code.secret);
+      widget.known.containsKey(code.secret) || _saved.contains(code.secret);
 
   void _add(QrResult result) {
     _found.clear();
@@ -190,9 +191,17 @@ class _QrPageState extends State<QrPage> {
 
     final Widget action;
     if (_known(code)) {
-      action = Text(
-        _saved.contains(code.secret) ? 'Saved' : 'Already in Keyhold',
-        style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+      final name = widget.known[code.secret];
+      action = Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            _saved.contains(code.secret) ? 'Saved' : 'Already in Keyhold',
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+          ),
+          if (!_saved.contains(code.secret) && name != null)
+            Text('as "${name.isEmpty ? '(no name)' : name}"', style: theme.textTheme.bodySmall),
+        ],
       );
     } else if (_export) {
       action = const SizedBox.shrink();
