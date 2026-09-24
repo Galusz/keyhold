@@ -197,6 +197,15 @@ class _VaultPageState extends State<VaultPage> {
         _store.backup.autoSave = on;
         _store.backup.saveSettings();
       }
+      ..onPair = (id, pageUrl) async {
+        final entry = _vault.entries[id];
+        final page = Uri.tryParse(pageUrl);
+        if (entry == null || page == null || !page.hasAuthority) return;
+        entry.url = page.origin;
+        _vault.put(entry);
+        await _persist();
+        if (mounted) setState(() {});
+      }
       ..onOpen = (id) async {
         final entry = _vault.entries[id];
         if (entry == null) return;
@@ -225,27 +234,28 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Future<void> _scanQr() async {
-    final found = await Navigator.of(context).push(
-      MaterialPageRoute<List<QrImport>>(builder: (_) => QrPage(entries: _vault.visible)),
-    );
-    if (found == null || found.isEmpty) return;
-    for (final item in found) {
-      final target = item.target;
-      if (target != null) {
-        target.totpSecret = item.code.secret;
-        _vault.put(target);
-      } else {
-        _vault.put(VaultEntry(
-          id: UniqueKey().toString(),
-          title: item.code.issuer.isNotEmpty ? item.code.issuer : item.code.account,
-          username: item.code.account,
-          totpSecret: item.code.secret,
-        ));
-      }
-    }
-    await _persist();
-    _toast('${found.length} two-factor ${found.length == 1 ? 'code' : 'codes'} saved');
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => QrPage(
+        knownSecrets: {
+          for (final e in _vault.visible)
+            if ((e.totpSecret ?? '').isNotEmpty) e.totpSecret!,
+        },
+        onSave: (code) async {
+          final title = code.issuer.isNotEmpty ? code.issuer : code.account;
+          _vault.put(VaultEntry(
+            id: UniqueKey().toString(),
+            title: title,
+            username: code.account,
+            totpSecret: code.secret,
+          ));
+          await _persist();
+          return code.issuer.isNotEmpty ? '$title — ${code.account}' : title;
+        },
+      ),
+    ));
+    if (mounted) setState(() {});
   }
+
 
   Future<void> _setPassword() async {
     final changed = await Navigator.of(context).push(
@@ -320,7 +330,7 @@ class _VaultPageState extends State<VaultPage> {
   Future<void> _open(VaultEntry entry, {required bool isNew}) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute<Object?>(
-        builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups),
+        builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups, addresses: _vault.addresses),
       ),
     );
     if (result == 'delete') {

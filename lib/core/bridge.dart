@@ -49,6 +49,9 @@ class BrowserBridge {
   /// Shows Keyhold's window with this entry open for editing.
   void Function(String id)? onOpen;
 
+  /// Ties a code that has no site yet to the page it was just used on.
+  void Function(String id, String pageUrl)? onPair;
+
   /// PNG of a site's icon when Keyhold already has one.
   final Uint8List? Function(String address) iconOf;
 
@@ -117,6 +120,16 @@ class BrowserBridge {
           if (host.isNotEmpty) onNever?.call(host, never);
           if (never) _drop((o) => o.host == host);
           await _json(response, HttpStatus.ok, {'never': neverSave().contains(host)});
+        case '/codes':
+          await _json(response, HttpStatus.ok, {
+            'codes': [for (final e in vault().codes) _codeOf(e)],
+          });
+        case '/pair':
+          final id = payload['id'] as String? ?? '';
+          final entry = vault().entries[id];
+          final unpaired = entry != null && !entry.deleted && hostOf(entry.url).isEmpty;
+          if (unpaired) onPair?.call(id, payload['url'] as String? ?? '');
+          await _json(response, HttpStatus.ok, {'result': unpaired ? 'paired' : 'kept'});
         case '/open':
           final id = payload['id'] as String? ?? '';
           final entry = vault().entries[id];
@@ -231,6 +244,8 @@ class BrowserBridge {
     return {
       'never': neverSave().contains(host),
       'autoSave': autoSave(),
+      'unpaired': [for (final e in vault().unpairedCodes) _codeOf(e)],
+      'codeCount': vault().codes.length,
       'entries': matches
           .map((e) => {
                 'id': e.id,
@@ -244,6 +259,14 @@ class BrowserBridge {
           .toList(),
     };
   }
+
+  Map<String, dynamic> _codeOf(VaultEntry e) => {
+        'id': e.id,
+        'title': e.title,
+        'username': e.username,
+        'hasCode': true,
+        'icon': _icon(e.url),
+      };
 
   String? _icon(String url) {
     final png = iconOf(url);

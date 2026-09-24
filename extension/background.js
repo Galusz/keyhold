@@ -52,6 +52,14 @@ async function allowed(message, sender) {
   return (result.entries || []).some((e) => e.id === message.id);
 }
 
+// A code may be picked on any page: from this site's, from those with no site
+// yet, or from the full list.
+async function allowedCode(message, sender) {
+  if (await allowed(message, sender)) return true;
+  const all = await call('/codes');
+  return (all.codes || []).some((e) => e.id === message.id);
+}
+
 // ---------- catching logins ----------
 
 async function save(message, sender) {
@@ -210,7 +218,9 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
   const routes = {
     lookup: () => call('/lookup', { url: pageUrl(message, sender) }),
     fill: async () => ((await allowed(message, sender)) ? call('/fill', { id: message.id }) : { error: 'denied' }),
-    code: async () => ((await allowed(message, sender)) ? call('/code', { id: message.id }) : { error: 'denied' }),
+    code: async () => ((await allowedCode(message, sender)) ? call('/code', { id: message.id }) : { error: 'denied' }),
+    codes: () => call('/codes'),
+    pair: () => call('/pair', { id: message.id, url: sender.url }),
     save: () => save(message, sender),
     user: () => session.set({ [`user:${sender.tab?.id}`]: { username: message.username, at: Date.now() } }),
     outcome: () => outcome(message, sender),

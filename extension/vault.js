@@ -372,6 +372,8 @@ const Standalone = (() => {
     return null;
   }
 
+  const codeOf = (e, map) => ({ id: e.id, title: e.title, username: e.username, hasCode: true, icon: iconFrom(map, e.url) });
+
   // ---------- two-factor codes ----------
 
   function base32(text) {
@@ -431,10 +433,13 @@ const Standalone = (() => {
       const { neverSave, autoSave } = await settings();
       const duplicates = duplicateIds(data);
       const map = await iconMap();
+      const codes = visible(data).filter((e) => e.totp);
       return {
         alone: true,
         never: neverSave.includes(host),
         autoSave,
+        unpaired: codes.filter((e) => !hostOf(e.url)).map((e) => codeOf(e, map)),
+        codeCount: codes.length,
         entries: forSite(data, body.url).map((e) => ({
           id: e.id,
           title: e.title,
@@ -444,6 +449,24 @@ const Standalone = (() => {
           duplicate: duplicates.has(e.id),
           icon: iconFrom(map, e.url),
         })),
+      };
+    },
+
+    async '/codes'(data) {
+      const map = await iconMap();
+      return { codes: visible(data).filter((e) => e.totp).map((e) => codeOf(e, map)) };
+    },
+
+    // A code with no site yet gets the page it was just used on.
+    async '/pair'(data, body) {
+      return {
+        result: await write((fresh) => {
+          const e = (fresh.entries || []).find((x) => x.id === body.id && !x.deleted);
+          if (!e || hostOf(e.url)) return 'kept';
+          e.url = new URL(body.url).origin;
+          e.updatedAt = Date.now();
+          return 'paired';
+        }),
       };
     },
 
@@ -564,6 +587,7 @@ const Standalone = (() => {
       const e = visible(data).find((x) => x.id === body.id);
       if (!e) return { error: 'not found' };
       const groups = [...new Set(visible(data).map((x) => x.group).filter(Boolean))].sort();
+      const addresses = [...new Set(visible(data).map((x) => (x.url || '').trim()).filter(Boolean))].sort();
       return {
         entry: {
           id: e.id,
@@ -576,6 +600,7 @@ const Standalone = (() => {
           notes: e.notes || '',
         },
         groups,
+        addresses,
       };
     },
 

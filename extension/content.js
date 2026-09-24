@@ -109,11 +109,11 @@ function fillCode(field, code) {
 // ---------- entries for this page ----------
 
 let lookup = null;
-const entries = () =>
+const lookupResult = () =>
   (lookup ??= api.runtime
     .sendMessage({ type: 'lookup' })
-    .then((r) => (r && r.entries) || [])
-    .catch(() => []));
+    .then((r) => (r && !r.error ? r : { entries: [] }))
+    .catch(() => ({ entries: [] })));
 
 // ---------- fields ----------
 
@@ -123,13 +123,14 @@ async function scan() {
   const found = deepInputs().filter((i) => !kinds.has(i) && shown(i) && kindOf(i));
   if (found.length === 0) return;
 
-  const list = await entries();
-  if (list.length === 0) return;
-  const withCode = list.some((e) => e.hasCode);
+  const result = await lookupResult();
+  const list = result.entries || [];
+  const anyCode = list.some((e) => e.hasCode) || (result.codeCount || 0) > 0;
 
   for (const input of found) {
     const kind = kindOf(input);
-    if (kind === 'code' && !withCode) continue;
+    if (kind === 'login' && list.length === 0) continue;
+    if (kind === 'code' && !anyCode) continue;
     kinds.set(input, kind);
     // Password fields usually carry the page's own "show password" eye there.
     if (input.type !== 'password') {
@@ -193,15 +194,22 @@ function closeMenu() {
   menu = null;
 }
 
-async function openMenu(field) {
-  if (menu && menu.field === field) return;
+async function openMenu(field, allCodes) {
+  if (menu && menu.field === field && !allCodes) return;
   closeMenu();
 
   const kind = kinds.get(field);
   // Fresh every time: logins may have been kept or deleted since the page loaded.
   lookup = null;
-  let items = await entries();
-  if (kind === 'code') items = items.filter((e) => e.hasCode);
+  const result = await lookupResult();
+  let items = result.entries || [];
+  if (kind === 'code') {
+    items = allCodes || items.filter((e) => e.hasCode);
+    // No code of this site's own: the codes not tied to any site yet, and
+    // the whole list at the bottom in case the right one is paired elsewhere.
+    if (!allCodes && items.length === 0) items = (result.unpaired || []).map((e) => ({ ...e, unpaired: true }));
+    if (!allCodes && (result.codeCount || 0) > items.length) items = [...items, { all: true, title: 'All codes…' }];
+  }
   if (items.length === 0) return;
 
   const host = document.createElement('keyhold-menu');
@@ -244,11 +252,14 @@ async function openMenu(field) {
     title.textContent = entry.title;
     const sub = document.createElement('div');
     sub.className = 'sub';
-    sub.textContent = entry.username;
+    sub.textContent = entry.unpaired ? `${entry.username || ''} · not tied to a site yet` : entry.username || '';
     text.append(title, sub);
     row.append(text);
 
-    if (kind === 'code') {
+    if (entry.all) {
+      site.remove();
+      sub.remove();
+    } else if (kind === 'code') {
       const code = document.createElement('div');
       code.className = 'code';
       code.textContent = '··· ···';
@@ -319,6 +330,7 @@ async function openMenu(field) {
         menu.loaded = true;
         await Promise.all(
           items.map(async (entry, i) => {
+            if (entry.all) return;
             const r = await api.runtime.sendMessage({ type: 'code', id: entry.id });
             if (!menu || !r || !r.code) return;
             menu.codes[i] = r.code;
@@ -326,7 +338,7 @@ async function openMenu(field) {
           })
         );
       }
-      rows.forEach((row) => (row.bar.style.width = `${(left / 30) * 100}%`));
+      rows.forEach((row) => row.bar && (row.bar.style.width = `${(left / 30) * 100}%`));
     };
     tick();
     menu.timer = setInterval(tick, 1000);
@@ -344,9 +356,16 @@ async function pick(index) {
   const entry = items[index];
 
   if (kinds.get(field) === 'code') {
+    if (entry.all) {
+      const all = await api.runtime.sendMessage({ type: 'codes' });
+      openMenu(field, (all && all.codes) || []);
+      return;
+    }
     const code = codes[index];
     closeMenu();
     if (code) fillCode(field, code);
+    // A code with no site yet belongs to this one from now on.
+    api.runtime.sendMessage({ type: 'pair', id: entry.id }).catch(() => {});
     return;
   }
 

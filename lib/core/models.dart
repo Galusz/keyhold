@@ -195,6 +195,20 @@ class Vault {
     }).toList();
   }
 
+  /// The distinct addresses entries are kept for, sorted.
+  List<String> get addresses {
+    final all = {for (final e in visible) if (e.url.trim().isNotEmpty) e.url.trim()}.toList();
+    all.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return all;
+  }
+
+  /// Every two-factor code in the vault.
+  List<VaultEntry> get codes => visible.where((e) => (e.totpSecret ?? '').isNotEmpty).toList();
+
+  /// Codes not tied to any site yet: no address. On a code field with no code
+  /// of its own these are offered, and the one picked gets that site.
+  List<VaultEntry> get unpairedCodes => codes.where((e) => hostOf(e.url).isEmpty).toList();
+
   /// Logins kept more than once: the same site (host and port; the title when
   /// there is no address) and the same username. Each group newest first.
   List<List<VaultEntry>> get duplicates {

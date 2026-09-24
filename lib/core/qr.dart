@@ -23,9 +23,12 @@ class ScannedCode {
 }
 
 class QrResult {
-  QrResult({this.codes = const [], this.unsupported = 0, this.error});
+  QrResult({this.codes = const [], this.unsupported = 0, this.error, this.export = false});
 
   final List<ScannedCode> codes;
+
+  /// Google Authenticator's export: many accounts in one code, saved together.
+  final bool export;
 
   /// Accounts using 8 digits, SHA-256 or counters, which Keyhold cannot generate.
   final int unsupported;
@@ -220,7 +223,7 @@ QrResult _parseMigration(Uint8List bytes) {
     ));
   }
 
-  return QrResult(codes: codes, unsupported: unsupported);
+  return QrResult(codes: codes, unsupported: unsupported, export: true);
 }
 
 class _Proto {

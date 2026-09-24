@@ -4,80 +4,66 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../core/models.dart';
 import '../core/qr.dart';
 import 'camera_scan_page.dart';
 
-/// A scanned account and where it goes: an existing entry or a new one.
-class QrImport {
-  QrImport(this.code, this.target, {this.suggestions = const []});
-
-  final ScannedCode code;
-  VaultEntry? target;
-  final List<VaultEntry> suggestions;
-}
-
+/// Scans two-factor QR codes. Each code becomes its own entry; it is paired
+/// with a site later — on first use, or by giving it the site's address.
 class QrPage extends StatefulWidget {
-  const QrPage({super.key, required this.entries});
+  const QrPage({super.key, required this.knownSecrets, required this.onSave});
 
-  final List<VaultEntry> entries;
+  /// Codes already in the vault, which are not saved twice.
+  final Set<String> knownSecrets;
+
+  /// Keeps one code; returns the entry's name for the message.
+  final Future<String> Function(ScannedCode code) onSave;
 
   @override
   State<QrPage> createState() => _QrPageState();
 }
 
 class _QrPageState extends State<QrPage> {
-  final _found = <QrImport>[];
+  final _found = <ScannedCode>[];
+  final _saved = <String>{};
+  bool _export = false;
   String? _message;
   bool _busy = false;
 
-  String _norm(String s) => s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
-
-  String _siteName(VaultEntry e) {
-    var text = e.url.trim().toLowerCase();
-    if (!text.contains('://')) text = 'https://$text';
-    final parts = (Uri.tryParse(text)?.host ?? '').split('.');
-    return parts.length >= 2 ? parts[parts.length - 2] : '';
-  }
-
-  /// Entries that look like the same account: same site name as the issuer,
-  /// best of all with the same username.
-  List<VaultEntry> _suggest(ScannedCode code) {
-    final issuer = _norm(code.issuer);
-    final account = code.account.toLowerCase();
-    if (issuer.isEmpty && account.isEmpty) return const [];
-
-    final scored = <(int, VaultEntry)>[];
-    for (final e in widget.entries) {
-      var score = 0;
-      if (issuer.isNotEmpty &&
-          (_siteName(e) == issuer || _norm(e.title).contains(issuer))) {
-        score += 2;
-      }
-      if (account.isNotEmpty && e.username.toLowerCase() == account) score += 1;
-      if (score >= 2) scored.add((score, e));
-    }
-    scored.sort((a, b) => b.$1.compareTo(a.$1));
-    return scored.take(5).map((s) => s.$2).toList();
-  }
+  bool _known(ScannedCode code) =>
+      widget.knownSecrets.contains(code.secret) || _saved.contains(code.secret);
 
   void _add(QrResult result) {
-    var added = 0;
+    _found.clear();
+    _export = result.export;
     for (final code in result.codes) {
-      if (_found.any((f) => f.code.secret == code.secret)) continue;
-      final suggestions = _suggest(code);
-      _found.add(QrImport(code, suggestions.isEmpty ? null : suggestions.first,
-          suggestions: suggestions));
-      added++;
+      if (!_found.any((f) => f.secret == code.secret)) _found.add(code);
     }
-
     final parts = [
       if (result.error != null) result.error!,
-      if (result.codes.isNotEmpty) '$added found',
+      if (_found.length > 1) '${_found.length} found',
       if (result.unsupported > 0)
         '${result.unsupported} use a code type Keyhold cannot generate yet',
     ];
-    setState(() => _message = parts.join(' — '));
+    setState(() => _message = parts.isEmpty ? null : parts.join(' — '));
+  }
+
+  Future<void> _save(ScannedCode code) async {
+    final name = await widget.onSave(code);
+    setState(() {
+      _saved.add(code.secret);
+      _message = 'Saved as $name';
+    });
+  }
+
+  Future<void> _saveAll() async {
+    var count = 0;
+    for (final code in _found) {
+      if (_known(code)) continue;
+      await widget.onSave(code);
+      _saved.add(code.secret);
+      count++;
+    }
+    setState(() => _message = 'Saved $count ${count == 1 ? 'code' : 'codes'}');
   }
 
   Future<void> _scanScreen() async {
@@ -118,11 +104,8 @@ class _QrPageState extends State<QrPage> {
       appBar: AppBar(
         title: const Text('Add two-factor codes'),
         actions: [
-          if (_found.isNotEmpty)
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(_found),
-              child: Text('Save ${_found.length}'),
-            ),
+          if (_export && _found.any((c) => !_known(c)))
+            TextButton(onPressed: _saveAll, child: const Text('Save all')),
           const SizedBox(width: 8),
         ],
       ),
@@ -187,29 +170,10 @@ class _QrPageState extends State<QrPage> {
     );
   }
 
-  Widget _row(QrImport item) {
-    final code = item.code;
+  Widget _row(ScannedCode code) {
+    final theme = Theme.of(context);
     final title = code.issuer.isNotEmpty ? code.issuer : code.account;
 
-    final target = DropdownButtonFormField<VaultEntry?>(
-      initialValue: item.target,
-      isExpanded: true,
-      decoration: const InputDecoration(labelText: 'Save to', isDense: true),
-      items: [
-        const DropdownMenuItem(value: null, child: Text('New entry')),
-        for (final e in item.suggestions)
-          DropdownMenuItem(
-            value: e,
-            child: Text(
-              '${e.title} — ${e.username}',
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-      ],
-      onChanged: (value) => setState(() => item.target = value),
-    );
-
-    final theme = Theme.of(context);
     Widget line(String label, String value, {TextStyle? style}) => Padding(
           padding: const EdgeInsets.only(bottom: 2),
           child: Row(
@@ -224,12 +188,23 @@ class _QrPageState extends State<QrPage> {
           ),
         );
 
-    final name = Padding(
+    final Widget action;
+    if (_known(code)) {
+      action = Text(
+        _saved.contains(code.secret) ? 'Saved' : 'Already in Keyhold',
+        style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+      );
+    } else if (_export) {
+      action = const SizedBox.shrink();
+    } else {
+      action = FilledButton(onPressed: () => _save(code), child: const Text('Save'));
+    }
+
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(padding: EdgeInsets.only(right: 16, top: 2), child: Icon(Icons.pin_outlined)),
+          const Padding(padding: EdgeInsets.only(right: 16), child: Icon(Icons.pin_outlined)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,18 +214,9 @@ class _QrPageState extends State<QrPage> {
               ],
             ),
           ),
+          action,
         ],
       ),
-    );
-
-    // On a phone the choice goes under the name, so the name keeps the width.
-    return LayoutBuilder(
-      builder: (context, box) => box.maxWidth < 600
-          ? Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(children: [name, Padding(padding: const EdgeInsets.only(left: 40), child: target)]),
-            )
-          : Row(children: [Expanded(child: name), SizedBox(width: 320, child: target)]),
     );
   }
 }

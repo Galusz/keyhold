@@ -9,11 +9,15 @@ class EntryPage extends StatefulWidget {
     required this.entry,
     required this.isNew,
     this.groups = const [],
+    this.addresses = const [],
   });
 
   final VaultEntry entry;
   final bool isNew;
   final List<String> groups;
+
+  /// Addresses of the other entries, to tie a two-factor code to one of them.
+  final List<String> addresses;
 
   @override
   State<EntryPage> createState() => _EntryPageState();
@@ -113,9 +117,16 @@ class _EntryPageState extends State<EntryPage> {
             ),
           ),
           const SizedBox(height: 16),
-          TextField(
+          DropdownMenu<String>(
             controller: _url,
-            decoration: const InputDecoration(labelText: 'Address'),
+            requestFocusOnTap: true,
+            enableFilter: true,
+            expandedInsets: EdgeInsets.zero,
+            label: const Text('Address'),
+            helperText: 'For a two-factor code: the site it is used on — pick one of your logins or type it',
+            dropdownMenuEntries: [
+              for (final a in widget.addresses) DropdownMenuEntry(value: a, label: a),
+            ],
           ),
           const SizedBox(height: 16),
           TextField(

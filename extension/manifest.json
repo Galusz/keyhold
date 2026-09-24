@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Keyhold",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "Fills logins and two-factor codes from your Keyhold vault.",
   "permissions": [
     "activeTab",

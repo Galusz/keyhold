@@ -126,7 +126,8 @@ class KeyholdAutofillService : AutofillService() {
             val code = login["code"] as? String
             // On a two-factor step the suggestion says which code goes in.
             val sub = if (form.usernames.isEmpty() && form.passwords.isEmpty() && code != null) {
-                "2FA code ${code.take(3)} ${code.drop(3)}"
+                "2FA code ${code.take(3)} ${code.drop(3)}" +
+                    if (login["unpaired"] == true) " · not tied to a site yet" else ""
             } else {
                 username
             }

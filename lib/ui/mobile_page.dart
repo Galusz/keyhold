@@ -223,32 +223,33 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   }
 
   Future<void> _scanQr() async {
-    final found = await Navigator.of(context).push(
-      MaterialPageRoute<List<QrImport>>(builder: (_) => QrPage(entries: _vault.visible)),
-    );
-    if (found == null || found.isEmpty) return;
-    for (final item in found) {
-      final target = item.target;
-      if (target != null) {
-        target.totpSecret = item.code.secret;
-        _vault.put(target);
-      } else {
-        _vault.put(VaultEntry(
-          id: UniqueKey().toString(),
-          title: item.code.issuer.isNotEmpty ? item.code.issuer : item.code.account,
-          username: item.code.account,
-          totpSecret: item.code.secret,
-        ));
-      }
-    }
-    await _persist();
-    _toast('${found.length} two-factor ${found.length == 1 ? 'code' : 'codes'} saved');
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => QrPage(
+        knownSecrets: {
+          for (final e in _vault.visible)
+            if ((e.totpSecret ?? '').isNotEmpty) e.totpSecret!,
+        },
+        onSave: (code) async {
+          final title = code.issuer.isNotEmpty ? code.issuer : code.account;
+          _vault.put(VaultEntry(
+            id: UniqueKey().toString(),
+            title: title,
+            username: code.account,
+            totpSecret: code.secret,
+          ));
+          await _persist();
+          return code.issuer.isNotEmpty ? '$title — ${code.account}' : title;
+        },
+      ),
+    ));
+    if (mounted) setState(() {});
   }
+
 
   /// True when the entry was deleted.
   Future<bool> _edit(VaultEntry entry, {required bool isNew}) async {
     final result = await Navigator.of(context).push(MaterialPageRoute<Object?>(
-      builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups),
+      builder: (_) => EntryPage(entry: entry, isNew: isNew, groups: _vault.groups, addresses: _vault.addresses),
     ));
     if (result == 'delete') {
       _vault.remove(entry.id);

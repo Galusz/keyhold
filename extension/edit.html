@@ -51,7 +51,9 @@
         <button class="eye" id="eye" title="Show">👁</button>
       </div>
       <label for="url">Address</label>
-      <input id="url" />
+      <input id="url" list="addresses" />
+      <datalist id="addresses"></datalist>
+      <div class="help">For a two-factor code: the site it is used on — pick one of your logins or type it</div>
       <label for="totp">Two-factor secret</label>
       <input id="totp" autocomplete="off" />
       <div class="help">Paste the setup key or the whole otpauth:// link</div>

@@ -30,6 +30,11 @@ async function open() {
   for (const name of FIELDS) field(name).value = result.entry[name] || '';
   field('heading').textContent = result.entry.title || 'Edit login';
   document.title = `Keyhold — ${result.entry.title || 'edit'}`;
+  for (const address of result.addresses || []) {
+    const option = document.createElement('option');
+    option.value = address;
+    field('addresses').append(option);
+  }
   for (const group of result.groups || []) {
     const option = document.createElement('option');
     option.value = group;

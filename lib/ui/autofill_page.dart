@@ -39,14 +39,20 @@ Future<void> serveAutofillLookups() async {
     // Read afresh every time: the app or a sync may have changed the vault.
     final vault = await store.load();
     final wantsCode = args['wantsCode'] == true;
+    final matches = autofillMatches(vault, args['domain'] as String? ?? '', args['app'] as String? ?? '');
+    // A code field with no code for this site: the codes not tied to any site yet.
+    final unpaired = wantsCode && !matches.any((e) => (e.totpSecret ?? '').isNotEmpty)
+        ? vault.unpairedCodes
+        : const <VaultEntry>[];
     return [
-      for (final e in autofillMatches(vault, args['domain'] as String? ?? '', args['app'] as String? ?? ''))
+      for (final e in [...matches, ...unpaired])
         {
           'id': e.id,
           'title': e.title,
           'username': e.username,
           'password': e.password,
           'code': wantsCode && (e.totpSecret ?? '').isNotEmpty ? await totpCode(e.totpSecret!) : null,
+          'unpaired': unpaired.contains(e),
         },
     ];
   });
@@ -123,7 +129,16 @@ class _AutofillPageState extends State<AutofillPage> {
     }
     final left = secondsLeft();
     if (left <= 1) await Future<void>.delayed(Duration(milliseconds: left * 1000 + 200));
+    await _pair(e);
     await _channel.invokeMethod('fill', {'code': await totpCode(secret)});
+  }
+
+  /// A code with no site yet belongs to this site or app from now on.
+  Future<void> _pair(VaultEntry e) async {
+    if ((e.totpSecret ?? '').isEmpty || hostOf(e.url).isNotEmpty) return;
+    e.url = _site.isNotEmpty ? 'https://$_site' : _address;
+    _vault.put(e);
+    await _store.save(_vault);
   }
 
   List<VaultEntry> get _shown {
@@ -139,6 +154,7 @@ class _AutofillPageState extends State<AutofillPage> {
     final code = _request['wantsCode'] == true && secret != null && secret.isNotEmpty
         ? await totpCode(secret)
         : null;
+    if (code != null) await _pair(e);
     await _channel.invokeMethod('fill', {
       'username': e.username,
       'password': e.password,
