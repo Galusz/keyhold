@@ -9,12 +9,7 @@ import '../core/storage.dart';
 import 'password_page.dart';
 
 class BackupPage extends StatefulWidget {
-  const BackupPage({
-    super.key,
-    required this.store,
-    required this.drive,
-    required this.onSync,
-  });
+  const BackupPage({super.key, required this.store, required this.drive, required this.onSync});
 
   final VaultStore store;
   final DriveSync drive;
@@ -64,12 +59,12 @@ class _BackupPageState extends State<BackupPage> {
   }
 
   RemoteConfig _collect() => RemoteConfig(
-        host: _host.text.trim(),
-        port: int.tryParse(_port.text.trim()) ?? 22,
-        user: _user.text.trim(),
-        keyPath: _key.text.trim(),
-        remoteDir: _dir.text.trim().isEmpty ? 'keyhold' : _dir.text.trim(),
-      );
+    host: _host.text.trim(),
+    port: int.tryParse(_port.text.trim()) ?? 22,
+    user: _user.text.trim(),
+    keyPath: _key.text.trim(),
+    remoteDir: _dir.text.trim().isEmpty ? 'keyhold' : _dir.text.trim(),
+  );
 
   Future<void> _addFolder() async {
     final path = await getDirectoryPath();
@@ -162,14 +157,20 @@ class _BackupPageState extends State<BackupPage> {
     if (result != null && result.needsPassword) {
       final password = await _askPassword();
       if (password == null) {
-        _driveMessage = 'Google Drive already holds a Keyhold vault. '
+        _driveMessage =
+            'Google Drive already holds a Keyhold vault. '
             'Its master password is needed to join it.';
         return;
       }
       result = await widget.onSync(password: password);
     }
-    _driveMessage = widget.drive.lastError ??
-        (result == null ? null : result.changedHere || result.uploaded ? 'Synced' : 'Already in sync');
+    _driveMessage =
+        widget.drive.lastError ??
+        (result == null
+            ? null
+            : result.changedHere || result.uploaded
+            ? 'Synced'
+            : 'Already in sync');
   }
 
   Future<String?> _askPassword() {
@@ -212,8 +213,6 @@ class _BackupPageState extends State<BackupPage> {
     final synced = drive.syncedAt;
 
     return [
-      Text('Google Drive', style: theme.textTheme.titleMedium),
-      const SizedBox(height: 4),
       Text(
         'Keeps the encrypted vault in a "Keyhold" folder in your own Google Drive, '
         'so your other devices stay in sync and a lost computer loses nothing. '
@@ -230,9 +229,11 @@ class _BackupPageState extends State<BackupPage> {
           alignment: Alignment.centerLeft,
           child: OutlinedButton.icon(
             onPressed: () async {
-              await Navigator.of(context).push(MaterialPageRoute<bool>(
-                builder: (_) => PasswordPage(store: widget.store, unlockMode: false),
-              ));
+              await Navigator.of(context).push(
+                MaterialPageRoute<bool>(
+                  builder: (_) => PasswordPage(store: widget.store, unlockMode: false),
+                ),
+              );
               if (mounted) setState(() {});
             },
             icon: const Icon(Icons.lock_outline),
@@ -246,9 +247,9 @@ class _BackupPageState extends State<BackupPage> {
             onPressed: _driveBusy
                 ? null
                 : () => _drive(() async {
-                      await drive.connect();
-                      await _syncDrive();
-                    }),
+                    await drive.connect();
+                    await _syncDrive();
+                  }),
             icon: const Icon(Icons.add_to_drive),
             label: const Text('Connect Google Drive'),
           ),
@@ -259,8 +260,10 @@ class _BackupPageState extends State<BackupPage> {
           runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text('Connected as ${drive.email}'
-                '${synced == null ? '' : ' — last sync ${_when(synced)}'}'),
+            Text(
+              'Connected as ${drive.email}'
+              '${synced == null ? '' : ' — last sync ${_when(synced)}'}',
+            ),
             OutlinedButton.icon(
               onPressed: _driveBusy ? null : () => _drive(_syncDrive),
               icon: const Icon(Icons.sync),
@@ -272,16 +275,34 @@ class _BackupPageState extends State<BackupPage> {
             ),
           ],
         ),
-      if (_driveBusy) ...[
-        const SizedBox(height: 12),
-        const LinearProgressIndicator(),
-      ],
-      if (_driveMessage != null) ...[
-        const SizedBox(height: 8),
-        Text(_driveMessage!),
-      ],
-      const Divider(height: 48),
+      if (_driveBusy) ...[const SizedBox(height: 12), const LinearProgressIndicator()],
+      if (_driveMessage != null) ...[const SizedBox(height: 8), Text(_driveMessage!)],
     ];
+  }
+
+  /// One kind of backup: a card with its state in the header, open or folded.
+  Widget _section({
+    required IconData icon,
+    required String title,
+    required String state,
+    required List<Widget> children,
+    bool open = true,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        initiallyExpanded: open,
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(state),
+        shape: const Border(),
+        collapsedShape: const Border(),
+        childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        expandedCrossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
+    );
   }
 
   void _save() {
@@ -307,104 +328,119 @@ class _BackupPageState extends State<BackupPage> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          ..._driveSection(theme),
-          Text('Folders on this computer', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(
-            'Every save drops a dated copy into each folder and keeps the last 30.',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+          _section(
+            icon: Icons.add_to_drive,
+            title: 'Google Drive',
+            state: widget.drive.connected ? 'On — ${widget.drive.email}' : 'Off',
+            children: _driveSection(theme),
           ),
-          const SizedBox(height: 12),
-          if (_folders.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                'No folders — local copies are off',
-                style: TextStyle(color: theme.colorScheme.error),
-              ),
-            ),
-          ..._folders.map(_folderRow),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _addFolder,
-            icon: const Icon(Icons.add),
-            label: const Text('Add folder'),
+          _section(
+            icon: Icons.folder_copy_outlined,
+            title: 'Folders on this computer',
+            state: _folders.isEmpty
+                ? 'Off'
+                : '${_folders.length} ${_folders.length == 1 ? 'folder' : 'folders'}'
+                      '${widget.store.backup.status.at == null ? '' : ' — last copy ${_when(widget.store.backup.status.at!)}'}',
+            children: _folderSection(theme),
           ),
-          const Divider(height: 48),
-          Text('Your server', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(
-            'The same copy goes over SFTP to a machine you own. The file stays encrypted, '
-            'so the server sees bytes and nothing else. Leave the host empty to skip this.',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+          // For those who run their own machine; folded away until set up.
+          _section(
+            icon: Icons.dns_outlined,
+            title: 'Your server',
+            state: _host.text.trim().isEmpty ? 'Off' : _host.text.trim(),
+            open: _host.text.trim().isNotEmpty,
+            children: _serverSection(theme),
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _host,
-            decoration: const InputDecoration(
-              labelText: 'Host',
-              hintText: 'vps.example.com',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _port,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Port',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _user,
-            decoration: const InputDecoration(
-              labelText: 'User',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _key,
-            decoration: InputDecoration(
-              labelText: 'Private key file',
-              hintText: r'C:\Users\you\.ssh\id_ed25519',
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                tooltip: 'Choose file',
-                icon: const Icon(Icons.folder_open),
-                onPressed: _pickKey,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _dir,
-            decoration: const InputDecoration(
-              labelText: 'Folder on the server',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 24),
-          OutlinedButton.icon(
-            onPressed: _busy ? null : _test,
-            icon: const Icon(Icons.wifi_tethering),
-            label: const Text('Test connection'),
-          ),
-          if (_message != null) ...[
-            const SizedBox(height: 20),
-            Text(
-              _message!,
-              style: TextStyle(
-                color: _failed ? theme.colorScheme.error : theme.colorScheme.primary,
-              ),
-            ),
-          ],
         ],
       ),
     );
   }
+
+  List<Widget> _folderSection(ThemeData theme) => [
+    Text(
+      'Every save drops a dated copy into each folder and keeps the last 30.',
+      style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+    ),
+    const SizedBox(height: 12),
+    if (_folders.isEmpty)
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          'No folders — local copies are off',
+          style: TextStyle(color: theme.colorScheme.error),
+        ),
+      ),
+    ..._folders.map(_folderRow),
+    const SizedBox(height: 8),
+    OutlinedButton.icon(
+      onPressed: _addFolder,
+      icon: const Icon(Icons.add),
+      label: const Text('Add folder'),
+    ),
+  ];
+
+  List<Widget> _serverSection(ThemeData theme) => [
+    Text(
+      'The same copy goes over SFTP to a machine you own. The file stays encrypted, '
+      'so the server sees bytes and nothing else. Leave the host empty to skip this.',
+      style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+    ),
+    const SizedBox(height: 16),
+    TextField(
+      controller: _host,
+      decoration: const InputDecoration(
+        labelText: 'Host',
+        hintText: 'vps.example.com',
+        border: OutlineInputBorder(),
+      ),
+    ),
+    const SizedBox(height: 16),
+    TextField(
+      controller: _port,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(labelText: 'Port', border: OutlineInputBorder()),
+    ),
+    const SizedBox(height: 16),
+    TextField(
+      controller: _user,
+      decoration: const InputDecoration(labelText: 'User', border: OutlineInputBorder()),
+    ),
+    const SizedBox(height: 16),
+    TextField(
+      controller: _key,
+      decoration: InputDecoration(
+        labelText: 'Private key file',
+        hintText: r'C:\Users\you\.ssh\id_ed25519',
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          tooltip: 'Choose file',
+          icon: const Icon(Icons.folder_open),
+          onPressed: _pickKey,
+        ),
+      ),
+    ),
+    const SizedBox(height: 16),
+    TextField(
+      controller: _dir,
+      decoration: const InputDecoration(
+        labelText: 'Folder on the server',
+        border: OutlineInputBorder(),
+      ),
+    ),
+    const SizedBox(height: 24),
+    OutlinedButton.icon(
+      onPressed: _busy ? null : _test,
+      icon: const Icon(Icons.wifi_tethering),
+      label: const Text('Test connection'),
+    ),
+    if (_message != null) ...[
+      const SizedBox(height: 20),
+      Text(
+        _message!,
+        style: TextStyle(color: _failed ? theme.colorScheme.error : theme.colorScheme.primary),
+      ),
+    ],
+  ];
 
   Widget _folderRow(String path) {
     final theme = Theme.of(context);
@@ -420,10 +456,7 @@ class _BackupPageState extends State<BackupPage> {
       title: Text(path, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: reachable
           ? null
-          : Text(
-              'Not reachable right now',
-              style: TextStyle(color: theme.colorScheme.error),
-            ),
+          : Text('Not reachable right now', style: TextStyle(color: theme.colorScheme.error)),
       trailing: IconButton(
         tooltip: 'Remove',
         icon: const Icon(Icons.close),
