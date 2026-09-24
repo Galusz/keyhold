@@ -316,6 +316,18 @@ function unlockScreen() {
   const input = document.createElement('input');
   input.type = 'password';
   input.autofocus = true;
+  // Our own eye: Edge's built-in one goes away once the field was left.
+  const field = document.createElement('div');
+  field.className = 'with-eye';
+  const eye = document.createElement('button');
+  eye.className = 'eye';
+  eye.title = 'Show';
+  eye.textContent = '👁';
+  eye.onclick = () => {
+    input.type = input.type === 'password' ? 'text' : 'password';
+    input.focus();
+  };
+  field.append(input, eye);
   const button = document.createElement('button');
   button.textContent = 'Unlock';
   const note = document.createElement('p');
@@ -346,7 +358,7 @@ function unlockScreen() {
     await api.runtime.sendMessage({ type: 'alone-disconnect' });
     load();
   };
-  content.append(hint, input, button, note, disconnect);
+  content.append(hint, field, button, note, disconnect);
   input.focus();
 }
 

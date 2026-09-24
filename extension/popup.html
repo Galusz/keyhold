@@ -68,6 +68,14 @@
       }
       .muted { color: #8aa79f; font-size: 13px; line-height: 1.5; }
       .small { font-size: 12px; }
+      .with-eye { position: relative; }
+      .with-eye input { padding-right: 40px; }
+      .eye {
+        position: absolute; right: 4px; top: 50%; transform: translateY(-50%); margin: 0; padding: 4px 6px;
+        background: transparent; color: #8aa79f; font-size: 14px;
+      }
+      .eye:hover { color: #e8f5f1; }
+      input::-ms-reveal { display: none; }
       .link { display: block; margin-top: 10px; color: #8aa79f; font-size: 12px; }
       .alone {
         display: flex; align-items: center; justify-content: space-between; gap: 8px;
