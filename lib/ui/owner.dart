@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth_platform_interface/local_auth_platform_interface.dart';
 
+import '../core/models.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
 
@@ -109,14 +110,45 @@ class _PasswordCheckState extends State<_PasswordCheck> {
   }
 }
 
-/// The small fingerprint after the name of an entry that asks for the owner
-/// before it is filled in.
-class GuardedMark extends StatelessWidget {
-  const GuardedMark({super.key});
+/// The small fingerprint after an entry's name, right on the list: lit when
+/// the entry asks for the owner before it is filled in, tapped to change that.
+class GuardToggle extends StatelessWidget {
+  const GuardToggle({super.key, required this.on, required this.onTap});
+
+  final bool on;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(left: 6),
-        child: Icon(Icons.fingerprint, size: 16, color: Theme.of(context).colorScheme.primary),
-      );
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return IconButton(
+      tooltip: t.guardedSwitch,
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+      iconSize: 18,
+      isSelected: on,
+      icon: Icon(Icons.fingerprint, color: theme.hintColor.withValues(alpha: 0.35)),
+      selectedIcon: Icon(Icons.fingerprint, color: theme.colorScheme.primary),
+      onPressed: onTap,
+    );
+  }
+}
+
+/// A title with the fingerprint toggle after it; a long title gives way, the toggle stays.
+Widget titleWithGuard(String title, {required bool on, required VoidCallback onTap}) => Row(
+      children: [
+        Flexible(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis)),
+        GuardToggle(on: on, onTap: onTap),
+      ],
+    );
+
+/// Marking an entry is free; taking the mark off needs the owner.
+Future<bool> toggleGuard(BuildContext context, VaultStore store, VaultEntry e) async {
+  if (e.guarded &&
+      !await confirmOwner(context, store, hint: Platform.isWindows ? t.helloConfirmHint : t.fingerprintConfirmHint)) {
+    return false;
+  }
+  e.guarded = !e.guarded;
+  return true;
 }

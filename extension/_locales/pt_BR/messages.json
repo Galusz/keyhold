@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Desbloquear o cofre do Google Drive"
+  },
+  "appError": {
+    "message": "O Keyhold neste computador respondeu com um erro. Tente reiniciar o app."
+  },
+  "changedElsewhere": {
+    "message": "Este login foi alterado nesse meio-tempo em outro dispositivo. Feche esta página e abra-a de novo para ver a alteração."
   }
 }

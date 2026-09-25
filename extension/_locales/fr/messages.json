@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Déverrouiller le coffre-fort depuis Google Drive"
+  },
+  "appError": {
+    "message": "Keyhold sur cet ordinateur a répondu par une erreur. Essayez de redémarrer l'appli."
+  },
+  "changedElsewhere": {
+    "message": "Cet identifiant a été modifié entre-temps sur un autre appareil. Fermez cette page et rouvrez-la pour voir la modification."
   }
 }

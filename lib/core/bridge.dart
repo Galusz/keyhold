@@ -265,6 +265,10 @@ class BrowserBridge {
                 'isCode': e.isCode,
                 'linked': e.twoFactor.isNotEmpty,
                 'guarded': vault().guarded(e),
+                // Only an exact match goes in the list on the page; a related
+                // domain's login shows in the popup, under its own host.
+                'exact': vault().exactFor(e, pageUrl),
+                'host': hostOf(e.isCode ? (vault().sitesOf(e).firstOrNull ?? '') : e.url),
               })
           .toList(),
     };

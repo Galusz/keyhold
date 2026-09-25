@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Google Drive の保管庫のロックを解除"
+  },
+  "appError": {
+    "message": "このパソコンの Keyhold がエラーを返しました。アプリを再起動してください。"
+  },
+  "changedElsewhere": {
+    "message": "このログインはその間に別のデバイスで変更されました。このページを閉じて開き直すと変更が表示されます。"
   }
 }

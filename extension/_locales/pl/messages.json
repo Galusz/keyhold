@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Odblokuj sejf z Google Drive"
+  },
+  "appError": {
+    "message": "Keyhold na tym komputerze odpowiedział błędem. Spróbuj uruchomić aplikację ponownie."
+  },
+  "changedElsewhere": {
+    "message": "Ten login zmienił się w międzyczasie na innym urządzeniu. Zamknij tę stronę i otwórz ją ponownie, aby zobaczyć zmianę."
   }
 }

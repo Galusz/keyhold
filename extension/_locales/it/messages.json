@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Sblocca la cassaforte da Google Drive"
+  },
+  "appError": {
+    "message": "Keyhold su questo computer ha risposto con un errore. Prova a riavviare l'app."
+  },
+  "changedElsewhere": {
+    "message": "Questo accesso è stato modificato nel frattempo su un altro dispositivo. Chiudi questa pagina e riaprila per vedere la modifica."
   }
 }

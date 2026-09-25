@@ -215,7 +215,9 @@ class _EntryPageState extends State<EntryPage> {
           ),
         ),
       ),
-      const SizedBox(height: 16),
+      const SizedBox(height: 8),
+      _guardSwitch(),
+      const SizedBox(height: 8),
       TextField(
         controller: _notes,
         maxLines: 3,
@@ -267,8 +269,6 @@ class _EntryPageState extends State<EntryPage> {
           IconButton(tooltip: t.add, icon: const Icon(Icons.add), onPressed: _addSite),
         ],
       ),
-      const SizedBox(height: 16),
-      _guardSwitch(),
     ];
   }
 
@@ -307,7 +307,9 @@ class _EntryPageState extends State<EntryPage> {
           ),
         ),
       ),
-      const SizedBox(height: 16),
+      const SizedBox(height: 8),
+      _guardSwitch(),
+      const SizedBox(height: 8),
       TextField(
         controller: _url,
         decoration: InputDecoration(labelText: t.address),
@@ -355,8 +357,6 @@ class _EntryPageState extends State<EntryPage> {
         maxLines: 5,
         decoration: InputDecoration(labelText: t.notes),
       ),
-      const SizedBox(height: 16),
-      _guardSwitch(),
     ];
   }
 }

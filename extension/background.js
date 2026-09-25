@@ -22,22 +22,23 @@ const VERDICT_WAIT = 8 * 1000;
 const FAILED_SHOW = 30 * 1000;
 
 // The Keyhold app on this computer when it runs; otherwise the vault this
-// extension opened from Google Drive, if any.
-async function call(path, body) {
-  const result = await callApp(path, body);
+// extension opened from Google Drive, if any. [fresh] asks the app even
+// within the wait after a miss: the user just opened the popup.
+async function call(path, body, fresh = false) {
+  const result = await callApp(path, body, fresh);
   if (result.error === 'app offline' || result.error === 'no token') {
     const alone = await Standalone.handle(path, body);
     if (alone) return alone;
   }
   // Never paired, and Keyhold answers here: pairing is the next step, not Google Drive.
-  if (result.error === 'no token' && (await Standalone.state()).state === 'none' && (await appAnswers())) {
+  if (result.error === 'no token' && (await Standalone.state()).state === 'none' && (await appAnswers(fresh))) {
     return { error: 'bad token' };
   }
   return result;
 }
 
-async function appAnswers() {
-  if (Date.now() < appDownUntil) return false;
+async function appAnswers(fresh) {
+  if (!fresh && Date.now() < appDownUntil) return false;
   try {
     return (await fetch(`${BRIDGE}/lookup`, { method: 'POST', signal: AbortSignal.timeout(APP_WAIT) })).status === 401;
   } catch (e) {
@@ -46,10 +47,10 @@ async function appAnswers() {
   }
 }
 
-async function callApp(path, body) {
+async function callApp(path, body, fresh = false) {
   const { token } = await api.storage.local.get('token');
   if (!token) return { error: 'no token' };
-  if (Date.now() < appDownUntil) return { error: 'app offline' };
+  if (!fresh && Date.now() < appDownUntil) return { error: 'app offline' };
 
   try {
     const response = await fetch(BRIDGE + path, {
@@ -58,6 +59,7 @@ async function callApp(path, body) {
       body: JSON.stringify(body || {}),
       signal: AbortSignal.timeout(QUESTIONS.includes(path) ? APP_WAIT : CONFIRMS.includes(path) ? CONFIRM_WAIT : SAVE_WAIT),
     });
+    appDownUntil = 0;
     if (!response.ok) {
       return { error: response.status === 401 ? 'bad token' : 'app error' };
     }
@@ -76,10 +78,17 @@ async function read(key) {
 // A page only ever gets entries for its own address; the popup asks for the active tab.
 const pageUrl = (message, sender) => (sender.tab ? sender.url : message.url);
 
+// A page gets only the entries of exactly its own host; the popup also those of related domains.
 async function allowed(message, sender) {
   if (!sender.tab) return true;
   const result = await call('/lookup', { url: sender.url });
-  return (result.entries || []).some((e) => e.id === message.id);
+  // EXPIRES: "!== false" while Keyhold app 1.1.0 (no "exact" in its answer) is around.
+  return (result.entries || []).some((e) => e.id === message.id && e.exact !== false);
+}
+
+// Pages that found nothing while the vault was shut look again.
+async function rescanTabs() {
+  for (const tab of await api.tabs.query({})) api.tabs.sendMessage(tab.id, { type: 'rescan' }).catch(() => {});
 }
 
 // A code may be picked on any page: from this site's, from those with no site
@@ -208,7 +217,16 @@ async function answerPin(message) {
   const pin = all[message.key];
   delete all[message.key];
   await session.set({ pins: all });
-  if (pin && message.yes) await call('/pair', { id: pin.id, url: pin.url });
+  if (pin && message.yes) {
+    const result = await call('/pair', { id: pin.id, url: pin.url });
+    // Not saved: asked again rather than forgotten.
+    if (!result || result.error) {
+      all[message.key] = pin;
+      await session.set({ pins: all });
+      await syncOffers();
+      return { error: (result && result.error) || 'app offline' };
+    }
+  }
   await syncOffers();
   return { ok: true };
 }
@@ -275,15 +293,17 @@ function blink() {
 api.tabs.onUpdated.addListener((tabId, change, tab) => {
   if (change.status === 'complete') refreshIcon(tabId, tab.url);
 });
-api.tabs.onActivated.addListener(({ tabId }) =>
-  api.tabs.get(tabId).then((tab) => refreshIcon(tabId, tab.url), () => {})
-);
+api.tabs.onActivated.addListener(({ tabId }) => {
+  api.tabs.get(tabId).then((tab) => refreshIcon(tabId, tab.url), () => {});
+  // A page that found nothing while the app was off looks again when it comes back to the front.
+  api.tabs.sendMessage(tabId, { type: 'rescan' }).catch(() => {});
+});
 
 api.runtime.onMessage.addListener((message, sender, reply) => {
   if (sender.id !== api.runtime.id) return false;
 
   const routes = {
-    lookup: () => call('/lookup', { url: pageUrl(message, sender) }),
+    lookup: () => call('/lookup', { url: pageUrl(message, sender) }, !sender.tab),
     fill: async () => ((await allowed(message, sender)) ? call('/fill', { id: message.id }) : { error: 'denied' }),
     code: async () => ((await allowedCode(message, sender)) ? call('/code', { id: message.id, use: message.use === true }) : { error: 'denied' }),
     codes: () => call('/codes'),
@@ -303,7 +323,11 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
       autosave: () => call('/autosave', { on: message.on }),
       alone: () => Standalone.state(),
       'alone-connect': () => Standalone.connect(),
-      'alone-unlock': () => Standalone.unlock(message.password || ''),
+      'alone-unlock': async () => {
+        const result = await Standalone.unlock(message.password || '');
+        if (result && result.ok) rescanTabs();
+        return result;
+      },
       'alone-lock': () => Standalone.lock(),
       'alone-disconnect': () => Standalone.disconnect(),
       open: () => call('/open', { id: message.id }),

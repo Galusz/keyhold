@@ -1411,12 +1411,12 @@ class _VaultPageState extends State<VaultPage> with WindowListener {
           ),
         ),
       ),
-      title: Text.rich(
-        TextSpan(children: [
-          TextSpan(text: e.title.isEmpty ? t.noTitle : e.title),
-          if (_vault.guarded(e)) const WidgetSpan(child: GuardedMark()),
-        ]),
-      ),
+      title: titleWithGuard(e.title.isEmpty ? t.noTitle : e.title, on: e.guarded, onTap: () async {
+        if (!await toggleGuard(context, _store, e)) return;
+        _vault.put(e);
+        await _persist();
+        if (mounted) setState(() {});
+      }),
       subtitle: e.isCode
           ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
           : Text(

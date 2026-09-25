@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Tresor aus Google Drive entsperren"
+  },
+  "appError": {
+    "message": "Keyhold auf diesem Computer hat mit einem Fehler geantwortet. Starte die App neu."
+  },
+  "changedElsewhere": {
+    "message": "Dieses Login wurde inzwischen auf einem anderen Gerät geändert. Schließe diese Seite und öffne sie erneut, um die Änderung zu sehen."
   }
 }

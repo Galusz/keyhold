@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Unlock the vault from Google Drive"
+  },
+  "appError": {
+    "message": "Keyhold on this computer answered with an error. Try restarting the app."
+  },
+  "changedElsewhere": {
+    "message": "This login was changed on another device meanwhile. Close this page and open it again to see the change."
   }
 }

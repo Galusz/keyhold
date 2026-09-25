@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "Desbloquear la caja fuerte de Google Drive"
+  },
+  "appError": {
+    "message": "Keyhold en este ordenador respondió con un error. Prueba a reiniciar la app."
+  },
+  "changedElsewhere": {
+    "message": "Este inicio de sesión se cambió mientras tanto en otro dispositivo. Cierra esta página y ábrela de nuevo para ver el cambio."
   }
 }

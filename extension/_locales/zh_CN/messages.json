@@ -295,5 +295,11 @@
   },
   "unlockDriveVault": {
     "message": "解锁来自 Google Drive 的密码库"
+  },
+  "appError": {
+    "message": "此电脑上的 Keyhold 返回了错误。请尝试重新启动应用。"
+  },
+  "changedElsewhere": {
+    "message": "此登录信息在此期间已在其他设备上被修改。请关闭此页面并重新打开以查看更改。"
   }
 }

@@ -109,12 +109,31 @@ function fillCode(field, code) {
 
 // ---------- entries for this page ----------
 
+// Only an answer is kept for the page's life: a miss (the app not up yet,
+// the vault still shut) is asked again at the next look.
 let lookup = null;
 const lookupResult = () =>
   (lookup ??= api.runtime
     .sendMessage({ type: 'lookup' })
-    .then((r) => (r && !r.error ? r : { entries: [] }))
-    .catch(() => ({ entries: [] })));
+    .then((r) => {
+      if (r && !r.error) return r;
+      lookup = null;
+      return { entries: [] };
+    })
+    .catch(() => {
+      lookup = null;
+      return { entries: [] };
+    }));
+
+api.runtime.onMessage.addListener((message) => {
+  if (message && message.type === 'rescan') {
+    lookup = null;
+    rescan();
+  }
+});
+
+// EXPIRES: when no Keyhold app 1.1.0 is left — it does not say which entries match exactly.
+const exact = (e) => e.exact !== false;
 
 // ---------- fields ----------
 
@@ -125,8 +144,9 @@ async function scan() {
   if (found.length === 0) return;
 
   const result = await lookupResult();
-  const list = (result.entries || []).filter((e) => !e.isCode);
-  const anyCode = (result.entries || []).some((e) => e.hasCode) || (result.codeCount || 0) > 0;
+  // On the page itself only what is kept for exactly this host.
+  const list = (result.entries || []).filter((e) => !e.isCode && exact(e));
+  const anyCode = (result.entries || []).some((e) => e.hasCode && exact(e)) || (result.codeCount || 0) > 0;
 
   for (const input of found) {
     const kind = kindOf(input);
@@ -161,10 +181,26 @@ function iconAt(x, y) {
       withIcon.delete(input);
       continue;
     }
+    if (!shown(input) || !seen(input)) continue;
     const r = input.getBoundingClientRect();
     if (y >= r.top && y <= r.bottom && x <= r.right && x > r.right - 34) return input;
   }
   return null;
+}
+
+// Something of the page's own over the icon (a field's clear button, a
+// banner's button) keeps its click.
+const CONTROLS = 'button, a[href], input, select, textarea, [role="button"], [role="link"], [role="checkbox"]';
+
+function coveredAt(input, x, y) {
+  const root = input.getRootNode();
+  const hosts = new Set();
+  for (let n = root.host; n; n = n.getRootNode().host) hosts.add(n);
+  for (const el of (root.elementsFromPoint ? root : document).elementsFromPoint(x, y)) {
+    if (el === input || hosts.has(el) || el.contains(input)) return false;
+    if (el.matches(CONTROLS)) return true;
+  }
+  return false;
 }
 
 // A hand over the icon, so it reads as something to click; the page's own cursor comes back after.
@@ -173,7 +209,8 @@ document.addEventListener(
   'mousemove',
   (e) => {
     const under = e.composedPath()[0];
-    const onIcon = withIcon.size > 0 && iconAt(e.clientX, e.clientY) && under instanceof HTMLElement;
+    const input = withIcon.size > 0 && iconAt(e.clientX, e.clientY);
+    const onIcon = input && under instanceof HTMLElement && !coveredAt(input, e.clientX, e.clientY);
     if (pointed && (!onIcon || pointed.element !== under)) {
       pointed.element.style.setProperty('cursor', pointed.value, pointed.priority);
       pointed = null;
@@ -191,7 +228,7 @@ document.addEventListener(
   (e) => {
     if (!e.isTrusted || withIcon.size === 0) return;
     const input = iconAt(e.clientX, e.clientY);
-    if (!input) return;
+    if (!input || coveredAt(input, e.clientX, e.clientY)) return;
     e.preventDefault();
     e.stopImmediatePropagation();
     input.focus();
@@ -210,8 +247,14 @@ scan();
 
 // ---------- dropdown ----------
 
+// A page's own rules must not hide or dim the list: "!important" inside the
+// shadow root beats the page's, and the list sits in the top layer.
 const STYLE = `
-  :host { all: initial; }
+  :host { all: initial !important; display: block !important; position: fixed !important;
+    inset: 0 auto auto 0 !important; width: 0 !important; height: 0 !important; margin: 0 !important;
+    padding: 0 !important; border: 0 !important; background: transparent !important; overflow: visible !important;
+    opacity: 1 !important; visibility: visible !important; filter: none !important; transform: none !important;
+    clip-path: none !important; mask: none !important; pointer-events: auto !important; z-index: 2147483647 !important; }
   .menu { position: fixed; z-index: 2147483647; background: #16211E; color: #E8F5F1; border-radius: 10px;
     box-shadow: 0 8px 28px rgba(0,0,0,.45); padding: 6px; font: 14px system-ui, sans-serif; max-height: 320px;
     overflow-y: auto; box-sizing: border-box; }
@@ -232,6 +275,10 @@ const STYLE = `
 
 let menu = null;
 
+// A pick counts once the list could be seen for a moment, on a field that can be seen.
+const PICK_DELAY = 400;
+const seen = (el) => !el.checkVisibility || el.checkVisibility({ opacityProperty: true, visibilityProperty: true });
+
 function closeMenu() {
   if (!menu) return;
   clearInterval(menu.timer);
@@ -251,7 +298,7 @@ async function openMenu(field, allCodes) {
   // Fresh every time: logins may have been kept or deleted since the page loaded.
   lookup = null;
   const result = await lookupResult();
-  let items = result.entries || [];
+  let items = (result.entries || []).filter(exact);
   if (kind !== 'code') items = items.filter((e) => !e.isCode);
   if (kind === 'code') {
     // The codes themselves; a login pointing at one is not listed twice.
@@ -271,6 +318,10 @@ async function openMenu(field, allCodes) {
   box.className = 'menu';
   root.append(style, box);
   document.documentElement.appendChild(host);
+  if (typeof host.showPopover === 'function') {
+    host.popover = 'manual';
+    host.showPopover();
+  }
 
   const rows = items.map((entry, i) => {
     const row = document.createElement('div');
@@ -337,7 +388,7 @@ async function openMenu(field, allCodes) {
     return row;
   });
 
-  menu = { host, field, items, rows, index: -1, codes: {} };
+  menu = { host, box, field, items, rows, index: -1, codes: {}, shownAt: performance.now() };
 
   menu.place = () => {
     if (!field.isConnected) return closeMenu();
@@ -408,6 +459,7 @@ function highlight(index) {
 async function pick(index) {
   const { field, items, codes } = menu;
   const entry = items[index];
+  if (performance.now() - menu.shownAt < PICK_DELAY || !seen(field) || !seen(menu.box)) return;
 
   if (kinds.get(field) === 'code') {
     if (entry.all) {

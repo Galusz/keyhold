@@ -14,6 +14,8 @@ const FIELDS = ['title', 'username', 'password', 'url', 'totp', 'group', 'notes'
 let sites = [];
 let pinned = [];
 const unpin = new Set();
+// When the entry last changed, as this page got it: a newer one elsewhere is not overwritten.
+let base = 0;
 
 function renderSites() {
   const box = field('sites');
@@ -94,6 +96,7 @@ async function open() {
     field('twoFactor').append(option);
   }
   for (const name of FIELDS) field(name).value = result.entry[name] || '';
+  base = result.entry.updatedAt || 0;
   field('heading').textContent = result.entry.title || (result.code ? t('twoFactorCode') : t('editLogin'));
   document.title = `Keyhold — ${result.entry.title || t('editLogin')}`;
   for (const group of result.groups || []) {
@@ -120,9 +123,11 @@ field('save').onclick = async () => {
   addSite();
   entry.sites = sites;
   entry.unpin = [...unpin];
+  entry.updatedAt = base;
   status(t('savingToDrive'));
   const result = await api.runtime.sendMessage({ type: 'put', entry });
   if (result && result.result === 'saved') window.close();
+  else if (result && result.result === 'changed') status(t('changedElsewhere'));
   else status((result && result.error) || t('notSaved'));
 };
 

@@ -454,6 +454,15 @@ class Vault {
     return notes;
   }
 
+  /// Whether [e] belongs to exactly this page's host (and port, when given),
+  /// not only to a parent domain or a subdomain of it.
+  bool exactFor(VaultEntry e, String address) {
+    final host = hostOf(address);
+    final port = _portOf(address);
+    bool here(String site) => !isAppAddress(site) && hostOf(site) == host && (port == null || _portOf(site) == port);
+    return e.isCode ? sitesOf(e).any(here) : here(e.url);
+  }
+
   static int? _portOf(String url) {
     var text = url.trim();
     if (!text.contains('://')) text = 'https://$text';

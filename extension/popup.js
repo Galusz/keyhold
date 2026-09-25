@@ -12,7 +12,9 @@ let autoSaveOn = null;
 let appState = null;
 
 // Runs inside the page, so it must not reference anything outside itself.
-function fillPage(data) {
+// Only into the site the logins were looked up for: the tab may have moved on.
+function fillPage(data, origin) {
+  if (location.origin !== origin) return 'none';
   const visible = (el) => el && !el.disabled && el.getClientRects().length > 0;
   // Includes fields inside shadow roots (Home Assistant and other component pages).
   const deep = (root, out = []) => {
@@ -138,7 +140,14 @@ function renderOffers(offers) {
       b.className = cls;
       b.title = tip;
       b.onclick = async () => {
-        await api.runtime.sendMessage({ type: 'review', id: offer.id, keep });
+        for (const other of review.querySelectorAll('button')) other.disabled = true;
+        const result = await api.runtime.sendMessage({ type: 'review', id: offer.id, keep });
+        // Not saved (Google Drive out of reach): the login stays here to try again.
+        if (result && result.error) {
+          note.textContent = result.error;
+          for (const other of review.querySelectorAll('button')) other.disabled = false;
+          return;
+        }
         load();
       };
       review.append(b);
@@ -225,7 +234,8 @@ function render(entries, tab, alone) {
     title.textContent = entry.title;
     const user = document.createElement('div');
     user.className = 'user';
-    user.textContent = entry.username;
+    // Kept for a related domain, not this very one: its own host says so.
+    user.textContent = entry.exact === false && entry.host ? `${entry.username} · ${entry.host}` : entry.username;
     box.append(title, user);
     row.append(box);
 
@@ -268,7 +278,7 @@ function render(entries, tab, alone) {
       const [result] = await api.scripting.executeScript({
         target: { tabId: tab.id, allFrames: false },
         func: fillPage,
-        args: [data],
+        args: [data, new URL(tab.url).origin],
       });
       if (result && result.result === 'none') {
         message(t('noLoginField'));
@@ -299,9 +309,11 @@ async function load() {
     ? null
     : result.error === 'bad token'
       ? 'unpaired'
-      : result.error || result.alone
-        ? 'off'
-        : 'paired';
+      : result.error === 'app error'
+        ? 'paired'
+        : result.error || result.alone
+          ? 'off'
+          : 'paired';
   if (!menuPanel.hidden) showMenu();
   if (!result || result.error === 'bad token') {
     pairingScreen();
@@ -314,7 +326,7 @@ async function load() {
     return;
   }
   if (result.error) {
-    message(result.error);
+    message(result.error === 'app error' ? t('appError') : result.error);
     return;
   }
   const offers = await api.runtime.sendMessage({ type: 'offers' });
@@ -339,12 +351,22 @@ function closeMenu() {
   menuButton.classList.remove('open');
 }
 
+// From the menu and from the "not running" screen alike: the pairing goes
+// only once Google Drive is connected, so a cancelled sign-in leaves it be.
+// The answer is an error to show, or null.
+async function switchToDrive() {
+  const result = await api.runtime.sendMessage({ type: 'alone-connect' });
+  if (!result || !result.ok) return (result && result.error) || t('driveNotConnected');
+  await api.storage.local.remove('token');
+  unlockScreen();
+  return null;
+}
+
 async function useDrive() {
   closeMenu();
   message(t('connecting'));
-  const result = await api.runtime.sendMessage({ type: 'alone-connect' });
-  if (result && result.ok) unlockScreen();
-  else message((result && result.error) || t('driveNotConnected'));
+  const error = await switchToDrive();
+  if (error) message(error);
 }
 
 menuButton.onclick = () => (menuPanel.hidden ? showMenu() : closeMenu());
@@ -387,11 +409,7 @@ async function showMenu() {
     item(t('pairApp'), pairingScreen);
   }
   if (drive === 'none') {
-    item(token ? t('useDriveInstead') : t('useDriveVault'), async () => {
-      // The app is asked first while paired, so the vault from Drive needs the pairing gone.
-      await api.storage.local.remove('token');
-      await useDrive();
-    });
+    item(token ? t('useDriveInstead') : t('useDriveVault'), useDrive);
   } else {
     if (drive === 'open') {
       item(t('lockVault'), async () => {
@@ -430,14 +448,11 @@ async function noAppScreen() {
   drive.onclick = async () => {
     drive.disabled = true;
     drive.textContent = t('connecting');
-    const result = await api.runtime.sendMessage({ type: 'alone-connect' });
-    if (result && result.ok) {
-      unlockScreen();
-      return;
-    }
+    const error = await switchToDrive();
+    if (!error) return;
     drive.disabled = false;
     drive.textContent = t('useDriveVault');
-    note.textContent = (result && result.error) || t('driveNotConnected');
+    note.textContent = error;
   };
   const pair = document.createElement('a');
   pair.href = '#';

@@ -90,6 +90,9 @@ const Standalone = (() => {
 
   // ---------- Google Drive ----------
 
+  // Google no longer signs in without asking: the user's own action may bring its window up.
+  const signInError = (text) => Object.assign(new Error(text), { signIn: true });
+
   async function token(interactive) {
     const { driveToken } = await session.get('driveToken');
     if (driveToken && driveToken.until > Date.now() + 60 * 1000) return driveToken.token;
@@ -103,13 +106,18 @@ const Standalone = (() => {
     };
     if (!interactive) query.prompt = 'none';
     if (driveEmail) query.login_hint = driveEmail;
-    const back = await ext.identity.launchWebAuthFlow({
-      url: `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(query)}`,
-      interactive,
-    });
+    let back;
+    try {
+      back = await ext.identity.launchWebAuthFlow({
+        url: `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(query)}`,
+        interactive,
+      });
+    } catch (e) {
+      throw signInError(e.message || t('googleDidNotSignIn'));
+    }
     const answer = new URLSearchParams(new URL(back).hash.slice(1));
     const value = answer.get('access_token');
-    if (!value) throw new Error(answer.get('error') || t('googleDidNotSignIn'));
+    if (!value) throw signInError(answer.get('error') || t('googleDidNotSignIn'));
     await session.set({
       driveToken: { token: value, until: Date.now() + Number(answer.get('expires_in') || 3600) * 1000 },
     });
@@ -117,13 +125,47 @@ const Standalone = (() => {
   }
 
   async function drive(url, init = {}, interactive = false) {
-    const response = await fetch(url, {
-      ...init,
-      headers: { ...(init.headers || {}), Authorization: `Bearer ${await token(interactive)}` },
-    });
-    if (response.status === 401) await session.remove('driveToken');
+    const send = async () =>
+      fetch(url, {
+        ...init,
+        headers: { ...(init.headers || {}), Authorization: `Bearer ${await token(interactive)}` },
+      });
+    let response = await send();
+    if (response.status === 401) {
+      // A token Google no longer takes: once more with a fresh one.
+      await session.remove('driveToken');
+      response = await send();
+    }
     if (!response.ok) throw new Error(t('driveAnswered', String(response.status)));
     return response;
+  }
+
+  // The account signed in, so a silent renewal later asks Google for this very one.
+  async function rememberAccount() {
+    try {
+      const about = await (await drive('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)')).json();
+      if (about.user && about.user.emailAddress) await local.set({ driveEmail: about.user.emailAddress });
+    } catch (e) {
+      // the renewal then goes without the hint
+    }
+  }
+
+  // Something the user just did: when the silent sign-in no longer works,
+  // Google's window comes up once instead of the change being lost.
+  async function signedIn(job) {
+    try {
+      return await job();
+    } catch (e) {
+      if (!e.signIn) throw e;
+      await session.remove('driveToken');
+      await token(true);
+      await rememberAccount();
+      return job();
+    }
+  }
+
+  async function revision(id) {
+    return (await (await drive(`https://www.googleapis.com/drive/v3/files/${id}?fields=version`)).json()).version;
   }
 
   async function vaultFiles(interactive) {
@@ -184,29 +226,60 @@ const Standalone = (() => {
     return loaded;
   }
 
+  // Every write and pull of the vault file, one after another: two at once
+  // would start from the same copy, and one of the changes would be lost.
+  let queue = Promise.resolve();
+  const serial = (job) => {
+    const run = queue.then(() => job(), () => job());
+    queue = run.catch(() => {});
+    return run;
+  };
+
   // Newer copy from Drive every few minutes, without holding anything up.
   async function pullSoon() {
     const { pulledAt } = await local.get('pulledAt');
     if (pulledAt && Date.now() - pulledAt < PULL_EVERY) return;
     await local.set({ pulledAt: Date.now() });
-    download()
+    serial(download)
       .then(() => (loaded = null))
       .catch(() => {});
   }
 
+  // The newest copy from Drive for a page about to change an entry; offline, the one kept here.
+  async function fresh(data) {
+    try {
+      await serial(download);
+      loaded = null;
+      return (await vault()) || data;
+    } catch (e) {
+      return data;
+    }
+  }
+
+  // Answers that changed nothing need no upload.
+  const UNCHANGED = new Set(['kept', 'missing', 'changed']);
+
   // Changes go on top of the newest copy in Drive, so nothing another device
-  // saved meanwhile is lost.
-  async function write(change) {
-    const { dek } = await session.get('dek');
-    const bytes = await download();
-    const parts = parse(bytes);
-    const key = fromB64(dek);
-    const data = JSON.parse(new TextDecoder().decode(await open(key, parts.payload)));
-    const result = change(data);
-    const payload = await seal(key, new TextEncoder().encode(JSON.stringify(data)));
-    await upload(concat(parts.header, payload));
-    loaded = data;
-    return result;
+  // saved meanwhile is lost; if the file moves before the upload, again on the newer one.
+  function write(change) {
+    return serial(async () => {
+      const { dek } = await session.get('dek');
+      const { driveFile } = await local.get('driveFile');
+      const key = fromB64(dek);
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const before = await revision(driveFile);
+        const parts = parse(await download());
+        const data = JSON.parse(new TextDecoder().decode(await open(key, parts.payload)));
+        const result = change(data);
+        if (UNCHANGED.has(result)) return result;
+        const payload = await seal(key, new TextEncoder().encode(JSON.stringify(data)));
+        if ((await revision(driveFile)) !== before) continue;
+        await upload(concat(parts.header, payload));
+        loaded = data;
+        return result;
+      }
+      throw new Error(t('driveNotReachable'));
+    });
   }
 
   // ---------- matching, as the app does it ----------
@@ -409,6 +482,15 @@ const Standalone = (() => {
   const sitesOf = (data, code) => [...(code.sites || []), ...loginsOf(data, code).map((l) => (l.url || '').trim()).filter(Boolean)];
   const paired = (data, code) => sitesOf(data, code).length > 0;
 
+  // Exactly this page's host (and port, when given); a related domain's entry
+  // is for the popup only, never for the list on the page.
+  function exactFor(data, e, address) {
+    const host = hostOf(address);
+    const port = portOf(address);
+    const here = (site) => hostOf(site) === host && (!port || portOf(site) === port);
+    return isCode(e) ? sitesOf(data, e).some(here) : here(e.url);
+  }
+
   function codesForSite(data, address) {
     const host = hostOf(address);
     if (!host) return [];
@@ -511,6 +593,8 @@ const Standalone = (() => {
           linked: !!e.twoFactor,
           duplicate: duplicates.has(e.id),
           icon: iconFrom(map, isCode(e) ? sitesOf(data, e)[0] || '' : e.url),
+          exact: exactFor(data, e, body.url),
+          host: hostOf(isCode(e) ? sitesOf(data, e)[0] || '' : e.url),
         })),
       };
     },
@@ -523,13 +607,13 @@ const Standalone = (() => {
     // A code with no site yet gets the page it was just used on.
     async '/pair'(data, body) {
       return {
-        result: await write((fresh) => {
+        result: await signedIn(() => write((fresh) => {
           const e = (fresh.entries || []).find((x) => x.id === body.id && !x.deleted);
           if (!e || paired(fresh, e)) return 'kept';
           e.sites = [...(e.sites || []), new URL(body.url).origin];
           e.updatedAt = Date.now();
           return 'paired';
-        }),
+        })),
       };
     },
 
@@ -592,15 +676,12 @@ const Standalone = (() => {
     },
 
     async '/review'(data, body) {
-      const list = await offers();
-      const offer = list[body.id];
-      delete list[body.id];
-      await keepOffers(list);
+      const offer = (await offers())[body.id];
       if (!offer) return { result: 'missing' };
-      if (!body.keep || offer.known) return { result: 'dropped' };
-
-      return {
-        result: await write((fresh) => {
+      let result = 'dropped';
+      // A login kept leaves the list only once it is in Drive: a failed save can be tried again.
+      if (body.keep && !offer.known) {
+        result = await signedIn(() => write((fresh) => {
           const existing = loginAt(fresh, offer.url, offer.username);
           if (existing) {
             existing.password = offer.password;
@@ -620,8 +701,12 @@ const Standalone = (() => {
             updatedAt: Date.now(),
           });
           return 'saved';
-        }),
-      };
+        }));
+      }
+      const list = await offers();
+      delete list[body.id];
+      await keepOffers(list);
+      return { result };
     },
 
     async '/fail'(data, body) {
@@ -651,6 +736,7 @@ const Standalone = (() => {
     // The edit page: one whole entry; for a login also the codes to pin to it,
     // each with its current digits, as names can repeat.
     async '/entry'(data, body) {
+      data = await fresh(data);
       const e = visible(data).find((x) => x.id === body.id);
       if (!e) return { error: t('notFound') };
       const groups = [...new Set(visible(data).map((x) => x.group).filter(Boolean))].sort();
@@ -668,6 +754,7 @@ const Standalone = (() => {
           group: e.group || '',
           notes: e.notes || '',
           twoFactor: e.twoFactor || '',
+          updatedAt: e.updatedAt || 0,
         },
         sites: e.sites || [],
         pinned: isCode(e) ? loginsOf(data, e).map((l) => ({ id: l.id, label: `${l.title} — ${l.username}`, url: l.url || '' })) : [],
@@ -679,9 +766,11 @@ const Standalone = (() => {
     async '/put'(data, body) {
       const changed = body.entry || {};
       return {
-        result: await write((fresh) => {
+        result: await signedIn(() => write((fresh) => {
           const e = (fresh.entries || []).find((x) => x.id === changed.id && !x.deleted);
           if (!e) return 'missing';
+          // Changed on another device since the page opened: its fields would go back.
+          if ((e.updatedAt || 0) !== (changed.updatedAt || 0)) return 'changed';
           e.title = changed.title || '';
           e.url = changed.url || '';
           e.notes = changed.notes || '';
@@ -703,14 +792,14 @@ const Standalone = (() => {
           }
           e.updatedAt = Date.now();
           return 'saved';
-        }),
+        })),
       };
     },
 
     // As in the app: the entry stays as a marker so the deletion reaches other devices.
     async '/delete'(data, body) {
       return {
-        result: await write((fresh) => {
+        result: await signedIn(() => write((fresh) => {
           const e = (fresh.entries || []).find((x) => x.id === body.id);
           if (!e) return 'missing';
           e.deleted = true;
@@ -718,7 +807,7 @@ const Standalone = (() => {
           delete e.totp;
           e.updatedAt = Date.now();
           return 'deleted';
-        }),
+        })),
       };
     },
 
@@ -757,6 +846,7 @@ const Standalone = (() => {
         await session.remove('driveToken');
         await local.remove(['driveFile', 'vaultFile']);
         if ((await vaultFiles(true)).length === 0) return { error: t('noVaultInDrive') };
+        await rememberAccount();
         await local.set({ driveConnected: true });
         return { ok: true };
       } catch (e) {
@@ -792,10 +882,11 @@ const Standalone = (() => {
       const { driveFile, vaultFile } = await local.get(['driveFile', 'vaultFile']);
       let ids;
       try {
-        ids = (await vaultFiles(false)).map((f) => f.id);
+        ids = (await signedIn(() => vaultFiles(false))).map((f) => f.id);
       } catch (e) {
+        // Signed out of Google: said so, not opened from an old copy.
+        if (e.signIn || !vaultFile) return { error: e.message };
         // Offline: only the copy kept here can open.
-        if (!vaultFile) return { error: e.message };
         const dek = await keyIn(fromB64(vaultFile));
         return dek ? opened(dek) : { error: t('wrongMasterPassword') };
       }

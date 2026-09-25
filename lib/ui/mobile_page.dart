@@ -322,6 +322,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
         left: () => _left,
         onCopy: _copy,
         onEdit: () => _edit(entry, isNew: false),
+        onGuard: () async {
+          if (!await toggleGuard(context, _store, entry)) return;
+          _vault.put(entry);
+          await _persist();
+          if (mounted) setState(() {});
+        },
       ),
     ));
     setState(() {});
@@ -558,14 +564,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
         icons: _store.icons,
         address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
       ),
-      title: Text.rich(
-        TextSpan(children: [
-          TextSpan(text: e.title.isEmpty ? t.noTitle : e.title),
-          if (_vault.guarded(e)) const WidgetSpan(child: GuardedMark()),
-        ]),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      title: titleWithGuard(e.title.isEmpty ? t.noTitle : e.title, on: e.guarded, onTap: () async {
+        if (!await toggleGuard(context, _store, e)) return;
+        _vault.put(e);
+        await _persist();
+        if (mounted) setState(() {});
+      }),
       subtitle: e.isCode
           ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
           : Text(
@@ -633,6 +637,7 @@ class _Details extends StatefulWidget {
     required this.left,
     required this.onCopy,
     required this.onEdit,
+    required this.onGuard,
   });
 
   final VaultEntry entry;
@@ -641,6 +646,9 @@ class _Details extends StatefulWidget {
   final void Function(String label, String value) onCopy;
   /// True when the entry was deleted.
   final Future<bool> Function() onEdit;
+
+  /// The fingerprint mark on or off, as by the list's small fingerprint.
+  final Future<void> Function() onGuard;
 
   @override
   State<_Details> createState() => _DetailsState();
@@ -718,6 +726,16 @@ class _DetailsState extends State<_Details> {
             _field(t.codeSeconds(widget.left()), '${code.substring(0, 3)} ${code.substring(3)}', copy: code),
           _field(t.username, e.username),
           _field(t.password, e.password, secret: true),
+          SwitchListTile(
+            secondary: const Icon(Icons.fingerprint),
+            value: e.guarded,
+            title: Text(t.guardedSwitch),
+            subtitle: Text(t.guardedSwitchHint),
+            onChanged: (_) async {
+              await widget.onGuard();
+              if (mounted) setState(() {});
+            },
+          ),
           _field(t.address, e.url),
           _field(t.notes, e.notes),
         ],
