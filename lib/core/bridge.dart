@@ -212,7 +212,7 @@ class BrowserBridge {
       until: DateTime.now().add(offerTime),
       expiry: Timer(offerTime, () => _offers.remove(id)),
     );
-    return {'result': 'offered', 'id': id, 'known': state == 'same', 'autoSave': autoSave()};
+    return {'result': 'offered', 'id': id, 'known': state == 'same', 'changed': state == 'changed', 'autoSave': autoSave()};
   }
 
   void _drop(bool Function(_Offer offer) test) {

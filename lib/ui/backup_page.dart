@@ -1,22 +1,34 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
 import '../core/drive.dart';
+import '../core/crypto.dart';
 import '../core/remote.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
+import 'delete_vault_page.dart';
 import 'password_page.dart';
 
 class BackupPage extends StatefulWidget {
-  const BackupPage({super.key, required this.store, required this.drive, required this.onSync});
+  const BackupPage({
+    super.key,
+    required this.store,
+    required this.drive,
+    required this.onSync,
+    required this.onOpenCopy,
+  });
 
   final VaultStore store;
   final DriveSync drive;
 
   /// Runs a sync through the vault screen, which owns the open vault.
   final Future<SyncResult?> Function({String? password}) onSync;
+
+  /// Opens a vault file (a backup copy) to look inside.
+  final Future<void> Function(Uint8List bytes, String name) onOpenCopy;
 
   @override
   State<BackupPage> createState() => _BackupPageState();
@@ -71,6 +83,36 @@ class _BackupPageState extends State<BackupPage> {
     final path = await getDirectoryPath();
     if (path == null || _folders.contains(path)) return;
     setState(() => _folders.add(path));
+    // Copies of another vault in it (an earlier one, before a reinstall): it can be looked into.
+    final copies = Directory(path)
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.uri.pathSegments.last.startsWith('vault-') && f.path.endsWith('.khd'))
+        .toList()
+      ..sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
+    if (copies.isEmpty) return;
+    final newest = copies.first;
+    final bytes = newest.readAsBytesSync();
+    if (await widget.store.opens(bytes) || !mounted) return;
+    final bring = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.otherVaultTitle),
+        content: Text(t.otherVaultHint(_when(newest.lastModifiedSync()))),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.notNow)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.open)),
+        ],
+      ),
+    );
+    if (bring == true) await widget.onOpenCopy(bytes, newest.uri.pathSegments.last);
+  }
+
+  Future<void> _openCopyFile() async {
+    const type = XTypeGroup(label: 'Keyhold', extensions: ['khd']);
+    final file = await openFile(acceptedTypeGroups: const [type]);
+    if (file == null) return;
+    await widget.onOpenCopy(await file.readAsBytes(), file.name);
   }
 
   String? _validate(RemoteConfig config) {
@@ -160,6 +202,9 @@ class _BackupPageState extends State<BackupPage> {
         return;
       }
       result = await widget.onSync(password: password);
+      if (result != null && await readRecoveryCode(password) != null && mounted) {
+        await newPasswordAfterRecovery(context, widget.store);
+      }
     }
     _driveMessage =
         widget.drive.lastError ??
@@ -181,7 +226,7 @@ class _BackupPageState extends State<BackupPage> {
           child: TextField(
             controller: field,
             obscureText: true,
-            decoration: InputDecoration(labelText: t.masterPassword),
+            decoration: InputDecoration(labelText: t.masterPassword, helperText: t.orRecoveryCode, helperMaxLines: 2),
             onSubmitted: (v) => Navigator.pop(context, v),
           ),
         ),
@@ -344,6 +389,17 @@ class _BackupPageState extends State<BackupPage> {
             open: _host.text.trim().isNotEmpty,
             children: _serverSection(theme),
           ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => DeleteVaultPage(store: widget.store, drive: widget.drive),
+              )),
+              icon: const Icon(Icons.delete_forever_outlined),
+              label: Text(t.deleteVault),
+            ),
+          ),
         ],
       ),
     );
@@ -365,10 +421,21 @@ class _BackupPageState extends State<BackupPage> {
       ),
     ..._folders.map(_folderRow),
     const SizedBox(height: 8),
-    OutlinedButton.icon(
-      onPressed: _addFolder,
-      icon: const Icon(Icons.add),
-      label: Text(t.addFolder),
+    Wrap(
+      spacing: 12,
+      runSpacing: 8,
+      children: [
+        OutlinedButton.icon(
+          onPressed: _addFolder,
+          icon: const Icon(Icons.add),
+          label: Text(t.addFolder),
+        ),
+        OutlinedButton.icon(
+          onPressed: _openCopyFile,
+          icon: const Icon(Icons.folder_open_outlined),
+          label: Text(t.openCopy),
+        ),
+      ],
     ),
   ];
 

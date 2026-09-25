@@ -7,6 +7,7 @@ import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'core/autotype.dart';
+import 'l10n/l10n.dart';
 import 'tray.dart';
 import 'ui/autofill_page.dart';
 import 'ui/mobile_page.dart';
@@ -62,6 +63,9 @@ class KeyholdApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Keyhold',
+      locale: appLocale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorSchemeSeed: const Color(0xFF1FCFB4),

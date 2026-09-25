@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:dartssh2/dartssh2.dart';
 
 import '../l10n/l10n.dart';
+import 'backup.dart';
 
 class RemoteConfig {
   RemoteConfig({
@@ -56,52 +57,39 @@ class RemoteClient {
     );
   }
 
-  Future<String> upload(File file, String name) async {
+  /// The same 7 slots as in a folder: each copy moves one slot on when its
+  /// slot is due, then the latest save goes up.
+  Future<void> backup(File vault, String tag) async {
     final client = await _connect();
     try {
       final sftp = await client.sftp();
       await _ensureDir(sftp, config.remoteDir);
-
-      final remotePath = '${config.remoteDir}/$name';
-      final handle = await sftp.open(
-        remotePath,
-        mode: SftpFileOpenMode.create |
-            SftpFileOpenMode.write |
-            SftpFileOpenMode.truncate,
-      );
-      await handle.write(file.openRead().cast<Uint8List>());
-      await handle.close();
-      return remotePath;
-    } finally {
-      client.close();
-    }
-  }
-
-  Future<List<String>> list() async {
-    final client = await _connect();
-    try {
-      final sftp = await client.sftp();
-      final items = await sftp.listdir(config.remoteDir);
-      return items
-          .map((e) => e.filename)
-          .where((n) => n.endsWith('.khd'))
-          .toList()
-        ..sort();
-    } finally {
-      client.close();
-    }
-  }
-
-  Future<void> trim(int keep) async {
-    final names = await list();
-    if (names.length <= keep) return;
-
-    final client = await _connect();
-    try {
-      final sftp = await client.sftp();
-      for (final name in names.take(names.length - keep)) {
-        await sftp.remove('${config.remoteDir}/$name');
+      String path(int slot) => '${config.remoteDir}/${BackupService.slotName(tag, slot)}';
+      Future<DateTime?> heldSince(int slot) async {
+        try {
+          final seconds = (await sftp.stat(path(slot))).modifyTime;
+          return seconds == null ? null : DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+        } catch (_) {
+          return null;
+        }
       }
+
+      for (var i = BackupService.slots.length - 1; i >= 1; i--) {
+        if (await heldSince(i - 1) == null) continue;
+        if (!BackupService.movesOn(await heldSince(i), i)) continue;
+        try {
+          await sftp.remove(path(i));
+        } catch (_) {
+          // the slot was empty
+        }
+        await sftp.rename(path(i - 1), path(i));
+      }
+      final handle = await sftp.open(
+        path(0),
+        mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate,
+      );
+      await handle.write(vault.openRead().cast<Uint8List>());
+      await handle.close();
     } finally {
       client.close();
     }

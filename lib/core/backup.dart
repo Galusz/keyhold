@@ -23,12 +23,32 @@ class BackupService {
   BackupService(this._settingsFile);
 
   final File _settingsFile;
-  static const int keepCopies = 30;
 
-  // A phone has no backup folders; its copy is the one in Google Drive.
-  List<String> targets = Platform.isWindows
-      ? [r'E:\ACCESS\keyhold', r'D:\_KOPIA_ACCESS\keyhold']
-      : [];
+  /// The copies kept of a vault in every place: the latest save, then one
+  /// roughly an hour, a day, a week, a month, a quarter and a year old.
+  /// Not every moment survives, but there is always some history.
+  static const slots = [
+    ('0-latest', Duration.zero),
+    ('1-hour', Duration(hours: 1)),
+    ('2-day', Duration(days: 1)),
+    ('3-week', Duration(days: 7)),
+    ('4-month', Duration(days: 30)),
+    ('5-quarter', Duration(days: 90)),
+    ('6-year', Duration(days: 365)),
+  ];
+
+  static String slotName(String tag, int slot) => 'vault-$tag-${slots[slot].$1}.khd';
+
+  /// A slot takes the next newer copy once its own is older than its age;
+  /// an empty slot fills straight away.
+  static bool movesOn(DateTime? held, int slot) =>
+      held == null || DateTime.now().difference(held) >= slots[slot].$2;
+
+  /// Folders that get a copy of every save; the user picks them.
+  List<String> targets = [];
+
+  // Early builds put these in for everyone; they stay only where they really exist.
+  static const _earlyDefaults = [r'E:\ACCESS\keyhold', r'D:\_KOPIA_ACCESS\keyhold'];
 
   RemoteConfig remote = RemoteConfig();
   String bridgeToken = '';
@@ -57,7 +77,9 @@ class BackupService {
     try {
       final raw = jsonDecode(_settingsFile.readAsStringSync()) as Map<String, dynamic>;
       final list = (raw['backupTargets'] as List<dynamic>?)?.cast<String>();
-      if (list != null && list.isNotEmpty) targets = list;
+      if (list != null) {
+        targets = list.where((p) => !_earlyDefaults.contains(p) || Directory(p).existsSync()).toList();
+      }
 
       final remoteJson = raw['remote'] as Map<String, dynamic>?;
       if (remoteJson != null) remote = RemoteConfig.fromJson(remoteJson);
@@ -101,15 +123,7 @@ class BackupService {
     }));
   }
 
-  Future<BackupStatus> run(File vault) async {
-    final stamp = DateTime.now()
-        .toIso8601String()
-        .substring(0, 16)
-        .replaceAll(':', '')
-        .replaceAll('-', '')
-        .replaceAll('T', '-');
-
-    final name = 'vault-$stamp.khd';
+  Future<BackupStatus> run(File vault, String tag) async {
     final done = <String>[];
     final errors = <String>[];
 
@@ -117,8 +131,8 @@ class BackupService {
       try {
         final dir = Directory(target);
         dir.createSync(recursive: true);
-        await vault.copy('${dir.path}${Platform.pathSeparator}$name');
-        _trim(dir);
+        _rotate(dir, tag);
+        await vault.copy('${dir.path}${Platform.pathSeparator}${slotName(tag, 0)}');
         done.add(target);
       } catch (e) {
         errors.add('$target: $e');
@@ -127,9 +141,7 @@ class BackupService {
 
     if (remote.configured) {
       try {
-        final client = RemoteClient(remote);
-        await client.upload(vault, name).timeout(const Duration(seconds: 25));
-        await client.trim(keepCopies).timeout(const Duration(seconds: 25));
+        await RemoteClient(remote).backup(vault, tag).timeout(const Duration(seconds: 40));
         done.add(remote.host);
       } catch (e) {
         errors.add('${remote.host}: $e');
@@ -145,16 +157,33 @@ class BackupService {
     return status;
   }
 
-  void _trim(Directory dir) {
-    final copies = dir
-        .listSync()
-        .whereType<File>()
-        .where((f) => f.path.contains('vault-') && f.path.endsWith('.khd'))
-        .toList()
-      ..sort((a, b) => b.path.compareTo(a.path));
-    for (final old in copies.skip(keepCopies)) {
+  /// Removes the vault copies Keyhold left in the backup folders.
+  void deleteCopies() {
+    for (final target in targets) {
+      final dir = Directory(target);
+      if (!dir.existsSync()) continue;
+      for (final f in dir.listSync().whereType<File>()) {
+        if (f.path.contains('vault-') && f.path.endsWith('.khd')) f.deleteSync();
+      }
+    }
+  }
+
+  /// Moves each copy one slot on when its slot is due, oldest slots first, and
+  /// drops the dated copies this vault made before there were slots.
+  void _rotate(Directory dir, String tag) {
+    final sep = Platform.pathSeparator;
+    for (var i = slots.length - 1; i >= 1; i--) {
+      final newer = File('${dir.path}$sep${slotName(tag, i - 1)}');
+      if (!newer.existsSync()) continue;
+      final slot = File('${dir.path}$sep${slotName(tag, i)}');
+      if (!movesOn(slot.existsSync() ? slot.lastModifiedSync() : null, i)) continue;
+      newer.renameSync(slot.path);
+    }
+    final dated = RegExp('^vault-$tag-\\d{8}-\\d{4}\\.khd\$');
+    for (final f in dir.listSync().whereType<File>()) {
+      if (!dated.hasMatch(f.uri.pathSegments.last)) continue;
       try {
-        old.deleteSync();
+        f.deleteSync();
       } catch (_) {
         // a locked file just stays until the next run
       }

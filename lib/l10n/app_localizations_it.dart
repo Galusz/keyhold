@@ -920,7 +920,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get nobodyCanRecover =>
-      'Nessuno può recuperarla per te — nemmeno questa app. Scrivila in un posto sicuro.';
+      'Se la dimentichi, solo la chiave di recupero apre la tua cassaforte: stampa il foglio di recupero.';
 
   @override
   String get groupApps => 'App';
@@ -1101,4 +1101,197 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get cameraHint =>
       'Inquadra il codice QR a due fattori di un sito, oppure l\'esportazione di Google Authenticator.';
+
+  @override
+  String get deleteThisCode => 'Eliminare questo codice a due fattori?';
+
+  @override
+  String get deleteCodeWarning =>
+      'Sparisce da tutti i tuoi dispositivi. Senza di esso non puoi accedere dove viene usato.';
+
+  @override
+  String get deleteLoginWarning => 'Spariscono da tutti i tuoi dispositivi.';
+
+  @override
+  String nextCode(String code) {
+    return 'prossimo $code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'Nessuna password principale: i tuoi backup non si possono aprire su un altro computer. Fai clic per impostarla.';
+
+  @override
+  String get printRecoverySheet => 'Stampa il foglio di recupero';
+
+  @override
+  String get recoverySheet => 'Foglio di recupero';
+
+  @override
+  String get recoveryIntro =>
+      'Questa chiave apre la tua cassaforte se dimentichi la password principale. Stampa il foglio, copiaci a mano l\'ultima riga e tienilo a casa.';
+
+  @override
+  String get print => 'Stampa';
+
+  @override
+  String get done => 'Fatto';
+
+  @override
+  String get sheetTitle => 'Foglio di recupero Keyhold';
+
+  @override
+  String sheetMade(String date) {
+    return 'Creato il $date';
+  }
+
+  @override
+  String get sheetWhere => 'Dove si trova la tua cassaforte';
+
+  @override
+  String sheetDrive(String email) {
+    return 'Google Drive di $email, cartella \"Keyhold\"';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'Copie nelle cartelle: $folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'Copie sul server $host';
+  }
+
+  @override
+  String get sheetOnlyHere =>
+      'Solo su questo dispositivo. Attiva un backup in Keyhold.';
+
+  @override
+  String get sheetSteps => 'Su un nuovo computer o telefono';
+
+  @override
+  String get sheetStep1 => 'Installa Keyhold: galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'Connetti lo stesso Google Drive in Keyhold.';
+
+  @override
+  String get sheetStep3 =>
+      'Quando Keyhold chiede la password principale, digita questa chiave di recupero. Poi scegli una nuova password principale.';
+
+  @override
+  String get sheetKeepSafe =>
+      'Chiunque abbia questo foglio completato può aprire la tua cassaforte. Custodiscilo come una chiave di casa di riserva.';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive, cartella \"Keyhold\"';
+
+  @override
+  String get noBackupPlaces =>
+      'Nessuna cartella di backup, server o Google Drive: la cassaforte è solo su questo computer. Fai clic per configurarne uno.';
+
+  @override
+  String get deleteVault => 'Elimina la cassaforte';
+
+  @override
+  String get deleteVaultHint =>
+      'Tutto ciò che Keyhold conserva su questo dispositivo viene cancellato: password, codici a due fattori, file e impostazioni. Poi Keyhold si chiude e riparte vuoto.';
+
+  @override
+  String get deleteVaultDrive =>
+      'Eliminala anche da Google Drive (gli altri dispositivi tengono la loro copia finché non la elimini anche lì)';
+
+  @override
+  String get deleteVaultFolders =>
+      'Elimina anche le copie nelle cartelle di backup';
+
+  @override
+  String get deleteVaultSure => 'Eliminare la cassaforte per sempre?';
+
+  @override
+  String get deleteVaultSureHint => 'L’operazione non si può annullare.';
+
+  @override
+  String get vaultDeleted =>
+      'La cassaforte è stata eliminata. Keyhold ora si chiude.';
+
+  @override
+  String get recoveryGate =>
+      'Digita la tua password principale per vedere la chiave di recupero.';
+
+  @override
+  String get showKey => 'Mostra la chiave';
+
+  @override
+  String get recoveryNeedsPassword =>
+      'Prima imposta una password principale: la chiave di recupero appare solo dopo.';
+
+  @override
+  String get recoveryCopyRow => 'Copia a mano questa riga sul foglio stampato';
+
+  @override
+  String get checkRow =>
+      'Poi digita l\'ultima riga come l\'hai scritta sul foglio';
+
+  @override
+  String get check => 'Controlla';
+
+  @override
+  String get rowMatches =>
+      'Corrisponde. Conserva il foglio in un posto sicuro.';
+
+  @override
+  String get rowDiffers =>
+      'Non corrisponde. Confronta l\'ultima riga con lo schermo e correggila sul foglio.';
+
+  @override
+  String get sheetKeyLabel => 'Chiave di recupero';
+
+  @override
+  String get sheetCopyRow =>
+      'Copia qui a mano l\'ultima riga dalla schermata di Keyhold.';
+
+  @override
+  String get orRecoveryCode =>
+      'L\'hai dimenticata? Digita invece la chiave di recupero del tuo foglio di recupero.';
+
+  @override
+  String get newPasswordAfterKey =>
+      'La chiave di recupero ha aperto la tua cassaforte. Scegli una nuova password principale: sostituirà quella dimenticata su tutti i tuoi dispositivi.';
+
+  @override
+  String get otherVaultTitle => 'Copie di un’altra cassaforte';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'Questa cartella contiene già copie di un’altra cassaforte Keyhold (la più recente del $when). Aprirla per guardarci dentro? La tua cassaforte resta com’è.';
+  }
+
+  @override
+  String get copyPasswordTitle => 'Password principale di questa copia';
+
+  @override
+  String get copyNotOpened =>
+      'Impossibile aprire la copia: password o chiave di recupero errata, oppure non è una cassaforte Keyhold.';
+
+  @override
+  String get openCopy => 'Apri una copia di backup…';
+
+  @override
+  String copyTitle(String name) {
+    return 'Copia: $name';
+  }
+
+  @override
+  String get copyReadOnly =>
+      'Solo da consultare: qui nulla cambia la tua cassaforte. Puoi aggiungere singole voci alla tua cassaforte.';
+
+  @override
+  String get addToVault => 'Aggiungi alla mia cassaforte';
+
+  @override
+  String addedToVault(String name) {
+    return '\"$name\" è nella tua cassaforte';
+  }
 }

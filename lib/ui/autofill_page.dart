@@ -13,22 +13,15 @@ import 'mobile_page.dart' show askFingerprint;
 import 'vault_page.dart' show SiteAvatar;
 
 /// Logins for a web page ([site]) or an app ([app]). An app has no address:
-/// its logins are kept under `androidapp://package`, or found under its
-/// website — pl.mbank.android → mbank.pl.
+/// only logins kept under its own `androidapp://package` are offered by
+/// themselves — a look-alike app must not get the bank's login; the search
+/// screen finds any other.
 List<VaultEntry> autofillMatches(Vault vault, String site, String app) {
-  List<VaultEntry> at(String address) => [
-        ...vault.forSite(address).where((e) => !e.isCode),
-        ...vault.codesForSite(address),
-      ];
-  if (site.isNotEmpty) return at(site);
-  final found = at('androidapp://$app');
-  final parts = app.split('.');
-  if (parts.length >= 2) {
-    for (final e in at('${parts[1]}.${parts[0]}')) {
-      if (!found.contains(e)) found.add(e);
-    }
-  }
-  return found;
+  final address = site.isNotEmpty ? site : 'androidapp://$app';
+  return [
+    ...vault.forSite(address).where((e) => !e.isCode),
+    ...vault.codesForSite(address),
+  ];
 }
 
 /// Answers the phone's autofill service, which runs this without a screen to
@@ -224,7 +217,7 @@ class _AutofillPageState extends State<AutofillPage> {
     final password = _request['password'] as String? ?? '';
     final label = _request['label'] as String? ?? '';
 
-    final existing = _vault.forSite(_address).where((e) => e.username == username).firstOrNull;
+    final existing = _vault.loginAt(_address, username);
     if (existing != null) {
       if (existing.password != password) {
         existing.password = password;
@@ -232,7 +225,7 @@ class _AutofillPageState extends State<AutofillPage> {
       }
     } else {
       _vault.put(VaultEntry(
-        id: UniqueKey().toString(),
+        id: newId(),
         title: _site.isNotEmpty ? _site : (label.isNotEmpty ? label : _app),
         username: username,
         password: password,

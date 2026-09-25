@@ -146,8 +146,9 @@ async function scan() {
       });
     }
     input.addEventListener('mousedown', (e) => e.isTrusted && openMenu(input));
+    // Only the user's own keys: a page must not open the list and pick from it.
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown' && !menu) openMenu(input);
+      if (e.isTrusted && e.key === 'ArrowDown' && !menu) openMenu(input);
     });
   }
 }
@@ -306,6 +307,7 @@ async function openMenu(field, allCodes) {
     }
   };
   menu.keys = (e) => {
+    if (!e.isTrusted) return;
     if (e.key === 'Escape') return closeMenu();
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();

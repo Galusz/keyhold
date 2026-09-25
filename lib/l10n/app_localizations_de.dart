@@ -898,7 +898,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get nobodyCanRecover =>
-      'Niemand kann es für dich wiederherstellen – nicht einmal diese App. Notiere es an einem sicheren Ort.';
+      'Wenn du es vergisst, öffnet nur der Wiederherstellungsschlüssel deinen Tresor: Notfallblatt drucken.';
 
   @override
   String get groupApps => 'Apps';
@@ -1073,4 +1073,198 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get cameraHint =>
       'Auf den Zwei-Faktor-QR-Code einer Website oder den Export aus Google Authenticator richten.';
+
+  @override
+  String get deleteThisCode => 'Diesen Zwei-Faktor-Code löschen?';
+
+  @override
+  String get deleteCodeWarning =>
+      'Er verschwindet von allen deinen Geräten. Ohne ihn kannst du dich dort, wo er genutzt wird, nicht mehr anmelden.';
+
+  @override
+  String get deleteLoginWarning => 'Sie verschwinden von allen deinen Geräten.';
+
+  @override
+  String nextCode(String code) {
+    return 'nächster $code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'Kein Master-Passwort: Deine Sicherungen lassen sich auf keinem anderen Computer öffnen. Zum Festlegen klicken.';
+
+  @override
+  String get printRecoverySheet => 'Notfallblatt drucken';
+
+  @override
+  String get recoverySheet => 'Notfallblatt';
+
+  @override
+  String get recoveryIntro =>
+      'Dieser Schlüssel öffnet deinen Tresor, falls du das Master-Passwort einmal vergisst. Das Blatt drucken, die letzte Zeile von Hand daraufschreiben und zu Hause aufbewahren.';
+
+  @override
+  String get print => 'Drucken';
+
+  @override
+  String get done => 'Fertig';
+
+  @override
+  String get sheetTitle => 'Keyhold-Notfallblatt';
+
+  @override
+  String sheetMade(String date) {
+    return 'Erstellt am $date';
+  }
+
+  @override
+  String get sheetWhere => 'Wo dein Tresor liegt';
+
+  @override
+  String sheetDrive(String email) {
+    return 'Google Drive von $email, Ordner „Keyhold“';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'Kopien in Ordnern: $folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'Kopien auf dem Server $host';
+  }
+
+  @override
+  String get sheetOnlyHere =>
+      'Nur auf diesem Gerät. In Keyhold eine Sicherung einschalten.';
+
+  @override
+  String get sheetSteps => 'Auf einem neuen Computer oder Smartphone';
+
+  @override
+  String get sheetStep1 => 'Keyhold installieren: galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'In Keyhold dasselbe Google Drive verbinden.';
+
+  @override
+  String get sheetStep3 =>
+      'Wenn Keyhold nach dem Master-Passwort fragt, diesen Wiederherstellungsschlüssel eingeben. Dann ein neues Master-Passwort wählen.';
+
+  @override
+  String get sheetKeepSafe =>
+      'Mit diesem ausgefüllten Blatt kann jeder deinen Tresor öffnen. Wie einen Ersatzschlüssel fürs Haus aufbewahren.';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive, Ordner „Keyhold“';
+
+  @override
+  String get noBackupPlaces =>
+      'Kein Sicherungsordner, Server oder Google Drive: Der Tresor ist nur auf diesem Computer. Zum Einrichten klicken.';
+
+  @override
+  String get deleteVault => 'Tresor löschen';
+
+  @override
+  String get deleteVaultHint =>
+      'Alles, was Keyhold auf diesem Gerät speichert, wird gelöscht: Passwörter, Zwei-Faktor-Codes, Dateien und Einstellungen. Danach schließt sich Keyhold und startet leer.';
+
+  @override
+  String get deleteVaultDrive =>
+      'Auch aus Google Drive löschen (andere Geräte behalten ihre Kopie, bis du sie auch dort löschst)';
+
+  @override
+  String get deleteVaultFolders =>
+      'Auch die Kopien in den Sicherungsordnern löschen';
+
+  @override
+  String get deleteVaultSure => 'Tresor endgültig löschen?';
+
+  @override
+  String get deleteVaultSureHint => 'Das lässt sich nicht rückgängig machen.';
+
+  @override
+  String get vaultDeleted =>
+      'Der Tresor ist gelöscht. Keyhold wird jetzt geschlossen.';
+
+  @override
+  String get recoveryGate =>
+      'Master-Passwort eingeben, um den Wiederherstellungsschlüssel zu sehen.';
+
+  @override
+  String get showKey => 'Schlüssel anzeigen';
+
+  @override
+  String get recoveryNeedsPassword =>
+      'Zuerst ein Master-Passwort festlegen: Erst danach wird der Wiederherstellungsschlüssel angezeigt.';
+
+  @override
+  String get recoveryCopyRow =>
+      'Diese Zeile von Hand auf das gedruckte Blatt übertragen';
+
+  @override
+  String get checkRow =>
+      'Dann die letzte Zeile so eingeben, wie sie auf dem Blatt steht';
+
+  @override
+  String get check => 'Prüfen';
+
+  @override
+  String get rowMatches =>
+      'Stimmt überein. Das Blatt an einem sicheren Ort aufbewahren.';
+
+  @override
+  String get rowDiffers =>
+      'Stimmt nicht überein. Die letzte Zeile mit dem Bildschirm vergleichen und auf dem Blatt korrigieren.';
+
+  @override
+  String get sheetKeyLabel => 'Wiederherstellungsschlüssel';
+
+  @override
+  String get sheetCopyRow =>
+      'Die letzte Zeile hier von Hand vom Keyhold-Bildschirm abschreiben.';
+
+  @override
+  String get orRecoveryCode =>
+      'Vergessen? Stattdessen den Wiederherstellungsschlüssel vom Notfallblatt eingeben.';
+
+  @override
+  String get newPasswordAfterKey =>
+      'Der Wiederherstellungsschlüssel hat deinen Tresor geöffnet. Neues Master-Passwort wählen: Es ersetzt das vergessene auf allen deinen Geräten.';
+
+  @override
+  String get otherVaultTitle => 'Kopien eines anderen Tresors';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'In diesem Ordner liegen schon Kopien eines anderen Keyhold-Tresors (die neueste vom $when). Zum Ansehen öffnen? Dein Tresor bleibt, wie er ist.';
+  }
+
+  @override
+  String get copyPasswordTitle => 'Master-Passwort dieser Kopie';
+
+  @override
+  String get copyNotOpened =>
+      'Die Kopie ließ sich nicht öffnen: falsches Passwort oder falscher Wiederherstellungsschlüssel, oder kein Keyhold-Tresor.';
+
+  @override
+  String get openCopy => 'Sicherungskopie öffnen…';
+
+  @override
+  String copyTitle(String name) {
+    return 'Kopie: $name';
+  }
+
+  @override
+  String get copyReadOnly =>
+      'Nur zum Ansehen: Hier ändert sich nichts an deinem Tresor. Einzelne Einträge kannst du in deinen Tresor übernehmen.';
+
+  @override
+  String get addToVault => 'In meinen Tresor übernehmen';
+
+  @override
+  String addedToVault(String name) {
+    return '„$name“ ist in deinem Tresor';
+  }
 }

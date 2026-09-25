@@ -6,8 +6,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.provider.Settings
 import android.view.autofill.AutofillManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -15,6 +19,9 @@ import io.flutter.plugin.common.MethodChannel
 // A FragmentActivity: the fingerprint prompt lives in a fragment.
 class MainActivity : FlutterFragmentActivity() {
     private var screenOff: BroadcastReceiver? = null
+
+    // The page being printed: kept until the print screen is done with it.
+    private var printing: WebView? = null
 
     override fun onDestroy() {
         screenOff?.let { unregisterReceiver(it) }
@@ -41,6 +48,22 @@ class MainActivity : FlutterFragmentActivity() {
             registerReceiver(receiver, filter)
         }
         screenOff = receiver
+
+        // The recovery sheet goes to the phone's own print screen, "Save as PDF" included.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/print")
+            .setMethodCallHandler { call, result ->
+                val name = call.argument<String>("name") ?: "Keyhold"
+                val view = WebView(this)
+                view.webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(page: WebView, url: String?) {
+                        getSystemService(PrintManager::class.java)
+                            .print(name, page.createPrintDocumentAdapter(name), PrintAttributes.Builder().build())
+                    }
+                }
+                view.loadDataWithBaseURL(null, call.argument<String>("html") ?: "", "text/html", "UTF-8", null)
+                printing = view
+                result.success(null)
+            }
 
         // Settings: is Keyhold the phone's password filler, and the system switch to make it one.
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/autofill-settings")

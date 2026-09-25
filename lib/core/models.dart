@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import '../l10n/l10n.dart';
@@ -11,6 +12,12 @@ String hostOf(String url) {
   final host = Uri.tryParse(text)?.host.toLowerCase() ?? '';
   return host.startsWith('www.') ? host.substring(4) : host;
 }
+
+final _random = Random.secure();
+
+/// A fresh id for an entry or a file: 128 random bits, so ids made on
+/// different devices never meet.
+String newId() => [for (var i = 0; i < 16; i++) _random.nextInt(256).toRadixString(16).padLeft(2, '0')].join();
 
 class VaultEntry {
   final String id;
@@ -158,14 +165,37 @@ class KeyWrap {
       );
 }
 
+/// The recovery key of a vault: the code the user keeps on paper, and the
+/// vault's key sealed by it, so the code alone opens the vault anywhere.
+class RecoveryWrap {
+  RecoveryWrap({required this.code, required this.sealed, required this.changedAt});
+
+  final String code;
+  final Uint8List sealed;
+  final int changedAt;
+
+  Map<String, dynamic> toJson() => {
+        'code': code,
+        'sealed': base64Encode(sealed),
+        'changedAt': changedAt,
+      };
+
+  factory RecoveryWrap.fromJson(Map<String, dynamic> j) => RecoveryWrap(
+        code: j['code'] as String,
+        sealed: base64Decode(j['sealed'] as String),
+        changedAt: (j['changedAt'] ?? 0) as int,
+      );
+}
+
 class Vault {
   static const int formatVersion = 1;
 
   final Map<String, VaultEntry> entries;
   final Map<String, VaultFile> files;
   KeyWrap? keyWrap;
+  RecoveryWrap? recovery;
 
-  Vault({Map<String, VaultEntry>? entries, Map<String, VaultFile>? files, this.keyWrap})
+  Vault({Map<String, VaultEntry>? entries, Map<String, VaultFile>? files, this.keyWrap, this.recovery})
       : entries = entries ?? {},
         files = files ?? {};
 
@@ -203,7 +233,10 @@ class Vault {
     final host = hostOf(address);
     if (host.isEmpty) return [];
     final port = _portOf(address);
-    final withAddress = visible.where((e) => hostOf(e.url).isNotEmpty);
+    // A login kept for an https page is not handed to the same site over plain http.
+    final plain = address.trim().toLowerCase().startsWith('http://');
+    final withAddress = visible.where(
+        (e) => hostOf(e.url).isNotEmpty && !(plain && e.url.trim().toLowerCase().startsWith('https://')));
 
     final exact = withAddress
         .where((e) => hostOf(e.url) == host && (port == null || _portOf(e.url) == port))
@@ -213,6 +246,14 @@ class Vault {
       final entryHost = hostOf(e.url);
       return entryHost == host || host.endsWith('.$entryHost') || entryHost.endsWith('.$host');
     }).toList();
+  }
+
+  /// The login kept for exactly this site under [username]: a new password
+  /// there never lands on a parent or sister domain's login.
+  VaultEntry? loginAt(String address, String username) {
+    final host = hostOf(address);
+    if (host.isEmpty) return null;
+    return visible.where((e) => !e.isCode && e.username == username && hostOf(e.url) == host).firstOrNull;
   }
 
   /// Every two-factor code in the vault.
@@ -259,7 +300,8 @@ class Vault {
   /// A code first used on [pageUrl]: that site joins its addresses.
   void addSite(VaultEntry code, String pageUrl) {
     final page = Uri.tryParse(pageUrl);
-    final site = page != null && page.hasAuthority ? page.origin : pageUrl.trim();
+    final web = page != null && page.hasAuthority && (page.scheme == 'http' || page.scheme == 'https');
+    final site = web ? page.origin : pageUrl.trim();
     if (site.isEmpty || code.sites.any((s) => hostOf(s) == hostOf(site))) return;
     code.sites.add(site);
     put(code);
@@ -405,6 +447,7 @@ class Vault {
         'entries': entries.values.map((e) => e.toJson()).toList(),
         'files': files.values.map((f) => f.toJson()).toList(),
         if (keyWrap != null) 'keyWrap': keyWrap!.toJson(),
+        if (recovery != null) 'recovery': recovery!.toJson(),
       });
 
   factory Vault.decode(String source) {
@@ -423,10 +466,12 @@ class Vault {
     }
 
     final wrap = root['keyWrap'] as Map<String, dynamic>?;
+    final recovery = root['recovery'] as Map<String, dynamic>?;
     return Vault(
       entries: entryMap,
       files: fileMap,
       keyWrap: wrap == null ? null : KeyWrap.fromJson(wrap),
+      recovery: recovery == null ? null : RecoveryWrap.fromJson(recovery),
     );
   }
 
@@ -448,6 +493,11 @@ class Vault {
     final theirs = remote.keyWrap;
     final wrap = theirs != null && (mine == null || theirs.changedAt > mine.changedAt) ? theirs : mine;
 
-    return Vault(entries: entryMap, files: fileMap, keyWrap: wrap);
+    final kept = remote.recovery != null &&
+            (local.recovery == null || remote.recovery!.changedAt > local.recovery!.changedAt)
+        ? remote.recovery
+        : local.recovery;
+
+    return Vault(entries: entryMap, files: fileMap, keyWrap: wrap, recovery: kept);
   }
 }

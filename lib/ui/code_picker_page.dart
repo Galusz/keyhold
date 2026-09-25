@@ -55,7 +55,7 @@ class _CodePickerPageState extends State<CodePickerPage> {
   }
 
   Future<void> _newCode() async {
-    final code = VaultEntry(id: UniqueKey().toString());
+    final code = VaultEntry(id: newId());
     final saved = await Navigator.of(context).push(
       MaterialPageRoute<Object?>(
         builder: (_) => EntryPage(

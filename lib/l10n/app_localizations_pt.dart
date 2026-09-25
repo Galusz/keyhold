@@ -928,7 +928,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get nobodyCanRecover =>
-      'Ninguém pode recuperá-la para você — nem mesmo este app. Anote-a em um lugar seguro.';
+      'Se você esquecê-la, só a chave de recuperação abre seu cofre: imprima a folha de recuperação.';
 
   @override
   String get groupApps => 'Apps';
@@ -1103,4 +1103,196 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get cameraHint =>
       'Aponte para o código QR de dois fatores de um site ou para a exportação do Google Authenticator.';
+
+  @override
+  String get deleteThisCode => 'Excluir este código de dois fatores?';
+
+  @override
+  String get deleteCodeWarning =>
+      'Ele some de todos os seus dispositivos. Sem ele, você não consegue fazer login onde ele é usado.';
+
+  @override
+  String get deleteLoginWarning => 'Ele some de todos os seus dispositivos.';
+
+  @override
+  String nextCode(String code) {
+    return 'próximo $code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'Sem senha mestra: seus backups não podem ser abertos em outro computador. Clique para definir uma.';
+
+  @override
+  String get printRecoverySheet => 'Imprimir a folha de recuperação';
+
+  @override
+  String get recoverySheet => 'Folha de recuperação';
+
+  @override
+  String get recoveryIntro =>
+      'Esta chave abre seu cofre se você esquecer a senha mestra. Imprima a folha, copie nela à mão a última linha e guarde-a em casa.';
+
+  @override
+  String get print => 'Imprimir';
+
+  @override
+  String get done => 'Concluído';
+
+  @override
+  String get sheetTitle => 'Folha de recuperação do Keyhold';
+
+  @override
+  String sheetMade(String date) {
+    return 'Feita em $date';
+  }
+
+  @override
+  String get sheetWhere => 'Onde está seu cofre';
+
+  @override
+  String sheetDrive(String email) {
+    return 'Google Drive de $email, pasta \"Keyhold\"';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'Cópias em pastas: $folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'Cópias no servidor $host';
+  }
+
+  @override
+  String get sheetOnlyHere =>
+      'Só neste dispositivo. Ative um backup no Keyhold.';
+
+  @override
+  String get sheetSteps => 'Em um novo computador ou telefone';
+
+  @override
+  String get sheetStep1 => 'Instale o Keyhold: galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'Conecte o mesmo Google Drive no Keyhold.';
+
+  @override
+  String get sheetStep3 =>
+      'Quando o Keyhold pedir a senha mestra, digite esta chave de recuperação. Depois escolha uma nova senha mestra.';
+
+  @override
+  String get sheetKeepSafe =>
+      'Qualquer pessoa com esta folha preenchida pode abrir seu cofre. Guarde-a como uma chave reserva de casa.';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive, pasta \"Keyhold\"';
+
+  @override
+  String get noBackupPlaces =>
+      'Nenhuma pasta de backup, servidor ou Google Drive: o cofre está só neste computador. Clique para configurar.';
+
+  @override
+  String get deleteVault => 'Excluir o cofre';
+
+  @override
+  String get deleteVaultHint =>
+      'Tudo o que o Keyhold guarda neste dispositivo é apagado: senhas, códigos de dois fatores, arquivos e configurações. Depois o Keyhold fecha e começa vazio.';
+
+  @override
+  String get deleteVaultDrive =>
+      'Excluir também do Google Drive (os outros dispositivos mantêm a cópia deles até você excluí-la lá também)';
+
+  @override
+  String get deleteVaultFolders =>
+      'Excluir também as cópias nas pastas de backup';
+
+  @override
+  String get deleteVaultSure => 'Excluir o cofre para sempre?';
+
+  @override
+  String get deleteVaultSureHint => 'Isso não pode ser desfeito.';
+
+  @override
+  String get vaultDeleted =>
+      'O cofre foi excluído. O Keyhold vai fechar agora.';
+
+  @override
+  String get recoveryGate =>
+      'Digite sua senha mestra para ver a chave de recuperação.';
+
+  @override
+  String get showKey => 'Mostrar a chave';
+
+  @override
+  String get recoveryNeedsPassword =>
+      'Defina primeiro uma senha mestra: a chave de recuperação só aparece depois disso.';
+
+  @override
+  String get recoveryCopyRow => 'Copie esta linha à mão na folha impressa';
+
+  @override
+  String get checkRow =>
+      'Depois digite a última linha como você a escreveu na folha';
+
+  @override
+  String get check => 'Verificar';
+
+  @override
+  String get rowMatches => 'Confere. Guarde a folha em um lugar seguro.';
+
+  @override
+  String get rowDiffers =>
+      'Não confere. Compare a última linha com a tela e corrija-a na folha.';
+
+  @override
+  String get sheetKeyLabel => 'Chave de recuperação';
+
+  @override
+  String get sheetCopyRow =>
+      'Copie aqui à mão a última linha da tela do Keyhold.';
+
+  @override
+  String get orRecoveryCode =>
+      'Esqueceu? Digite a chave de recuperação da sua folha de recuperação.';
+
+  @override
+  String get newPasswordAfterKey =>
+      'A chave de recuperação abriu seu cofre. Escolha uma nova senha mestra: ela substitui a esquecida em todos os seus dispositivos.';
+
+  @override
+  String get otherVaultTitle => 'Cópias de outro cofre';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'Esta pasta já tem cópias de outro cofre do Keyhold (a mais recente de $when). Abrir para ver o conteúdo? Seu cofre continua como está.';
+  }
+
+  @override
+  String get copyPasswordTitle => 'Senha mestra desta cópia';
+
+  @override
+  String get copyNotOpened =>
+      'Não foi possível abrir a cópia: senha ou chave de recuperação erradas, ou não é um cofre do Keyhold.';
+
+  @override
+  String get openCopy => 'Abrir uma cópia de backup…';
+
+  @override
+  String copyTitle(String name) {
+    return 'Cópia: $name';
+  }
+
+  @override
+  String get copyReadOnly =>
+      'Somente para ver: nada aqui altera seu cofre. Você pode adicionar itens avulsos ao seu cofre.';
+
+  @override
+  String get addToVault => 'Adicionar ao meu cofre';
+
+  @override
+  String addedToVault(String name) {
+    return '\"$name\" está no seu cofre';
+  }
 }

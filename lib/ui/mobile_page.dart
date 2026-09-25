@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../core/crypto.dart';
 import '../core/drive.dart';
 import '../core/favicons.dart';
 import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../l10n/l10n.dart';
+import 'delete_vault_page.dart';
 import 'entry_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
@@ -39,6 +41,9 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   late final _drive = DriveSync(_store);
   final _search = TextEditingController();
   final _codes = <String, String>{};
+
+  /// The code after the current one, shown in its last seconds.
+  final _next = <String, String>{};
 
   Vault _vault = Vault();
   bool _loading = true;
@@ -91,6 +96,8 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   void _lock() {
     if (!_store.backup.fingerprintLock || _locked) return;
+    // Nothing stays open behind the lock: details, edits and sheets close.
+    Navigator.of(context).popUntil((route) => route.isFirst);
     setState(() => _locked = true);
   }
 
@@ -135,10 +142,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     final window = DateTime.now().millisecondsSinceEpoch ~/ 30000;
     if (window != _codeWindow) {
       _codeWindow = window;
+      final next = DateTime.now().add(const Duration(seconds: 30));
       for (final e in _vault.visible) {
         final secret = e.totpSecret;
         if (secret == null || secret.isEmpty) continue;
         _codes[e.id] = await totpCode(secret);
+        _next[e.id] = await totpCode(secret, at: next);
       }
     }
     if (mounted) setState(() => _left = secondsLeft());
@@ -197,6 +206,9 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       final password = await _askPassword();
       if (password == null) return;
       result = await _sync(password: password);
+      if (result != null && await readRecoveryCode(password) != null && mounted) {
+        await newPasswordAfterRecovery(context, _store);
+      }
     }
     if (_drive.lastError != null) {
       _toast(_drive.lastError!);
@@ -216,7 +228,8 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
           obscureText: true,
           decoration: InputDecoration(
             labelText: t.masterPasswordOfVault,
-            helperText: t.masterPasswordFromComputer,
+            helperText: '${t.masterPasswordFromComputer}\n${t.orRecoveryCode}',
+            helperMaxLines: 4,
           ),
           onSubmitted: (v) => Navigator.pop(context, v),
         ),
@@ -272,8 +285,8 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       ),
     );
     if (choice == 'qr') await _scanQr();
-    if (choice == 'code') await _edit(VaultEntry(id: UniqueKey().toString()), isNew: true, code: true);
-    if (choice == 'new') await _edit(VaultEntry(id: UniqueKey().toString()), isNew: true);
+    if (choice == 'code') await _edit(VaultEntry(id: newId()), isNew: true, code: true);
+    if (choice == 'new') await _edit(VaultEntry(id: newId()), isNew: true);
   }
 
   Future<void> _scanQr() async {
@@ -290,7 +303,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
               : code.account.isEmpty
                   ? code.issuer
                   : '${code.issuer} (${code.account})';
-          _vault.put(VaultEntry(id: UniqueKey().toString(), title: name, totpSecret: code.secret));
+          _vault.put(VaultEntry(id: newId(), title: name, totpSecret: code.secret));
           await _persist();
           return name;
         },
@@ -521,6 +534,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   Widget _row(VaultEntry e) {
     final code = _codes[e.id] ?? _codes[e.twoFactor];
+    final next = _left <= 5 ? _next[e.id] ?? _next[e.twoFactor] : null;
     final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     final warn = _left <= 5 ? Theme.of(context).colorScheme.error : null;
     return ListTile(
@@ -558,6 +572,13 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
                   width: 90,
                   child: LinearProgressIndicator(value: _left / 30, minHeight: 2, color: warn),
                 ),
+                if (next != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    t.nextCode('${next.substring(0, 3)} ${next.substring(3)}'),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
+                  ),
+                ],
               ],
             ),
     );
@@ -637,7 +658,7 @@ class _DetailsState extends State<_Details> {
     super.dispose();
   }
 
-  Widget _field(String label, String value, {bool secret = false}) {
+  Widget _field(String label, String value, {bool secret = false, String? copy}) {
     if (value.isEmpty) return const SizedBox.shrink();
     return ListTile(
       title: Text(label, style: Theme.of(context).textTheme.bodySmall),
@@ -656,7 +677,7 @@ class _DetailsState extends State<_Details> {
           IconButton(
             tooltip: t.copy,
             icon: const Icon(Icons.copy_outlined),
-            onPressed: () => widget.onCopy(label, value),
+            onPressed: () => widget.onCopy(label, copy ?? value),
           ),
         ],
       ),
@@ -690,7 +711,7 @@ class _DetailsState extends State<_Details> {
       body: ListView(
         children: [
           if (code != null)
-            _field(t.codeSeconds(widget.left()), '${code.substring(0, 3)} ${code.substring(3)}'),
+            _field(t.codeSeconds(widget.left()), '${code.substring(0, 3)} ${code.substring(3)}', copy: code),
           _field(t.username, e.username),
           _field(t.password, e.password, secret: true),
           _field(t.address, e.url),
@@ -866,6 +887,18 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
               },
               icon: const Icon(Icons.lock_outline),
               label: Text(widget.store.hasPassword ? t.change : t.setMasterPassword),
+            ),
+          ),
+          const Divider(height: 40),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => DeleteVaultPage(store: widget.store, drive: widget.drive),
+              )),
+              icon: const Icon(Icons.delete_forever_outlined),
+              label: Text(t.deleteVault),
             ),
           ),
         ],

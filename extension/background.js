@@ -16,7 +16,19 @@ async function call(path, body) {
     const alone = await Standalone.handle(path, body);
     if (alone) return alone;
   }
+  // Never paired, and Keyhold answers here: pairing is the next step, not Google Drive.
+  if (result.error === 'no token' && (await Standalone.state()).state === 'none' && (await appAnswers())) {
+    return { error: 'bad token' };
+  }
   return result;
+}
+
+async function appAnswers() {
+  try {
+    return (await fetch(`${BRIDGE}/lookup`, { method: 'POST' })).status === 401;
+  } catch (e) {
+    return false;
+  }
 }
 
 async function callApp(path, body) {
@@ -83,6 +95,7 @@ async function save(message, sender) {
       frameId: sender.frameId,
       autoSave: result.autoSave === true,
       known: result.known === true,
+      changed: result.changed === true,
       at: Date.now(),
     },
   });
@@ -120,7 +133,8 @@ async function decide(tabId, id, verdict) {
   } else if (attempt.known) {
     // The saved password did its job (or nothing tells otherwise): nothing to ask.
     await call('/review', { id, keep: false });
-  } else if (verdict === 'worked' && attempt.autoSave) {
+  } else if (verdict === 'worked' && attempt.autoSave && !attempt.changed) {
+    // Only new logins are kept by themselves; a different password always asks.
     await call('/review', { id, keep: true });
   }
   await syncOffers();

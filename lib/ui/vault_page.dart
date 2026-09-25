@@ -22,6 +22,7 @@ import 'import_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
 import 'backup_page.dart';
+import 'copy_page.dart';
 
 enum EntryFilter { all, twoFactor, plain, files, duplicates }
 
@@ -119,7 +120,7 @@ class _VaultPageState extends State<VaultPage> {
       return 'updated';
     }
     _vault.put(VaultEntry(
-      id: UniqueKey().toString(),
+      id: newId(),
       title: hostOf(url),
       username: username,
       password: password,
@@ -247,7 +248,7 @@ class _VaultPageState extends State<VaultPage> {
               : code.account.isEmpty
                   ? code.issuer
                   : '${code.issuer} (${code.account})';
-          _vault.put(VaultEntry(id: UniqueKey().toString(), title: name, totpSecret: code.secret));
+          _vault.put(VaultEntry(id: newId(), title: name, totpSecret: code.secret));
           await _persist();
           return name;
         },
@@ -658,14 +659,12 @@ class _VaultPageState extends State<VaultPage> {
           IconButton(
             tooltip: t.backup,
             icon: const Icon(Icons.backup_outlined),
-            onPressed: () async {
-              await Navigator.of(context).push(
-                MaterialPageRoute<bool>(
-                  builder: (_) => BackupPage(store: _store, drive: _drive, onSync: _syncDrive),
-                ),
-              );
-              if (mounted) setState(() {});
-            },
+            onPressed: _openBackup,
+          ),
+          IconButton(
+            tooltip: t.openCopy,
+            icon: const Icon(Icons.folder_open_outlined),
+            onPressed: _pickCopy,
           ),
           IconButton(
             tooltip: t.importCsv,
@@ -704,7 +703,7 @@ class _VaultPageState extends State<VaultPage> {
             )
           : FloatingActionButton.extended(
               onPressed: () => _open(
-                  VaultEntry(id: UniqueKey().toString(), group: _group ?? ''),
+                  VaultEntry(id: newId(), group: _group ?? ''),
                   isNew: true,
                   code: _filter == EntryFilter.twoFactor),
               icon: const Icon(Icons.add),
@@ -727,10 +726,6 @@ class _VaultPageState extends State<VaultPage> {
   List<String> get _watched => _store.backup.watched ?? const [];
 
   Future<void> _startWatching() async {
-    if (_store.backup.watched == null) {
-      _store.backup.watched = defaultWatched();
-      _store.backup.saveSettings();
-    }
     await _scan();
     _watchTimer = Timer.periodic(const Duration(minutes: 15), (_) => _scan());
   }
@@ -896,7 +891,7 @@ class _VaultPageState extends State<VaultPage> {
     }
 
     _vault.putFile(VaultFile(
-      id: UniqueKey().toString(),
+      id: newId(),
       name: picked.name,
       data: base64Encode(bytes),
       size: bytes.length,
@@ -1087,15 +1082,105 @@ class _VaultPageState extends State<VaultPage> {
     return t.daysAgo(diff.inDays);
   }
 
+  /// A backup copy (from a folder, a pendrive, a year ago) opened only to look
+  /// inside; single entries can be taken back. The vault itself stays as it is.
+  Future<void> _openCopy(Uint8List bytes, String name) async {
+    var copy = await _store.openCopy(bytes);
+    if (copy == null) {
+      final password = await _askCopyPassword();
+      if (password == null) return;
+      copy = await _store.openCopy(bytes, password);
+    }
+    if (copy == null) {
+      _toast(t.copyNotOpened);
+      return;
+    }
+    if (!mounted) return;
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => CopyPage(
+        copy: copy!,
+        name: name,
+        onAdd: (e) async {
+          // A new entry of its own: whatever the vault holds now stays.
+          _vault.put(VaultEntry.fromJson({
+            ...e.toJson(),
+            'id': newId(),
+            'twoFactor': '',
+            'updatedAt': DateTime.now().millisecondsSinceEpoch,
+          }));
+          await _persist();
+        },
+      ),
+    ));
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _pickCopy() async {
+    const type = XTypeGroup(label: 'Keyhold', extensions: ['khd']);
+    final file = await openFile(acceptedTypeGroups: const [type]);
+    if (file == null) return;
+    await _openCopy(await file.readAsBytes(), file.name);
+  }
+
+  Future<String?> _askCopyPassword() {
+    final field = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.copyPasswordTitle),
+        content: SizedBox(
+          width: 380,
+          child: TextField(
+            controller: field,
+            obscureText: true,
+            autofocus: true,
+            decoration: InputDecoration(labelText: t.masterPassword, helperText: t.orRecoveryCode, helperMaxLines: 2),
+            onSubmitted: (v) => Navigator.pop(context, v),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, field.text), child: Text(t.open)),
+        ],
+      ),
+    ).whenComplete(field.dispose);
+  }
+
+  Future<void> _openBackup() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<bool>(
+        builder: (_) => BackupPage(store: _store, drive: _drive, onSync: _syncDrive, onOpenCopy: _openCopy),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   Widget _backupBar(int count) {
     final theme = Theme.of(context);
     final status = _store.backup.status;
+    final backup = _store.backup;
+
+    // Only places still set up count: a folder just removed is no backup any more.
+    final places = [...backup.targets, if (backup.remote.configured) backup.remote.host];
+    final done = status.targets.where(places.contains).toList();
+    final errors = status.errors.where((e) => places.any((p) => e.startsWith('$p:'))).toList();
+    final syncedAt = _drive.syncedAt;
 
     final (IconData icon, Color color, String text) = switch (status) {
-      _ when status.errors.isNotEmpty => (
+      _ when places.isEmpty && !_drive.connected => (
+          Icons.cloud_off_outlined,
+          theme.colorScheme.error,
+          t.noBackupPlaces,
+        ),
+      _ when places.isEmpty => (
+          Icons.cloud_done_outlined,
+          theme.colorScheme.primary,
+          syncedAt == null ? t.waitingFirstBackup : t.backedUpToDrive(_ago(syncedAt)),
+        ),
+      _ when errors.isNotEmpty => (
           Icons.error_outline,
           theme.colorScheme.error,
-          t.backupFailed(status.errors.first),
+          t.backupFailed(errors.first),
         ),
       _ when status.at == null => (
           Icons.cloud_off_outlined,
@@ -1110,12 +1195,40 @@ class _VaultPageState extends State<VaultPage> {
       _ => (
           Icons.cloud_done_outlined,
           theme.colorScheme.primary,
-          t.backedUpTo(_ago(status.at!), status.targets.join(', ')),
+          t.backedUpTo(_ago(status.at!), done.join(', ')),
         ),
     };
 
-    final syncedAt = _drive.syncedAt;
-    final drive = !_drive.connected
+    // Without a master password a copy opens only on this Windows account.
+    if (!_store.hasPassword) {
+      const ink = Colors.black87;
+      return Material(
+        color: const Color(0xFFFFE082),
+        child: InkWell(
+          onTap: _setPassword,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, size: 18, color: ink),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    t.noMasterPasswordBar,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(color: ink, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Text(t.itemCount(count), style: theme.textTheme.bodySmall?.copyWith(color: ink)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final drive = !_drive.connected || places.isEmpty
         ? null
         : _driveNeedsPassword
             ? t.driveNeedsPassword
@@ -1125,39 +1238,42 @@ class _VaultPageState extends State<VaultPage> {
                     ? null
                     : t.driveSynced(_ago(syncedAt));
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: theme.dividerColor)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: color),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(color: color),
-            ),
-          ),
-          if (drive != null) ...[
-            Icon(
-              _drive.lastError != null || _driveNeedsPassword
-                  ? Icons.sync_problem
-                  : Icons.add_to_drive,
-              size: 18,
-              color: _drive.lastError != null || _driveNeedsPassword
-                  ? theme.colorScheme.error
-                  : theme.colorScheme.primary,
-            ),
+    return InkWell(
+      onTap: _openBackup,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: theme.dividerColor)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: color),
             const SizedBox(width: 8),
-            Text(drive, style: theme.textTheme.bodySmall),
-            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(color: color),
+              ),
+            ),
+            if (drive != null) ...[
+              Icon(
+                _drive.lastError != null || _driveNeedsPassword
+                    ? Icons.sync_problem
+                    : Icons.add_to_drive,
+                size: 18,
+                color: _drive.lastError != null || _driveNeedsPassword
+                    ? theme.colorScheme.error
+                    : theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(drive, style: theme.textTheme.bodySmall),
+              const SizedBox(width: 16),
+            ],
+            Text(t.itemCount(count), style: theme.textTheme.bodySmall),
           ],
-          Text(t.itemCount(count), style: theme.textTheme.bodySmall),
-        ],
+        ),
       ),
     );
   }

@@ -907,7 +907,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get nobodyCanRecover =>
-      'Nikt go nie odzyska — nawet ta aplikacja. Zapisz je w bezpiecznym miejscu.';
+      'Jeśli je zapomnisz, sejf otworzy tylko klucz ratunkowy: wydrukuj zestaw ratunkowy.';
 
   @override
   String get groupApps => 'Aplikacje';
@@ -1090,4 +1090,197 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get cameraHint =>
       'Skieruj aparat na kod QR weryfikacji dwuetapowej ze strony albo na eksport z Google Authenticator.';
+
+  @override
+  String get deleteThisCode => 'Usunąć ten kod weryfikacyjny?';
+
+  @override
+  String get deleteCodeWarning =>
+      'Zniknie ze wszystkich urządzeń. Bez niego nie zalogujesz się tam, gdzie jest używany.';
+
+  @override
+  String get deleteLoginWarning => 'Znikną ze wszystkich urządzeń.';
+
+  @override
+  String nextCode(String code) {
+    return 'następny $code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'Brak hasła głównego: kopii zapasowych nie da się otworzyć na innym komputerze. Kliknij, aby je ustawić.';
+
+  @override
+  String get printRecoverySheet => 'Wydrukuj zestaw ratunkowy';
+
+  @override
+  String get recoverySheet => 'Zestaw ratunkowy';
+
+  @override
+  String get recoveryIntro =>
+      'Ten klucz otworzy sejf, jeśli kiedyś zapomnisz hasła głównego. Wydrukuj zestaw, przepisz na niego odręcznie ostatni wiersz i trzymaj go w domu.';
+
+  @override
+  String get print => 'Drukuj';
+
+  @override
+  String get done => 'Gotowe';
+
+  @override
+  String get sheetTitle => 'Zestaw ratunkowy Keyhold';
+
+  @override
+  String sheetMade(String date) {
+    return 'Utworzono $date';
+  }
+
+  @override
+  String get sheetWhere => 'Gdzie jest sejf';
+
+  @override
+  String sheetDrive(String email) {
+    return 'Google Drive konta $email, folder „Keyhold”';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'Kopie w folderach: $folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'Kopie na serwerze $host';
+  }
+
+  @override
+  String get sheetOnlyHere =>
+      'Tylko na tym urządzeniu. Włącz kopię zapasową w Keyhold.';
+
+  @override
+  String get sheetSteps => 'Na nowym komputerze lub telefonie';
+
+  @override
+  String get sheetStep1 => 'Zainstaluj Keyhold: galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'Połącz Keyhold z tym samym Google Drive.';
+
+  @override
+  String get sheetStep3 =>
+      'Gdy Keyhold poprosi o hasło główne, wpisz ten klucz ratunkowy. Potem wybierz nowe hasło główne.';
+
+  @override
+  String get sheetKeepSafe =>
+      'Każdy, kto ma ten wypełniony zestaw, może otworzyć sejf. Przechowuj go jak zapasowy klucz do domu.';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive, folder „Keyhold”';
+
+  @override
+  String get noBackupPlaces =>
+      'Brak folderu kopii, serwera i Google Drive: sejf jest tylko na tym komputerze. Kliknij, aby to ustawić.';
+
+  @override
+  String get deleteVault => 'Usuń sejf';
+
+  @override
+  String get deleteVaultHint =>
+      'Wszystko, co Keyhold trzyma na tym urządzeniu, zostanie wymazane: hasła, kody weryfikacyjne, pliki i ustawienia. Potem Keyhold zamknie się i zacznie od pustego sejfu.';
+
+  @override
+  String get deleteVaultDrive =>
+      'Usuń go też z Google Drive (inne urządzenia zachowają swoją kopię, dopóki nie usuniesz jej także tam)';
+
+  @override
+  String get deleteVaultFolders =>
+      'Usuń też kopie w folderach kopii zapasowych';
+
+  @override
+  String get deleteVaultSure => 'Usunąć sejf na zawsze?';
+
+  @override
+  String get deleteVaultSureHint => 'Tego nie da się cofnąć.';
+
+  @override
+  String get vaultDeleted => 'Sejf został usunięty. Keyhold zaraz się zamknie.';
+
+  @override
+  String get recoveryGate =>
+      'Wpisz hasło główne, aby zobaczyć klucz ratunkowy.';
+
+  @override
+  String get showKey => 'Pokaż klucz';
+
+  @override
+  String get recoveryNeedsPassword =>
+      'Najpierw ustaw hasło główne: klucz ratunkowy pojawi się dopiero potem.';
+
+  @override
+  String get recoveryCopyRow =>
+      'Przepisz ten wiersz odręcznie na wydrukowany zestaw';
+
+  @override
+  String get checkRow =>
+      'Potem wpisz ostatni wiersz tak, jak jest zapisany na zestawie';
+
+  @override
+  String get check => 'Sprawdź';
+
+  @override
+  String get rowMatches =>
+      'Zgadza się. Przechowuj zestaw w bezpiecznym miejscu.';
+
+  @override
+  String get rowDiffers =>
+      'Nie zgadza się. Porównaj ostatni wiersz z ekranem i popraw go na zestawie.';
+
+  @override
+  String get sheetKeyLabel => 'Klucz ratunkowy';
+
+  @override
+  String get sheetCopyRow =>
+      'Przepisz tu odręcznie ostatni wiersz z ekranu Keyhold.';
+
+  @override
+  String get orRecoveryCode =>
+      'Nie pamiętasz? Wpisz zamiast niego klucz ratunkowy z zestawu ratunkowego.';
+
+  @override
+  String get newPasswordAfterKey =>
+      'Klucz ratunkowy otworzył sejf. Wybierz nowe hasło główne: zastąpi zapomniane na wszystkich urządzeniach.';
+
+  @override
+  String get otherVaultTitle => 'Kopie innego sejfu';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'W tym folderze są już kopie innego sejfu Keyhold (najnowsza z $when). Otworzyć ją do podglądu? Twój sejf zostanie bez zmian.';
+  }
+
+  @override
+  String get copyPasswordTitle => 'Hasło główne tej kopii';
+
+  @override
+  String get copyNotOpened =>
+      'Nie udało się otworzyć kopii: złe hasło lub klucz ratunkowy albo to nie jest sejf Keyhold.';
+
+  @override
+  String get openCopy => 'Otwórz plik kopii…';
+
+  @override
+  String copyTitle(String name) {
+    return 'Kopia: $name';
+  }
+
+  @override
+  String get copyReadOnly =>
+      'Tylko do podglądu: nic tu nie zmienia Twojego sejfu. Pojedynczy wpis możesz dodać do swojego sejfu.';
+
+  @override
+  String get addToVault => 'Dodaj do mojego sejfu';
+
+  @override
+  String addedToVault(String name) {
+    return '„$name” jest w Twoim sejfie';
+  }
 }

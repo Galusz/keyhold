@@ -936,7 +936,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get nobodyCanRecover =>
-      'Personne ne peut le récupérer pour vous — pas même cette appli. Notez-le dans un endroit sûr.';
+      'Si vous l’oubliez, seule la clé de récupération ouvre votre coffre-fort : imprimez la fiche de récupération.';
 
   @override
   String get groupApps => 'Applis';
@@ -1112,4 +1112,196 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get cameraHint =>
       'Pointez vers le code QR de double authentification d’un site, ou vers l’export de Google Authenticator.';
+
+  @override
+  String get deleteThisCode => 'Supprimer ce code de double authentification ?';
+
+  @override
+  String get deleteCodeWarning =>
+      'Il disparaît de tous vos appareils. Sans lui, vous ne pourrez plus vous connecter là où il sert.';
+
+  @override
+  String get deleteLoginWarning => 'Il disparaît de tous vos appareils.';
+
+  @override
+  String nextCode(String code) {
+    return 'puis $code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'Pas de mot de passe principal : vos sauvegardes ne peuvent pas être ouvertes sur un autre ordinateur. Cliquez pour en définir un.';
+
+  @override
+  String get printRecoverySheet => 'Imprimer la fiche de récupération';
+
+  @override
+  String get recoverySheet => 'Fiche de récupération';
+
+  @override
+  String get recoveryIntro =>
+      'Cette clé ouvre votre coffre-fort si vous oubliez un jour le mot de passe principal. Imprimez la fiche, recopiez-y la dernière ligne à la main et gardez-la chez vous.';
+
+  @override
+  String get print => 'Imprimer';
+
+  @override
+  String get done => 'Terminé';
+
+  @override
+  String get sheetTitle => 'Fiche de récupération Keyhold';
+
+  @override
+  String sheetMade(String date) {
+    return 'Créée le $date';
+  }
+
+  @override
+  String get sheetWhere => 'Où se trouve votre coffre-fort';
+
+  @override
+  String sheetDrive(String email) {
+    return 'Google Drive de $email, dossier « Keyhold »';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'Copies dans les dossiers : $folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'Copies sur le serveur $host';
+  }
+
+  @override
+  String get sheetOnlyHere =>
+      'Uniquement sur cet appareil. Activez une sauvegarde dans Keyhold.';
+
+  @override
+  String get sheetSteps => 'Sur un nouvel ordinateur ou téléphone';
+
+  @override
+  String get sheetStep1 => 'Installez Keyhold : galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'Connectez le même Google Drive dans Keyhold.';
+
+  @override
+  String get sheetStep3 =>
+      'Quand Keyhold demande le mot de passe principal, saisissez cette clé de récupération. Choisissez ensuite un nouveau mot de passe principal.';
+
+  @override
+  String get sheetKeepSafe =>
+      'Toute personne qui a cette fiche complétée peut ouvrir votre coffre-fort. Rangez-la comme un double des clés de la maison.';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive, dossier « Keyhold »';
+
+  @override
+  String get noBackupPlaces =>
+      'Aucun dossier de sauvegarde, serveur ni Google Drive : le coffre-fort n’est que sur cet ordinateur. Cliquez pour en configurer un.';
+
+  @override
+  String get deleteVault => 'Supprimer le coffre-fort';
+
+  @override
+  String get deleteVaultHint =>
+      'Tout ce que Keyhold garde sur cet appareil est effacé : mots de passe, codes de double authentification, fichiers et réglages. Keyhold se ferme ensuite et redémarre vide.';
+
+  @override
+  String get deleteVaultDrive =>
+      'Le supprimer aussi de Google Drive (les autres appareils gardent leur copie tant que vous ne l’y supprimez pas)';
+
+  @override
+  String get deleteVaultFolders =>
+      'Supprimer aussi les copies dans les dossiers de sauvegarde';
+
+  @override
+  String get deleteVaultSure => 'Supprimer le coffre-fort définitivement ?';
+
+  @override
+  String get deleteVaultSureHint => 'Cette action est irréversible.';
+
+  @override
+  String get vaultDeleted => 'Le coffre-fort est supprimé. Keyhold se ferme.';
+
+  @override
+  String get recoveryGate =>
+      'Saisissez votre mot de passe principal pour voir la clé de récupération.';
+
+  @override
+  String get showKey => 'Afficher la clé';
+
+  @override
+  String get recoveryNeedsPassword =>
+      'Définissez d’abord un mot de passe principal : la clé de récupération n’apparaît qu’ensuite.';
+
+  @override
+  String get recoveryCopyRow =>
+      'Recopiez cette ligne à la main sur la fiche imprimée';
+
+  @override
+  String get checkRow =>
+      'Puis saisissez la dernière ligne telle que vous l’avez écrite sur la fiche';
+
+  @override
+  String get check => 'Vérifier';
+
+  @override
+  String get rowMatches => 'Elle correspond. Rangez la fiche en lieu sûr.';
+
+  @override
+  String get rowDiffers =>
+      'Elle ne correspond pas. Comparez la dernière ligne avec l’écran et corrigez-la sur la fiche.';
+
+  @override
+  String get sheetKeyLabel => 'Clé de récupération';
+
+  @override
+  String get sheetCopyRow =>
+      'Recopiez ici à la main la dernière ligne affichée à l’écran de Keyhold.';
+
+  @override
+  String get orRecoveryCode =>
+      'Oublié ? Saisissez plutôt la clé de récupération inscrite sur votre fiche.';
+
+  @override
+  String get newPasswordAfterKey =>
+      'La clé de récupération a ouvert votre coffre-fort. Choisissez un nouveau mot de passe principal : il remplacera celui que vous avez oublié sur tous vos appareils.';
+
+  @override
+  String get otherVaultTitle => 'Copies d’un autre coffre-fort';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'Ce dossier contient déjà des copies d’un autre coffre-fort Keyhold (la plus récente du $when). L’ouvrir pour la consulter ? Votre coffre-fort reste tel quel.';
+  }
+
+  @override
+  String get copyPasswordTitle => 'Mot de passe principal de cette copie';
+
+  @override
+  String get copyNotOpened =>
+      'La copie ne s’est pas ouverte : mauvais mot de passe ou mauvaise clé de récupération, ou ce n’est pas un coffre-fort Keyhold.';
+
+  @override
+  String get openCopy => 'Ouvrir une copie de sauvegarde…';
+
+  @override
+  String copyTitle(String name) {
+    return 'Copie : $name';
+  }
+
+  @override
+  String get copyReadOnly =>
+      'Consultation seulement : rien ici ne modifie votre coffre-fort. Vous pouvez y ajouter une entrée à la fois.';
+
+  @override
+  String get addToVault => 'Ajouter à mon coffre-fort';
+
+  @override
+  String addedToVault(String name) {
+    return '« $name » est dans votre coffre-fort';
+  }
 }

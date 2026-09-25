@@ -929,7 +929,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get nobodyCanRecover =>
-      'Nadie puede recuperarla por ti — ni siquiera esta app. Anótala en un lugar seguro.';
+      'Si la olvidas, solo la clave de recuperación abre tu caja fuerte: imprime la hoja de recuperación.';
 
   @override
   String get groupApps => 'Apps';
@@ -1104,4 +1104,196 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get cameraHint =>
       'Apunta al código QR de dos factores de un sitio web, o a la exportación de Google Authenticator.';
+
+  @override
+  String get deleteThisCode => '¿Eliminar este código de dos factores?';
+
+  @override
+  String get deleteCodeWarning =>
+      'Desaparece de todos tus dispositivos. Sin él no podrás iniciar sesión donde se usa.';
+
+  @override
+  String get deleteLoginWarning => 'Desaparece de todos tus dispositivos.';
+
+  @override
+  String nextCode(String code) {
+    return 'siguiente $code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'Sin contraseña maestra: tus copias de seguridad no se pueden abrir en otro equipo. Haz clic para configurarla.';
+
+  @override
+  String get printRecoverySheet => 'Imprimir la hoja de recuperación';
+
+  @override
+  String get recoverySheet => 'Hoja de recuperación';
+
+  @override
+  String get recoveryIntro =>
+      'Esta clave abre tu caja fuerte si alguna vez olvidas la contraseña maestra. Imprime la hoja, copia a mano en ella la última fila y guárdala en casa.';
+
+  @override
+  String get print => 'Imprimir';
+
+  @override
+  String get done => 'Listo';
+
+  @override
+  String get sheetTitle => 'Hoja de recuperación de Keyhold';
+
+  @override
+  String sheetMade(String date) {
+    return 'Creada el $date';
+  }
+
+  @override
+  String get sheetWhere => 'Dónde está tu caja fuerte';
+
+  @override
+  String sheetDrive(String email) {
+    return 'Google Drive de $email, carpeta \"Keyhold\"';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'Copias en carpetas: $folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'Copias en el servidor $host';
+  }
+
+  @override
+  String get sheetOnlyHere =>
+      'Solo en este dispositivo. Activa una copia de seguridad en Keyhold.';
+
+  @override
+  String get sheetSteps => 'En un equipo o teléfono nuevo';
+
+  @override
+  String get sheetStep1 => 'Instala Keyhold: galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'Conecta el mismo Google Drive en Keyhold.';
+
+  @override
+  String get sheetStep3 =>
+      'Cuando Keyhold te pida la contraseña maestra, escribe esta clave de recuperación. Después elige una nueva contraseña maestra.';
+
+  @override
+  String get sheetKeepSafe =>
+      'Cualquiera que tenga esta hoja completa puede abrir tu caja fuerte. Guárdala como una llave de repuesto de tu casa.';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive, carpeta \"Keyhold\"';
+
+  @override
+  String get noBackupPlaces =>
+      'Sin carpeta de copia, servidor ni Google Drive: la caja fuerte solo está en este equipo. Haz clic para configurarlo.';
+
+  @override
+  String get deleteVault => 'Eliminar la caja fuerte';
+
+  @override
+  String get deleteVaultHint =>
+      'Se borra todo lo que Keyhold guarda en este dispositivo: contraseñas, códigos de dos factores, archivos y configuración. Después Keyhold se cierra y empieza vacío.';
+
+  @override
+  String get deleteVaultDrive =>
+      'Eliminarla también de Google Drive (los demás dispositivos conservan su copia hasta que la elimines también allí)';
+
+  @override
+  String get deleteVaultFolders =>
+      'Eliminar también las copias de las carpetas de copia de seguridad';
+
+  @override
+  String get deleteVaultSure => '¿Eliminar la caja fuerte para siempre?';
+
+  @override
+  String get deleteVaultSureHint => 'No se puede deshacer.';
+
+  @override
+  String get vaultDeleted =>
+      'La caja fuerte se ha eliminado. Keyhold se cierra ahora.';
+
+  @override
+  String get recoveryGate =>
+      'Escribe tu contraseña maestra para ver la clave de recuperación.';
+
+  @override
+  String get showKey => 'Mostrar la clave';
+
+  @override
+  String get recoveryNeedsPassword =>
+      'Primero configura una contraseña maestra: la clave de recuperación solo se muestra después.';
+
+  @override
+  String get recoveryCopyRow => 'Copia a mano esta fila en la hoja impresa';
+
+  @override
+  String get checkRow =>
+      'Después escribe la última fila tal como la anotaste en la hoja';
+
+  @override
+  String get check => 'Comprobar';
+
+  @override
+  String get rowMatches => 'Coincide. Guarda la hoja en un lugar seguro.';
+
+  @override
+  String get rowDiffers =>
+      'No coincide. Compara la última fila con la pantalla y corrígela en la hoja.';
+
+  @override
+  String get sheetKeyLabel => 'Clave de recuperación';
+
+  @override
+  String get sheetCopyRow =>
+      'Copia aquí a mano la última fila desde la pantalla de Keyhold.';
+
+  @override
+  String get orRecoveryCode =>
+      '¿La olvidaste? Escribe en su lugar la clave de recuperación de tu hoja de recuperación.';
+
+  @override
+  String get newPasswordAfterKey =>
+      'La clave de recuperación abrió tu caja fuerte. Elige una nueva contraseña maestra: sustituye a la olvidada en todos tus dispositivos.';
+
+  @override
+  String get otherVaultTitle => 'Copias de otra caja fuerte';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'Esta carpeta ya tiene copias de otra caja fuerte de Keyhold (la más reciente del $when). ¿Abrirla para ver su contenido? Tu caja fuerte no cambia.';
+  }
+
+  @override
+  String get copyPasswordTitle => 'Contraseña maestra de esta copia';
+
+  @override
+  String get copyNotOpened =>
+      'No se pudo abrir la copia: contraseña o clave de recuperación incorrecta, o no es una caja fuerte de Keyhold.';
+
+  @override
+  String get openCopy => 'Abrir una copia de seguridad…';
+
+  @override
+  String copyTitle(String name) {
+    return 'Copia: $name';
+  }
+
+  @override
+  String get copyReadOnly =>
+      'Solo para ver: aquí nada cambia tu caja fuerte. Puedes añadir entradas sueltas a tu caja fuerte.';
+
+  @override
+  String get addToVault => 'Añadir a mi caja fuerte';
+
+  @override
+  String addedToVault(String name) {
+    return '\"$name\" está en tu caja fuerte';
+  }
 }

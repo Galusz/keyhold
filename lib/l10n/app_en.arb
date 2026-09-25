@@ -590,7 +590,7 @@
   "repeatIt": "Repeat it",
   "openVault": "Open vault",
   "savePassword": "Save password",
-  "nobodyCanRecover": "Nobody can recover it for you — not even this app. Write it down somewhere safe.",
+  "nobodyCanRecover": "If you forget it, only the recovery key opens your vault: print the recovery sheet.",
   "groupApps": "Apps",
   "openKeyholdFirst": "Open Keyhold once and enter the master password, then try again.",
   "pinTo": "Pin \"{name}\" to {place}?",
@@ -693,5 +693,113 @@
       }
     }
   },
-  "cameraHint": "Point at the two-factor QR code of a website, or at the export from Google Authenticator."
+  "cameraHint": "Point at the two-factor QR code of a website, or at the export from Google Authenticator.",
+  "deleteThisCode": "Delete this two-factor code?",
+  "deleteCodeWarning": "It disappears from all your devices. Without it you cannot sign in where it is used.",
+  "deleteLoginWarning": "It disappears from all your devices.",
+  "nextCode": "next {code}",
+  "@nextCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "noMasterPasswordBar": "No master password: your backups cannot be opened on another computer. Click to set one.",
+  "printRecoverySheet": "Print the recovery sheet",
+  "recoverySheet": "Recovery sheet",
+  "recoveryIntro": "This key opens your vault if you ever forget the master password. Print the sheet, copy the last row onto it by hand, and keep it at home.",
+  "print": "Print",
+  "done": "Done",
+  "sheetTitle": "Keyhold recovery sheet",
+  "sheetMade": "Made on {date}",
+  "@sheetMade": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sheetWhere": "Where your vault is",
+  "sheetDrive": "Google Drive of {email}, folder \"Keyhold\"",
+  "@sheetDrive": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "sheetFolders": "Copies in folders: {folders}",
+  "@sheetFolders": {
+    "placeholders": {
+      "folders": {
+        "type": "String"
+      }
+    }
+  },
+  "sheetServer": "Copies on the server {host}",
+  "@sheetServer": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "sheetOnlyHere": "Only on this device. Turn on a backup in Keyhold.",
+  "sheetSteps": "On a new computer or phone",
+  "sheetStep1": "Install Keyhold: galusz.github.io/keyhold",
+  "sheetStep2": "Connect the same Google Drive in Keyhold.",
+  "sheetStep3": "When Keyhold asks for the master password, type this recovery key. Then choose a new master password.",
+  "sheetKeepSafe": "Anyone with this completed sheet can open your vault. Keep it like a spare house key.",
+  "sheetDriveNoEmail": "Google Drive, folder \"Keyhold\"",
+  "noBackupPlaces": "No backup folder, server or Google Drive: the vault is only on this computer. Click to set one up.",
+  "deleteVault": "Delete the vault",
+  "deleteVaultHint": "Everything Keyhold keeps on this device is erased: passwords, two-factor codes, files and settings. Keyhold then closes and starts empty.",
+  "deleteVaultDrive": "Also delete it from Google Drive (other devices keep their own copy until you delete it there too)",
+  "deleteVaultFolders": "Also delete the copies in the backup folders",
+  "deleteVaultSure": "Delete the vault for good?",
+  "deleteVaultSureHint": "This cannot be undone.",
+  "vaultDeleted": "The vault is deleted. Keyhold closes now.",
+  "recoveryGate": "Type your master password to see the recovery key.",
+  "showKey": "Show the key",
+  "recoveryNeedsPassword": "Set a master password first: the recovery key is shown only after it.",
+  "recoveryCopyRow": "Copy this row by hand onto the printed sheet",
+  "checkRow": "Then type the last row as you wrote it on the sheet",
+  "check": "Check",
+  "rowMatches": "It matches. Keep the sheet somewhere safe.",
+  "rowDiffers": "It does not match. Compare the last row with the screen and correct it on the sheet.",
+  "sheetKeyLabel": "Recovery key",
+  "sheetCopyRow": "Copy the last row here by hand from the Keyhold screen.",
+  "orRecoveryCode": "Forgot it? Type the recovery key from your recovery sheet instead.",
+  "newPasswordAfterKey": "The recovery key opened your vault. Choose a new master password: it replaces the forgotten one on all your devices.",
+  "otherVaultTitle": "Copies of another vault",
+  "otherVaultHint": "This folder already holds copies of another Keyhold vault (the newest from {when}). Open it to look inside? Your vault stays as it is.",
+  "@otherVaultHint": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "copyPasswordTitle": "Master password of this copy",
+  "copyNotOpened": "This copy did not open: wrong password or recovery key, or not a Keyhold vault.",
+  "openCopy": "Open a backup copy…",
+  "copyTitle": "Copy: {name}",
+  "@copyTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "copyReadOnly": "Only for looking: nothing here changes your vault. Any single entry can be added to your vault.",
+  "addToVault": "Add to my vault",
+  "addedToVault": "\"{name}\" is in your vault",
+  "@addedToVault": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

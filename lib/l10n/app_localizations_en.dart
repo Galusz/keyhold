@@ -884,7 +884,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nobodyCanRecover =>
-      'Nobody can recover it for you — not even this app. Write it down somewhere safe.';
+      'If you forget it, only the recovery key opens your vault: print the recovery sheet.';
 
   @override
   String get groupApps => 'Apps';
@@ -1060,4 +1060,194 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get cameraHint =>
       'Point at the two-factor QR code of a website, or at the export from Google Authenticator.';
+
+  @override
+  String get deleteThisCode => 'Delete this two-factor code?';
+
+  @override
+  String get deleteCodeWarning =>
+      'It disappears from all your devices. Without it you cannot sign in where it is used.';
+
+  @override
+  String get deleteLoginWarning => 'It disappears from all your devices.';
+
+  @override
+  String nextCode(String code) {
+    return 'next $code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'No master password: your backups cannot be opened on another computer. Click to set one.';
+
+  @override
+  String get printRecoverySheet => 'Print the recovery sheet';
+
+  @override
+  String get recoverySheet => 'Recovery sheet';
+
+  @override
+  String get recoveryIntro =>
+      'This key opens your vault if you ever forget the master password. Print the sheet, copy the last row onto it by hand, and keep it at home.';
+
+  @override
+  String get print => 'Print';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get sheetTitle => 'Keyhold recovery sheet';
+
+  @override
+  String sheetMade(String date) {
+    return 'Made on $date';
+  }
+
+  @override
+  String get sheetWhere => 'Where your vault is';
+
+  @override
+  String sheetDrive(String email) {
+    return 'Google Drive of $email, folder \"Keyhold\"';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'Copies in folders: $folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'Copies on the server $host';
+  }
+
+  @override
+  String get sheetOnlyHere =>
+      'Only on this device. Turn on a backup in Keyhold.';
+
+  @override
+  String get sheetSteps => 'On a new computer or phone';
+
+  @override
+  String get sheetStep1 => 'Install Keyhold: galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'Connect the same Google Drive in Keyhold.';
+
+  @override
+  String get sheetStep3 =>
+      'When Keyhold asks for the master password, type this recovery key. Then choose a new master password.';
+
+  @override
+  String get sheetKeepSafe =>
+      'Anyone with this completed sheet can open your vault. Keep it like a spare house key.';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive, folder \"Keyhold\"';
+
+  @override
+  String get noBackupPlaces =>
+      'No backup folder, server or Google Drive: the vault is only on this computer. Click to set one up.';
+
+  @override
+  String get deleteVault => 'Delete the vault';
+
+  @override
+  String get deleteVaultHint =>
+      'Everything Keyhold keeps on this device is erased: passwords, two-factor codes, files and settings. Keyhold then closes and starts empty.';
+
+  @override
+  String get deleteVaultDrive =>
+      'Also delete it from Google Drive (other devices keep their own copy until you delete it there too)';
+
+  @override
+  String get deleteVaultFolders =>
+      'Also delete the copies in the backup folders';
+
+  @override
+  String get deleteVaultSure => 'Delete the vault for good?';
+
+  @override
+  String get deleteVaultSureHint => 'This cannot be undone.';
+
+  @override
+  String get vaultDeleted => 'The vault is deleted. Keyhold closes now.';
+
+  @override
+  String get recoveryGate =>
+      'Type your master password to see the recovery key.';
+
+  @override
+  String get showKey => 'Show the key';
+
+  @override
+  String get recoveryNeedsPassword =>
+      'Set a master password first: the recovery key is shown only after it.';
+
+  @override
+  String get recoveryCopyRow => 'Copy this row by hand onto the printed sheet';
+
+  @override
+  String get checkRow => 'Then type the last row as you wrote it on the sheet';
+
+  @override
+  String get check => 'Check';
+
+  @override
+  String get rowMatches => 'It matches. Keep the sheet somewhere safe.';
+
+  @override
+  String get rowDiffers =>
+      'It does not match. Compare the last row with the screen and correct it on the sheet.';
+
+  @override
+  String get sheetKeyLabel => 'Recovery key';
+
+  @override
+  String get sheetCopyRow =>
+      'Copy the last row here by hand from the Keyhold screen.';
+
+  @override
+  String get orRecoveryCode =>
+      'Forgot it? Type the recovery key from your recovery sheet instead.';
+
+  @override
+  String get newPasswordAfterKey =>
+      'The recovery key opened your vault. Choose a new master password: it replaces the forgotten one on all your devices.';
+
+  @override
+  String get otherVaultTitle => 'Copies of another vault';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'This folder already holds copies of another Keyhold vault (the newest from $when). Open it to look inside? Your vault stays as it is.';
+  }
+
+  @override
+  String get copyPasswordTitle => 'Master password of this copy';
+
+  @override
+  String get copyNotOpened =>
+      'This copy did not open: wrong password or recovery key, or not a Keyhold vault.';
+
+  @override
+  String get openCopy => 'Open a backup copy…';
+
+  @override
+  String copyTitle(String name) {
+    return 'Copy: $name';
+  }
+
+  @override
+  String get copyReadOnly =>
+      'Only for looking: nothing here changes your vault. Any single entry can be added to your vault.';
+
+  @override
+  String get addToVault => 'Add to my vault';
+
+  @override
+  String addedToVault(String name) {
+    return '\"$name\" is in your vault';
+  }
 }

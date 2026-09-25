@@ -115,3 +115,43 @@ Future<Uint8List> unwrapKey(
   final plain = await _algorithm.decrypt(box, secretKey: SecretKey(wrapping));
   return Uint8List.fromList(plain);
 }
+
+/// A recovery code: 20 random bytes and 2 bytes of their SHA-256 against
+/// typos, as 36 base32 characters shown in 3 rows of 3 groups of 4.
+Future<String> newRecoveryCode() async {
+  final secret = randomBytes(20);
+  final check = (await Sha256().hash(secret)).bytes.sublist(0, 2);
+  return encodeBase32(Uint8List.fromList([...secret, ...check])).substring(0, 36);
+}
+
+/// What the user typed, when it is a recovery code: spaces and dashes go,
+/// 0, 1 and 8 read as O, I and B, and the typo check has to pass.
+Future<String?> readRecoveryCode(String typed) async {
+  final clean = typed
+      .toUpperCase()
+      .replaceAll('0', 'O')
+      .replaceAll('1', 'I')
+      .replaceAll('8', 'B')
+      .replaceAll(RegExp(r'[^A-Z2-7]'), '');
+  if (clean.length != 36) return null;
+  final bytes = decodeBase32Key(clean);
+  if (bytes.length < 22) return null;
+  final check = (await Sha256().hash(bytes.sublist(0, 20))).bytes;
+  return check[0] == bytes[20] && check[1] == bytes[21] ? clean : null;
+}
+
+/// The vault's key sealed by a recovery code (salt first).
+Future<Uint8List> sealForRecovery(Uint8List dek, String code) async {
+  final salt = randomBytes(16);
+  return Uint8List.fromList([...salt, ...await wrapKey(dek, code, salt)]);
+}
+
+/// The vault's key back from [sealed] and a recovery code, or null.
+Future<Uint8List?> openWithRecovery(Uint8List sealed, String code) async {
+  if (sealed.length <= 16) return null;
+  try {
+    return await unwrapKey(sealed.sublist(16), code, sealed.sublist(0, 16));
+  } catch (_) {
+    return null;
+  }
+}

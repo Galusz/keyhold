@@ -1537,7 +1537,7 @@ abstract class AppLocalizations {
   /// No description provided for @nobodyCanRecover.
   ///
   /// In en, this message translates to:
-  /// **'Nobody can recover it for you — not even this app. Write it down somewhere safe.'**
+  /// **'If you forget it, only the recovery key opens your vault: print the recovery sheet.'**
   String get nobodyCanRecover;
 
   /// No description provided for @groupApps.
@@ -1785,6 +1785,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Point at the two-factor QR code of a website, or at the export from Google Authenticator.'**
   String get cameraHint;
+
+  /// No description provided for @deleteThisCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this two-factor code?'**
+  String get deleteThisCode;
+
+  /// No description provided for @deleteCodeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'It disappears from all your devices. Without it you cannot sign in where it is used.'**
+  String get deleteCodeWarning;
+
+  /// No description provided for @deleteLoginWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'It disappears from all your devices.'**
+  String get deleteLoginWarning;
+
+  /// No description provided for @nextCode.
+  ///
+  /// In en, this message translates to:
+  /// **'next {code}'**
+  String nextCode(String code);
+
+  /// No description provided for @noMasterPasswordBar.
+  ///
+  /// In en, this message translates to:
+  /// **'No master password: your backups cannot be opened on another computer. Click to set one.'**
+  String get noMasterPasswordBar;
+
+  /// No description provided for @printRecoverySheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Print the recovery sheet'**
+  String get printRecoverySheet;
+
+  /// No description provided for @recoverySheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery sheet'**
+  String get recoverySheet;
+
+  /// No description provided for @recoveryIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This key opens your vault if you ever forget the master password. Print the sheet, copy the last row onto it by hand, and keep it at home.'**
+  String get recoveryIntro;
+
+  /// No description provided for @print.
+  ///
+  /// In en, this message translates to:
+  /// **'Print'**
+  String get print;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @sheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyhold recovery sheet'**
+  String get sheetTitle;
+
+  /// No description provided for @sheetMade.
+  ///
+  /// In en, this message translates to:
+  /// **'Made on {date}'**
+  String sheetMade(String date);
+
+  /// No description provided for @sheetWhere.
+  ///
+  /// In en, this message translates to:
+  /// **'Where your vault is'**
+  String get sheetWhere;
+
+  /// No description provided for @sheetDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive of {email}, folder \"Keyhold\"'**
+  String sheetDrive(String email);
+
+  /// No description provided for @sheetFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies in folders: {folders}'**
+  String sheetFolders(String folders);
+
+  /// No description provided for @sheetServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies on the server {host}'**
+  String sheetServer(String host);
+
+  /// No description provided for @sheetOnlyHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Only on this device. Turn on a backup in Keyhold.'**
+  String get sheetOnlyHere;
+
+  /// No description provided for @sheetSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'On a new computer or phone'**
+  String get sheetSteps;
+
+  /// No description provided for @sheetStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Install Keyhold: galusz.github.io/keyhold'**
+  String get sheetStep1;
+
+  /// No description provided for @sheetStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect the same Google Drive in Keyhold.'**
+  String get sheetStep2;
+
+  /// No description provided for @sheetStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'When Keyhold asks for the master password, type this recovery key. Then choose a new master password.'**
+  String get sheetStep3;
+
+  /// No description provided for @sheetKeepSafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone with this completed sheet can open your vault. Keep it like a spare house key.'**
+  String get sheetKeepSafe;
+
+  /// No description provided for @sheetDriveNoEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive, folder \"Keyhold\"'**
+  String get sheetDriveNoEmail;
+
+  /// No description provided for @noBackupPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup folder, server or Google Drive: the vault is only on this computer. Click to set one up.'**
+  String get noBackupPlaces;
+
+  /// No description provided for @deleteVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the vault'**
+  String get deleteVault;
+
+  /// No description provided for @deleteVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything Keyhold keeps on this device is erased: passwords, two-factor codes, files and settings. Keyhold then closes and starts empty.'**
+  String get deleteVaultHint;
+
+  /// No description provided for @deleteVaultDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete it from Google Drive (other devices keep their own copy until you delete it there too)'**
+  String get deleteVaultDrive;
+
+  /// No description provided for @deleteVaultFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete the copies in the backup folders'**
+  String get deleteVaultFolders;
+
+  /// No description provided for @deleteVaultSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the vault for good?'**
+  String get deleteVaultSure;
+
+  /// No description provided for @deleteVaultSureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
+  String get deleteVaultSureHint;
+
+  /// No description provided for @vaultDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'The vault is deleted. Keyhold closes now.'**
+  String get vaultDeleted;
+
+  /// No description provided for @recoveryGate.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your master password to see the recovery key.'**
+  String get recoveryGate;
+
+  /// No description provided for @showKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the key'**
+  String get showKey;
+
+  /// No description provided for @recoveryNeedsPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a master password first: the recovery key is shown only after it.'**
+  String get recoveryNeedsPassword;
+
+  /// No description provided for @recoveryCopyRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy this row by hand onto the printed sheet'**
+  String get recoveryCopyRow;
+
+  /// No description provided for @checkRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Then type the last row as you wrote it on the sheet'**
+  String get checkRow;
+
+  /// No description provided for @check.
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get check;
+
+  /// No description provided for @rowMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'It matches. Keep the sheet somewhere safe.'**
+  String get rowMatches;
+
+  /// No description provided for @rowDiffers.
+  ///
+  /// In en, this message translates to:
+  /// **'It does not match. Compare the last row with the screen and correct it on the sheet.'**
+  String get rowDiffers;
+
+  /// No description provided for @sheetKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery key'**
+  String get sheetKeyLabel;
+
+  /// No description provided for @sheetCopyRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the last row here by hand from the Keyhold screen.'**
+  String get sheetCopyRow;
+
+  /// No description provided for @orRecoveryCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot it? Type the recovery key from your recovery sheet instead.'**
+  String get orRecoveryCode;
+
+  /// No description provided for @newPasswordAfterKey.
+  ///
+  /// In en, this message translates to:
+  /// **'The recovery key opened your vault. Choose a new master password: it replaces the forgotten one on all your devices.'**
+  String get newPasswordAfterKey;
+
+  /// No description provided for @otherVaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies of another vault'**
+  String get otherVaultTitle;
+
+  /// No description provided for @otherVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This folder already holds copies of another Keyhold vault (the newest from {when}). Open it to look inside? Your vault stays as it is.'**
+  String otherVaultHint(String when);
+
+  /// No description provided for @copyPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Master password of this copy'**
+  String get copyPasswordTitle;
+
+  /// No description provided for @copyNotOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'This copy did not open: wrong password or recovery key, or not a Keyhold vault.'**
+  String get copyNotOpened;
+
+  /// No description provided for @openCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a backup copy…'**
+  String get openCopy;
+
+  /// No description provided for @copyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy: {name}'**
+  String copyTitle(String name);
+
+  /// No description provided for @copyReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only for looking: nothing here changes your vault. Any single entry can be added to your vault.'**
+  String get copyReadOnly;
+
+  /// No description provided for @addToVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my vault'**
+  String get addToVault;
+
+  /// No description provided for @addedToVault.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" is in your vault'**
+  String addedToVault(String name);
 }
 
 class _AppLocalizationsDelegate

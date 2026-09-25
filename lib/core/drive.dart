@@ -257,6 +257,19 @@ class DriveSync {
 
   // ---------- Drive files ----------
 
+  /// Removes the "Keyhold" folder, with the vault in it, from the user's Google Drive.
+  Future<void> deleteRemote() async {
+    final found = await _json('GET', _api('/drive/v3/files', {
+      'q': "name = '$_folderName' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+      'fields': 'files(id)',
+      'spaces': 'drive',
+    }));
+    for (final folder in found['files'] as List<dynamic>) {
+      final (status, _) = await _authorized('DELETE', _api('/drive/v3/files/${folder['id']}', {}));
+      if (status != 204 && status != 200 && status != 404) throw DriveError(t.driveAnswered('$status'));
+    }
+  }
+
   Future<String> _folder() async {
     final found = await _json('GET', _api('/drive/v3/files', {
       'q': "name = '$_folderName' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",

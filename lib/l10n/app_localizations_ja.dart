@@ -863,7 +863,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get savePassword => 'パスワードを保存';
 
   @override
-  String get nobodyCanRecover => '誰にも復元できません。このアプリにもできません。安全な場所に書き留めておいてください。';
+  String get nobodyCanRecover =>
+      '忘れた場合、保管庫を開けるのはリカバリーキーだけです。リカバリーシートを印刷してください。';
 
   @override
   String get groupApps => 'アプリ';
@@ -1030,4 +1031,187 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get cameraHint =>
       'ウェブサイトの 2 段階認証 QR コード、または Google Authenticator のエクスポートにカメラを向けてください。';
+
+  @override
+  String get deleteThisCode => 'この 2 段階認証コードを削除しますか？';
+
+  @override
+  String get deleteCodeWarning =>
+      'すべてのデバイスから削除されます。このコードがないと、使用しているサイトにログインできなくなります。';
+
+  @override
+  String get deleteLoginWarning => 'すべてのデバイスから削除されます。';
+
+  @override
+  String nextCode(String code) {
+    return '次：$code';
+  }
+
+  @override
+  String get noMasterPasswordBar =>
+      'マスターパスワードが未設定です。バックアップを別のパソコンで開けません。クリックして設定してください。';
+
+  @override
+  String get printRecoverySheet => 'リカバリーシートを印刷';
+
+  @override
+  String get recoverySheet => 'リカバリーシート';
+
+  @override
+  String get recoveryIntro =>
+      'マスターパスワードを忘れたときは、このキーで保管庫を開けます。シートを印刷し、最後の行を手書きで書き写して、自宅に保管してください。';
+
+  @override
+  String get print => '印刷';
+
+  @override
+  String get done => '完了';
+
+  @override
+  String get sheetTitle => 'Keyhold リカバリーシート';
+
+  @override
+  String sheetMade(String date) {
+    return '作成日：$date';
+  }
+
+  @override
+  String get sheetWhere => '保管庫の保存場所';
+
+  @override
+  String sheetDrive(String email) {
+    return '$email の Google Drive、「Keyhold」フォルダ';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return 'フォルダ内のコピー：$folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return 'サーバー $host 上のコピー';
+  }
+
+  @override
+  String get sheetOnlyHere => 'このデバイスにしか保存されていません。Keyhold でバックアップをオンにしてください。';
+
+  @override
+  String get sheetSteps => '新しいパソコンやスマートフォンで';
+
+  @override
+  String get sheetStep1 => 'Keyhold をインストールします：galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => 'Keyhold で同じ Google Drive に接続します。';
+
+  @override
+  String get sheetStep3 =>
+      'Keyhold にマスターパスワードを求められたら、このリカバリーキーを入力します。その後、新しいマスターパスワードを設定します。';
+
+  @override
+  String get sheetKeepSafe =>
+      '記入済みのこのシートがあれば、誰でも保管庫を開けます。家の合鍵と同じように大切に保管してください。';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive の「Keyhold」フォルダ';
+
+  @override
+  String get noBackupPlaces =>
+      'バックアップ先のフォルダ、サーバー、Google Drive がありません。保管庫はこのパソコンにしかありません。クリックして設定します。';
+
+  @override
+  String get deleteVault => '保管庫を削除';
+
+  @override
+  String get deleteVaultHint =>
+      'Keyhold がこのデバイスに保存しているすべてのもの（パスワード、2 段階認証コード、ファイル、設定）が消去されます。その後 Keyhold は終了し、空の状態で起動します。';
+
+  @override
+  String get deleteVaultDrive =>
+      'Google Drive からも削除する（ほかのデバイスでは、そこで削除するまでコピーが残ります）';
+
+  @override
+  String get deleteVaultFolders => 'バックアップ先フォルダのコピーも削除する';
+
+  @override
+  String get deleteVaultSure => '保管庫を完全に削除しますか？';
+
+  @override
+  String get deleteVaultSureHint => 'この操作は元に戻せません。';
+
+  @override
+  String get vaultDeleted => '保管庫を削除しました。Keyhold を終了します。';
+
+  @override
+  String get recoveryGate => 'リカバリーキーを表示するには、マスターパスワードを入力してください。';
+
+  @override
+  String get showKey => 'キーを表示';
+
+  @override
+  String get recoveryNeedsPassword =>
+      '先にマスターパスワードを設定してください。リカバリーキーは設定後に表示されます。';
+
+  @override
+  String get recoveryCopyRow => 'この行を、印刷したシートに手書きで書き写してください';
+
+  @override
+  String get checkRow => '次に、シートに書いたとおりに最後の行を入力してください';
+
+  @override
+  String get check => '確認';
+
+  @override
+  String get rowMatches => '一致しました。シートを安全な場所に保管してください。';
+
+  @override
+  String get rowDiffers => '一致しません。最後の行を画面と見比べて、シートを修正してください。';
+
+  @override
+  String get sheetKeyLabel => 'リカバリーキー';
+
+  @override
+  String get sheetCopyRow => '最後の行を Keyhold の画面からここに手書きで書き写してください。';
+
+  @override
+  String get orRecoveryCode => 'お忘れの場合は、代わりにリカバリーシートのリカバリーキーを入力してください。';
+
+  @override
+  String get newPasswordAfterKey =>
+      'リカバリーキーで保管庫を開きました。新しいマスターパスワードを設定してください。すべてのデバイスで、忘れたパスワードの代わりに使われます。';
+
+  @override
+  String get otherVaultTitle => '別の保管庫のコピー';
+
+  @override
+  String otherVaultHint(String when) {
+    return 'このフォルダには別の Keyhold 保管庫のコピーがすでにあります（最新は $when）。開いて中身を見ますか？あなたの保管庫はそのままです。';
+  }
+
+  @override
+  String get copyPasswordTitle => 'このコピーのマスターパスワード';
+
+  @override
+  String get copyNotOpened =>
+      'コピーを開けませんでした。パスワードかリカバリーキーが違うか、Keyhold の保管庫ではありません。';
+
+  @override
+  String get openCopy => 'バックアップのコピーを開く…';
+
+  @override
+  String copyTitle(String name) {
+    return 'コピー：$name';
+  }
+
+  @override
+  String get copyReadOnly => '閲覧のみです。ここでの操作で保管庫は変わりません。個別の項目を保管庫に追加できます。';
+
+  @override
+  String get addToVault => '自分の保管庫に追加';
+
+  @override
+  String addedToVault(String name) {
+    return '「$name」は保管庫にあります';
+  }
 }

@@ -44,13 +44,18 @@ const Standalone = (() => {
     const flag = bytes[at++];
     let salt = null;
     let wrapped = null;
-    if (flag === 1) {
+    // Bit 1: the key sealed by the master password; bit 2: by the recovery code.
+    if (flag & 1) {
       salt = bytes.slice(at, at + 16);
       at += 16;
       const length = (bytes[at] << 8) | bytes[at + 1];
       at += 2;
       wrapped = bytes.slice(at, at + length);
       at += length;
+    }
+    if (flag & 2) {
+      const length = (bytes[at] << 8) | bytes[at + 1];
+      at += 2 + length;
     }
     return { header: bytes.slice(0, at), salt, wrapped, payload: bytes.slice(at) };
   }
@@ -156,7 +161,17 @@ const Standalone = (() => {
 
   let loaded = null;
 
+  // The vault opened here closes by itself after half an hour without use.
+  const IDLE_LOCK = 30 * 60 * 1000;
+
   async function vault() {
+    const { dek: open, usedAt } = await session.get(['dek', 'usedAt']);
+    if (open && usedAt && Date.now() - usedAt > IDLE_LOCK) {
+      loaded = null;
+      await session.remove(['dek', 'aloneOffers', 'usedAt']);
+      return null;
+    }
+    if (open && (!usedAt || Date.now() - usedAt > 60 * 1000)) await session.set({ usedAt: Date.now() });
     if (loaded) return loaded;
     const { dek } = await session.get('dek');
     const { vaultFile } = await local.get('vaultFile');
@@ -226,13 +241,21 @@ const Standalone = (() => {
     const host = hostOf(address);
     if (!host) return [];
     const port = portOf(address);
-    const withAddress = visible(data).filter((e) => hostOf(e.url));
+    // A login kept for an https page is not handed to the same site over plain http.
+    const plain = address.trim().toLowerCase().startsWith('http://');
+    const withAddress = visible(data).filter((e) => hostOf(e.url) && !(plain && (e.url || '').trim().toLowerCase().startsWith('https://')));
     const exact = withAddress.filter((e) => hostOf(e.url) === host && (!port || portOf(e.url) === port));
     if (exact.length) return exact;
     return withAddress.filter((e) => {
       const entryHost = hostOf(e.url);
       return entryHost === host || host.endsWith(`.${entryHost}`) || entryHost.endsWith(`.${host}`);
     });
+  }
+
+  // Like the app: a new password lands only on the login of exactly this site.
+  function loginAt(data, url, username) {
+    const host = hostOf(url);
+    return visible(data).find((e) => !(e.totp && !e.password) && e.username === username && hostOf(e.url) === host);
   }
 
   // The same site (host and port; the title without an address) and username
@@ -527,7 +550,7 @@ const Standalone = (() => {
       const { neverSave, autoSave } = await settings();
       if (neverSave.includes(host)) return { result: 'blocked' };
 
-      const existing = forSite(data, body.url).find((e) => e.username === (body.username || ''));
+      const existing = loginAt(data, body.url, body.username || '');
       const known = !!existing && existing.password === body.password;
       const list = await offers();
       // A retry on the same site replaces the earlier attempt.
@@ -544,7 +567,7 @@ const Standalone = (() => {
         until: Date.now() + OFFER_TIME,
       };
       await keepOffers(list);
-      return { result: 'offered', id, known, autoSave };
+      return { result: 'offered', id, known, changed: !!existing && !known, autoSave };
     },
 
     async '/offers'() {
@@ -575,7 +598,7 @@ const Standalone = (() => {
 
       return {
         result: await write((fresh) => {
-          const existing = forSite(fresh, offer.url).find((e) => e.username === offer.username);
+          const existing = loginAt(fresh, offer.url, offer.username);
           if (existing) {
             existing.password = offer.password;
             existing.updatedAt = Date.now();
@@ -758,7 +781,7 @@ const Standalone = (() => {
       if (!parts.salt) return { error: t('setPasswordInApp') };
       try {
         const dek = await unwrap(password, parts.salt, parts.wrapped);
-        await session.set({ dek: toB64(dek) });
+        await session.set({ dek: toB64(dek), usedAt: Date.now() });
         loaded = null;
         // Every missing icon, so the list under the fields has them too.
         const map = await iconMap();
@@ -771,14 +794,15 @@ const Standalone = (() => {
 
     async lock() {
       loaded = null;
-      await session.remove(['dek', 'aloneOffers']);
+      await session.remove(['dek', 'aloneOffers', 'usedAt']);
       return { ok: true };
     },
 
     async disconnect() {
       loaded = null;
-      await session.remove(['dek', 'aloneOffers', 'driveToken']);
-      await local.remove(['driveFile', 'vaultFile', 'pulledAt', 'driveEmail']);
+      icons = null;
+      await session.remove(['dek', 'aloneOffers', 'driveToken', 'usedAt']);
+      await local.remove(['driveFile', 'vaultFile', 'pulledAt', 'driveEmail', 'icons']);
       return { ok: true };
     },
   };

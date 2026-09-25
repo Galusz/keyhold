@@ -35,6 +35,15 @@ class LoginForm(
             "url_field", "url", "address_bar_edit_text",
         )
 
+        // Only a browser's address bar tells the page: any app can show a field named "url".
+        private val BROWSERS = setOf(
+            "com.android.chrome", "com.chrome.beta", "com.chrome.dev", "org.chromium.chrome",
+            "org.mozilla.firefox", "org.mozilla.firefox_beta", "org.mozilla.fenix", "org.mozilla.focus",
+            "com.microsoft.emmx", "com.brave.browser", "com.opera.browser", "com.opera.mini.native",
+            "com.sec.android.app.sbrowser", "com.vivaldi.browser", "com.duckduckgo.mobile.android",
+            "com.kiwibrowser.browser", "com.mi.globalbrowser",
+        )
+
         /// Reads every screen of the session, newest last: a two-step login
         /// asks for the username on one screen and the password on the next.
         fun parse(structures: List<AssistStructure>): LoginForm {
@@ -42,7 +51,7 @@ class LoginForm(
             val nodes = nodesOf(last)
 
             var domain = nodes.firstNotNullOfOrNull { it.webDomain?.takeIf(String::isNotBlank) } ?: ""
-            if (domain.isEmpty()) {
+            if (domain.isEmpty() && last.activityComponent?.packageName in BROWSERS) {
                 domain = hostOf(nodes.firstOrNull { it.idEntry in URL_BARS }?.text?.toString() ?: "")
             }
             domain = domain.lowercase().removePrefix("www.")

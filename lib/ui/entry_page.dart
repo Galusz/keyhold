@@ -109,6 +109,24 @@ class _EntryPageState extends State<EntryPage> {
     _showLinkedCode();
   }
 
+  /// Deleting reaches every device, and a two-factor code gone is a sign-in gone: asked first.
+  Future<void> _delete() async {
+    final e = widget.entry;
+    final name = e.title.trim();
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(name.isNotEmpty ? t.deleteNamed(name) : _isCode ? t.deleteThisCode : t.deleteThisLogin),
+        content: Text(_isCode ? t.deleteCodeWarning : t.deleteLoginWarning),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.delete)),
+        ],
+      ),
+    );
+    if (sure == true && mounted) Navigator.of(context).pop('delete');
+  }
+
   void _save() {
     final e = widget.entry;
     e.title = _title.text.trim();
@@ -161,7 +179,7 @@ class _EntryPageState extends State<EntryPage> {
             IconButton(
               tooltip: t.delete,
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => Navigator.of(context).pop('delete'),
+              onPressed: _delete,
             ),
           TextButton(onPressed: _save, child: Text(t.save)),
           const SizedBox(width: 8),

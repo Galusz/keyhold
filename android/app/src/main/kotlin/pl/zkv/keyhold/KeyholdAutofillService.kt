@@ -196,6 +196,7 @@ class KeyholdAutofillService : AutofillService() {
             .putExtra(AutofillActivity.EXTRA_DOMAIN, form.domain)
             .putExtra(AutofillActivity.EXTRA_APP, form.app)
             .putExtra(AutofillActivity.EXTRA_ENTRY, entry)
+            .putExtra(AutofillActivity.EXTRA_LABEL, appLabel(form.app))
             .putParcelableArrayListExtra(AutofillActivity.EXTRA_USERNAMES, ArrayList(form.usernames))
             .putParcelableArrayListExtra(AutofillActivity.EXTRA_PASSWORDS, ArrayList(form.passwords))
             .putParcelableArrayListExtra(AutofillActivity.EXTRA_CODES, ArrayList(form.codes))

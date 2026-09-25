@@ -101,21 +101,3 @@ Future<WatchResult> scanWatched(Vault vault, List<String> watched) async {
   return WatchResult(added: added, updated: updated, skipped: skipped, missing: missing);
 }
 
-/// What is worth keeping by default, if it exists on this machine.
-List<String> defaultWatched() {
-  final home = Platform.environment['USERPROFILE'] ?? '';
-  final sep = Platform.pathSeparator;
-  final candidates = <String>[
-    if (home.isNotEmpty) '$home$sep.ssh',
-    if (home.isNotEmpty && Directory(home).existsSync())
-      ...Directory(home)
-          .listSync(followLinks: false)
-          .whereType<File>()
-          .where((f) => f.path.toLowerCase().endsWith('.kdbx'))
-          .map((f) => f.path),
-    r'E:\ACCESS\2fa',
-  ];
-  return candidates
-      .where((p) => FileSystemEntity.typeSync(p) != FileSystemEntityType.notFound)
-      .toList();
-}

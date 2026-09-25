@@ -27,11 +27,12 @@ int secondsLeft({int period = 30}) {
   return period - (now % period);
 }
 
-Future<String> totpCode(String secret, {int digits = 6, int period = 30}) async {
+/// The code of [at], or of now.
+Future<String> totpCode(String secret, {int digits = 6, int period = 30, DateTime? at}) async {
   final key = decodeBase32(secret);
   if (key.isEmpty) return ''.padLeft(digits, '-');
 
-  final counter = DateTime.now().millisecondsSinceEpoch ~/ 1000 ~/ period;
+  final counter = (at ?? DateTime.now()).millisecondsSinceEpoch ~/ 1000 ~/ period;
   final message = Uint8List(8);
   var rest = counter;
   for (var i = 7; i >= 0; i--) {

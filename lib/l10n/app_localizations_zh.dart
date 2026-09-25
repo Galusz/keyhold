@@ -858,7 +858,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get savePassword => '保存密码';
 
   @override
-  String get nobodyCanRecover => '没有人能帮您找回它，就连本应用也不行。请把它写下来，放在安全的地方。';
+  String get nobodyCanRecover => '如果您忘记了它，只有恢复密钥才能打开您的密码库：请打印恢复单。';
 
   @override
   String get groupApps => '应用';
@@ -1022,4 +1022,179 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get cameraHint => '对准网站的双重验证二维码，或 Google Authenticator 导出的二维码。';
+
+  @override
+  String get deleteThisCode => '删除此双重验证码？';
+
+  @override
+  String get deleteCodeWarning => '它会从您的所有设备上消失。没有它，您将无法在用到它的地方登录。';
+
+  @override
+  String get deleteLoginWarning => '它会从您的所有设备上消失。';
+
+  @override
+  String nextCode(String code) {
+    return '下一个 $code';
+  }
+
+  @override
+  String get noMasterPasswordBar => '未设置主密码：您的备份无法在其他电脑上打开。点击即可设置。';
+
+  @override
+  String get printRecoverySheet => '打印恢复单';
+
+  @override
+  String get recoverySheet => '恢复单';
+
+  @override
+  String get recoveryIntro =>
+      '如果您忘记了主密码，这个密钥可以打开您的密码库。请打印恢复单，把最后一行亲手抄上去，然后放在家里。';
+
+  @override
+  String get print => '打印';
+
+  @override
+  String get done => '完成';
+
+  @override
+  String get sheetTitle => 'Keyhold 恢复单';
+
+  @override
+  String sheetMade(String date) {
+    return '创建于 $date';
+  }
+
+  @override
+  String get sheetWhere => '密码库存放位置';
+
+  @override
+  String sheetDrive(String email) {
+    return '$email 的 Google Drive，“Keyhold”文件夹';
+  }
+
+  @override
+  String sheetFolders(String folders) {
+    return '文件夹中的副本：$folders';
+  }
+
+  @override
+  String sheetServer(String host) {
+    return '服务器 $host 上的副本';
+  }
+
+  @override
+  String get sheetOnlyHere => '只保存在这台设备上。请在 Keyhold 中开启备份。';
+
+  @override
+  String get sheetSteps => '在新电脑或新手机上';
+
+  @override
+  String get sheetStep1 => '安装 Keyhold：galusz.github.io/keyhold';
+
+  @override
+  String get sheetStep2 => '在 Keyhold 中连接同一个 Google Drive。';
+
+  @override
+  String get sheetStep3 => 'Keyhold 要求输入主密码时，请输入此恢复密钥。然后设置新的主密码。';
+
+  @override
+  String get sheetKeepSafe => '任何人拿到这张填好的恢复单，都能打开您的密码库。请像保管家里的备用钥匙一样保管它。';
+
+  @override
+  String get sheetDriveNoEmail => 'Google Drive 中的“Keyhold”文件夹';
+
+  @override
+  String get noBackupPlaces => '没有备份文件夹、服务器或 Google Drive：密码库只在这台电脑上。点击进行设置。';
+
+  @override
+  String get deleteVault => '删除密码库';
+
+  @override
+  String get deleteVaultHint =>
+      'Keyhold 在此设备上保存的所有内容都将被清除：密码、双重验证码、文件和设置。之后 Keyhold 会关闭，并以空密码库重新开始。';
+
+  @override
+  String get deleteVaultDrive =>
+      '同时从 Google Drive 中删除（其他设备会保留各自的副本，直到您在那里也将其删除）';
+
+  @override
+  String get deleteVaultFolders => '同时删除备份文件夹中的副本';
+
+  @override
+  String get deleteVaultSure => '要永久删除密码库吗？';
+
+  @override
+  String get deleteVaultSureHint => '此操作无法撤消。';
+
+  @override
+  String get vaultDeleted => '密码库已删除。Keyhold 即将关闭。';
+
+  @override
+  String get recoveryGate => '输入主密码即可查看恢复密钥。';
+
+  @override
+  String get showKey => '显示密钥';
+
+  @override
+  String get recoveryNeedsPassword => '请先设置主密码：设置之后才会显示恢复密钥。';
+
+  @override
+  String get recoveryCopyRow => '将这一行亲手抄到打印好的恢复单上';
+
+  @override
+  String get checkRow => '然后输入您在恢复单上写下的最后一行';
+
+  @override
+  String get check => '核对';
+
+  @override
+  String get rowMatches => '一致。请把恢复单放在安全的地方。';
+
+  @override
+  String get rowDiffers => '不一致。请将最后一行与屏幕上的内容对照，并在恢复单上改正。';
+
+  @override
+  String get sheetKeyLabel => '恢复密钥';
+
+  @override
+  String get sheetCopyRow => '请从 Keyhold 屏幕上将最后一行亲手抄在这里。';
+
+  @override
+  String get orRecoveryCode => '忘记了？请改为输入恢复单上的恢复密钥。';
+
+  @override
+  String get newPasswordAfterKey => '恢复密钥已打开您的密码库。请设置新的主密码：它将在您的所有设备上取代忘记的那个。';
+
+  @override
+  String get otherVaultTitle => '另一个密码库的副本';
+
+  @override
+  String otherVaultHint(String when) {
+    return '此文件夹中已有另一个 Keyhold 密码库的副本（最新的来自 $when）。要打开查看吗？您的密码库保持不变。';
+  }
+
+  @override
+  String get copyPasswordTitle => '此副本的主密码';
+
+  @override
+  String get copyNotOpened => '无法打开副本：密码或恢复密钥错误，或者这不是 Keyhold 密码库。';
+
+  @override
+  String get openCopy => '打开备份副本…';
+
+  @override
+  String copyTitle(String name) {
+    return '副本：$name';
+  }
+
+  @override
+  String get copyReadOnly => '仅供查看：这里的操作不会改变您的密码库。可以将单个条目添加到您的密码库。';
+
+  @override
+  String get addToVault => '添加到我的密码库';
+
+  @override
+  String addedToVault(String name) {
+    return '“$name”已在您的密码库中';
+  }
 }
