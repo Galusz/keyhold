@@ -209,20 +209,31 @@ class DriveSync {
   }
 
   Future<SyncResult> _sync(Vault local) async {
+    // Everything here belongs to the vault open when the sync began: if
+    // another one takes its place meanwhile, the sync stops before it writes.
+    final generation = store.generation;
+    bool gone() => store.generation != generation || local.generation != generation;
+    if (gone()) return SyncResult();
     store.syncKeyWrap(local);
+    final tag = await store.tag();
     final folder = await _folder();
-    final remote = await _mine(folder);
+    final remote = await _mine(folder, tag);
+    if (gone()) return SyncResult();
 
     // The first time: the vault gets its own file, whatever else is there.
     if (remote == null) {
       if (!store.hasPassword) throw DriveError(t.setPasswordFirst);
-      await _upload(folder, null, await store.fileFor(local), name: 'vault-${await store.tag()}.khd');
+      final bytes = await store.fileFor(local);
+      if (gone()) return SyncResult();
+      await _upload(folder, null, bytes, name: 'vault-$tag.khd');
       return SyncResult(uploaded: true);
     }
 
+    final downloaded = await _download(remote);
+    if (gone()) return SyncResult();
     final Vault theirs;
     try {
-      theirs = await store.open(await _download(remote));
+      theirs = await store.open(downloaded);
     } catch (_) {
       throw DriveError(t.driveFileUnreadable);
     }
@@ -231,7 +242,11 @@ class DriveSync {
     final changedHere = _hasNewer(theirs, local);
     final changedThere = _hasNewer(local, theirs);
 
-    if (changedThere) await _upload(folder, remote, await store.fileFor(merged));
+    if (changedThere) {
+      final bytes = await store.fileFor(merged);
+      if (gone()) return SyncResult();
+      await _upload(folder, remote, bytes);
+    }
 
     return SyncResult(
       vault: changedHere ? merged : null,
@@ -243,6 +258,8 @@ class DriveSync {
   /// Whether [a] holds an entry, a file or a password change that [b] lacks or has older.
   bool _hasNewer(Vault a, Vault b) {
     if ((a.keyWrap?.changedAt ?? 0) > (b.keyWrap?.changedAt ?? 0)) return true;
+    // A recovery key made on this device has to reach Drive, or another device could not use it.
+    if ((a.recovery?.changedAt ?? 0) > (b.recovery?.changedAt ?? 0)) return true;
     if (a.nameAt > b.nameAt) return true;
     for (final e in a.entries.values) {
       final other = b.entries[e.id];
@@ -277,7 +294,7 @@ class DriveSync {
 
   /// Removes this vault's file from the user's Google Drive; other vaults stay.
   Future<void> deleteMine() async {
-    final id = await _mine(await _folder());
+    final id = await _mine(await _folder(), await store.tag());
     if (id == null) return;
     final (status, _) = await _authorized('DELETE', _api('/drive/v3/files/$id', {}));
     if (status != 204 && status != 200 && status != 404) throw DriveError(t.driveAnswered('$status'));
@@ -312,8 +329,8 @@ class DriveSync {
 
   /// This vault's file: named by its mark, or the unmarked file of before,
   /// which takes the mark once this vault's key is seen to open it.
-  Future<String?> _mine(String folder) async {
-    final name = 'vault-${await store.tag()}.khd';
+  Future<String?> _mine(String folder, String tag) async {
+    final name = 'vault-$tag.khd';
     final files = await _list(folder);
     for (final f in files) {
       if (f.name == name) return f.id;

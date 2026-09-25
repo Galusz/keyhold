@@ -98,7 +98,9 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   }
 
   void _lock() {
-    if (!_store.backup.fingerprintLock || _locked) return;
+    // While Keyhold starts (unlock, start or new-password screens) there is
+    // nothing to hide yet, and those screens must not be closed.
+    if (!_store.backup.fingerprintLock || _locked || _loading) return;
     // Nothing stays open behind the lock: details, edits and sheets close.
     Navigator.of(context).popUntil((route) => route.isFirst);
     setState(() => _locked = true);
@@ -132,6 +134,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     if (!await _ensureVault()) return;
     // The fingerprint panel comes up only from the Unlock button.
     _locked = _store.backup.fingerprintLock;
+    unawaited(_lockChannel.invokeMethod('secure', _locked));
     await _loadVault();
     await _refreshCodes();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
@@ -366,6 +369,14 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
           _vault.splitCodes();
           await _persist();
           _toast(t.addedCount(picked.length));
+        },
+        beforeClose: () async {
+          _syncSoon?.cancel();
+          // A sync already running finishes first, then one last one.
+          while (_syncing) {
+            await Future<void>.delayed(const Duration(milliseconds: 100));
+          }
+          await _sync();
         },
         onSwitched: _reopen,
       ),
@@ -729,6 +740,7 @@ class _Settings extends StatefulWidget {
     required this.onSync,
     required this.onRename,
     required this.onImport,
+    required this.beforeClose,
     required this.onSwitched,
   });
 
@@ -738,6 +750,7 @@ class _Settings extends StatefulWidget {
   final Future<SyncResult?> Function() onSync;
   final Future<void> Function(String name) onRename;
   final Future<void> Function(List<VaultEntry> picked) onImport;
+  final Future<void> Function() beforeClose;
   final Future<void> Function() onSwitched;
 
   @override
@@ -806,7 +819,7 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
                   drive: drive,
                   vault: widget.vault,
                   onRename: widget.onRename,
-                  beforeClose: () async => widget.onSync(),
+                  beforeClose: widget.beforeClose,
                   onSwitched: widget.onSwitched,
                 ),
               ));
@@ -838,6 +851,7 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
               widget.store.backup
                 ..fingerprintLock = on
                 ..saveSettings();
+              await const MethodChannel('keyhold/lock').invokeMethod('secure', on);
               if (mounted) setState(() {});
             },
           ),

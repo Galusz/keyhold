@@ -5,6 +5,12 @@ import 'dart:typed_data';
 import '../l10n/l10n.dart';
 
 /// "example.com" from any address, without "www.".
+/// An app's address, `androidapp://package`: matched only letter for letter,
+/// never as a web address — an app called `mbank.pl` is not the bank's site.
+bool isAppAddress(String url) => url.trim().toLowerCase().startsWith('androidapp://');
+
+bool _sameApp(String a, String b) => a.trim().toLowerCase() == b.trim().toLowerCase();
+
 String hostOf(String url) {
   var text = url.trim();
   if (text.isEmpty) return '';
@@ -199,6 +205,10 @@ class Vault {
   String name;
   int nameAt;
 
+  /// Which opening of the vault in the store this copy belongs to; not
+  /// stored. A copy from before another vault took its place is never saved.
+  int generation = -1;
+
   Vault({
     Map<String, VaultEntry>? entries,
     Map<String, VaultFile>? files,
@@ -245,13 +255,16 @@ class Vault {
   /// another service. Otherwise ones for its parent domain or a subdomain
   /// (login.bank.pl ↔ bank.pl).
   List<VaultEntry> forSite(String address) {
+    if (isAppAddress(address)) return visible.where((e) => _sameApp(e.url, address)).toList();
     final host = hostOf(address);
     if (host.isEmpty) return [];
     final port = _portOf(address);
     // A login kept for an https page is not handed to the same site over plain http.
     final plain = address.trim().toLowerCase().startsWith('http://');
-    final withAddress = visible.where(
-        (e) => hostOf(e.url).isNotEmpty && !(plain && e.url.trim().toLowerCase().startsWith('https://')));
+    final withAddress = visible.where((e) =>
+        !isAppAddress(e.url) &&
+        hostOf(e.url).isNotEmpty &&
+        !(plain && e.url.trim().toLowerCase().startsWith('https://')));
 
     final exact = withAddress
         .where((e) => hostOf(e.url) == host && (port == null || _portOf(e.url) == port))
@@ -266,9 +279,11 @@ class Vault {
   /// The login kept for exactly this site under [username]: a new password
   /// there never lands on a parent or sister domain's login.
   VaultEntry? loginAt(String address, String username) {
-    final host = hostOf(address);
-    if (host.isEmpty) return null;
-    return visible.where((e) => !e.isCode && e.username == username && hostOf(e.url) == host).firstOrNull;
+    bool here(VaultEntry e) => isAppAddress(address)
+        ? _sameApp(e.url, address)
+        : !isAppAddress(e.url) && hostOf(e.url) == hostOf(address);
+    if (!isAppAddress(address) && hostOf(address).isEmpty) return null;
+    return visible.where((e) => !e.isCode && e.username == username && here(e)).firstOrNull;
   }
 
   /// Every two-factor code in the vault.
@@ -288,11 +303,13 @@ class Vault {
   /// Codes for a page, by their addresses — the same rule as for logins:
   /// this very host first, its parent domain or a subdomain otherwise.
   List<VaultEntry> codesForSite(String address) {
+    if (isAppAddress(address)) return codes.where((c) => sitesOf(c).any((s) => _sameApp(s, address))).toList();
     final host = hostOf(address);
     if (host.isEmpty) return [];
     final port = _portOf(address);
-    bool exact(String site) => hostOf(site) == host && (port == null || _portOf(site) == port);
+    bool exact(String site) => !isAppAddress(site) && hostOf(site) == host && (port == null || _portOf(site) == port);
     bool related(String site) {
+      if (isAppAddress(site)) return false;
       final h = hostOf(site);
       return h.isNotEmpty && (h == host || host.endsWith('.$h') || h.endsWith('.$host'));
     }
@@ -526,6 +543,21 @@ class Vault {
       recovery: kept,
       name: named.name,
       nameAt: named.nameAt,
-    );
+    )..generation = local.generation;
+  }
+
+  /// Takes in, in place, whatever [other] holds that is newer: the same rule as [merge].
+  void absorb(Vault other) {
+    final merged = merge(this, other);
+    entries
+      ..clear()
+      ..addAll(merged.entries);
+    files
+      ..clear()
+      ..addAll(merged.files);
+    keyWrap = merged.keyWrap;
+    recovery = merged.recovery;
+    name = merged.name;
+    nameAt = merged.nameAt;
   }
 }

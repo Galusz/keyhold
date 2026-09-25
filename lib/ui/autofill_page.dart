@@ -29,14 +29,27 @@ List<VaultEntry> autofillMatches(Vault vault, String site, String app) {
 Future<void> serveAutofillLookups() async {
   DartPluginRegistrant.ensureInitialized();
   const channel = MethodChannel('keyhold/autofill-lookup');
-  final store = VaultStore();
-  final opened = store.init();
+  var store = VaultStore();
+  var opened = store.init();
 
   channel.setMethodCallHandler((call) async {
     if (call.method != 'lookup' || await opened != VaultState.open) return <Object>[];
     final args = call.arguments as Map;
-    // Read afresh every time: the app or a sync may have changed the vault.
-    final vault = await store.load();
+    // Read afresh every time: the app or a sync may have changed the vault,
+    // the settings, or put another vault in its place.
+    Vault vault;
+    try {
+      store.backup.loadSettings();
+      vault = await store.load();
+    } catch (_) {
+      store = VaultStore();
+      opened = store.init();
+      if (await opened != VaultState.open) return <Object>[];
+      vault = await store.load();
+    }
+    // With the fingerprint lock on, the suggestions only name the logins:
+    // the password or the code goes in after the finger.
+    final locked = store.backup.fingerprintLock;
     final wantsCode = args['wantsCode'] == true;
     final matches = autofillMatches(vault, args['domain'] as String? ?? '', args['app'] as String? ?? '');
     // A code field with no code for this site: the codes not tied to any site yet.
@@ -53,8 +66,10 @@ Future<void> serveAutofillLookups() async {
           'id': e.id,
           'title': e.title,
           'username': e.username,
-          'password': e.password,
-          'code': wantsCode && (vault.secretFor(e) ?? '').isNotEmpty ? await totpCode(vault.secretFor(e)!) : null,
+          'password': locked ? null : e.password,
+          'code': locked || !wantsCode || (vault.secretFor(e) ?? '').isEmpty ? null : await totpCode(vault.secretFor(e)!),
+          'hasCode': wantsCode && (vault.secretFor(e) ?? '').isNotEmpty,
+          'locked': locked,
           'unpaired': unpaired.contains(e),
         },
     ];
@@ -115,7 +130,7 @@ class _AutofillPageState extends State<AutofillPage> {
     }
     final entry = _request['entry'] as String?;
     if (entry != null) {
-      await _fillCode(entry);
+      await _fillEntry(entry);
       return;
     }
     // The whole vault on show: the fingerprint lock applies here too.
@@ -126,13 +141,19 @@ class _AutofillPageState extends State<AutofillPage> {
     setState(() => _loading = false);
   }
 
-  /// Behind a two-factor suggestion: the code of this very moment, or —
-  /// quietly — the next one when this one is in its last second.
-  Future<void> _fillCode(String id) async {
+  /// Behind a suggestion that fills at the moment it is tapped: a
+  /// two-factor code of this very moment (or — quietly — the next one when
+  /// this one is in its last second), or, with the fingerprint lock on, any
+  /// login once the finger is there.
+  Future<void> _fillEntry(String id) async {
     final e = _vault.entries[id];
-    final secret = e == null ? null : _vault.secretFor(e);
-    if (e == null || e.deleted || secret == null || secret.isEmpty) {
+    if (e == null || e.deleted || (_store.backup.fingerprintLock && !await askFingerprint())) {
       await _channel.invokeMethod('close');
+      return;
+    }
+    final secret = _vault.secretFor(e);
+    if (_request['wantsCode'] != true || secret == null || secret.isEmpty) {
+      await _channel.invokeMethod('fill', {'username': e.username, 'password': e.password});
       return;
     }
     await _offerPin(e);

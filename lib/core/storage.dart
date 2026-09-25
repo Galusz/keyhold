@@ -66,6 +66,15 @@ class VaultStore {
 
   bool get isOpen => _key != null;
 
+  /// Moves on whenever the open vault goes away (closed, switched, deleted):
+  /// a sync or a save begun before that is dropped, so one vault's entries
+  /// never land in another.
+  int get generation => _generation;
+  int _generation = 0;
+
+  /// The vault is about to go: nothing begun from now on may save it.
+  void invalidate() => _generation++;
+
   /// A new, empty vault on this device, sealed by [password] from the start
   /// and with its recovery key made. The vault open until now is closed first.
   Future<void> createVault(String name, String password) async {
@@ -79,7 +88,9 @@ class VaultStore {
     _recovery = RecoveryWrap(code: code, sealed: await sealForRecovery(key, code), changedAt: _wrapChangedAt);
     _key = key;
     await _storeKey(key);
-    await save(Vault()..rename(name));
+    await save(Vault()
+      ..rename(name)
+      ..generation = _generation);
   }
 
   /// The key of the vault in [bytes] when [typed] is its master password or
@@ -108,10 +119,20 @@ class VaultStore {
     _salt = parts.salt;
     _wrapped = parts.wrapped;
     _headerRecovery = parts.recovery;
+    vault.generation = _generation;
     await _storeKey(key);
-    await save(vault);
     final tag = await this.tag();
+    // This vault closed here before may hold changes that never reached the
+    // copy being opened (made offline): they come along.
     final left = closedFile(tag);
+    if (left.existsSync()) {
+      try {
+        vault.absorb(Vault.decode(await unseal(key, _parse(await left.readAsBytes()).payload)));
+      } catch (_) {
+        // a damaged leftover: the copy being opened stands
+      }
+    }
+    await save(vault);
     if (left.existsSync()) left.deleteSync();
     backup
       ..closed = backup.closed.where((c) => c.tag != tag).toList()
@@ -124,6 +145,11 @@ class VaultStore {
   /// Puts the open vault aside: its file moves among the closed ones and
   /// opens again with its master password. Nothing is deleted.
   Future<void> _close() async {
+    // A vault this device cannot open (its key lost) is put aside, never overwritten.
+    if (_key == null && _vaultFile.existsSync()) {
+      _vaultFile.renameSync(
+          '${_dir.path}${Platform.pathSeparator}vault-locked-${DateTime.now().millisecondsSinceEpoch}.khd');
+    }
     if (_key != null && _vaultFile.existsSync()) {
       // A vault without a master password could never be opened again.
       if (!hasPassword) throw StateError('closing a vault without a master password');
@@ -142,6 +168,8 @@ class VaultStore {
 
   void _forgetKey() {
     if (_keyFile.existsSync()) _keyFile.deleteSync();
+    _generation++;
+    _seen = null;
     _key = null;
     _resetHeader();
     backup
@@ -370,14 +398,27 @@ class VaultStore {
 
   Future<void> _writing = Future.value();
 
-  /// One write at a time, each through a file of its own that then replaces
-  /// the vault in one step: a crash leaves the old vault whole.
+  /// The vault file as this store last read or wrote it. On a phone the app,
+  /// the autofill screen and the lookups each have a store of their own: a
+  /// file changed since is another one's save.
+  ({int size, DateTime modified})? _seen;
+
+  ({int size, DateTime modified})? _stamp() {
+    if (!_vaultFile.existsSync()) return null;
+    final s = _vaultFile.statSync();
+    return (size: s.size, modified: s.modified);
+  }
+
+  /// One write at a time, each through a file of its own (a random name, as
+  /// other parts of the app may write too) that then replaces the vault in one
+  /// step: a crash leaves the old vault whole.
   Future<void> _write(Uint8List payload) {
     final bytes = Uint8List.fromList([..._buildHeader(), ...payload]);
     final done = _writing.then((_) async {
-      final tmp = File('${_vaultFile.path}.$pid.tmp');
+      final tmp = File('${_vaultFile.path}.${newId().substring(0, 12)}.tmp');
       await tmp.writeAsBytes(bytes, flush: true);
       tmp.renameSync(_vaultFile.path);
+      _seen = _stamp();
       await backup.run(_vaultFile, await tag());
     });
     _writing = done.catchError((_) {});
@@ -385,8 +426,15 @@ class VaultStore {
   }
 
   Future<Vault> load() async {
+    final vault = await _read();
+    vault.generation = _generation;
+    return vault;
+  }
+
+  Future<Vault> _read() async {
     if (!_vaultFile.existsSync()) return Vault();
     final bytes = await _vaultFile.readAsBytes();
+    _seen = _stamp();
     if (bytes.isEmpty) return Vault();
     final parts = _split(bytes);
     if (parts.payload.isEmpty) return Vault();
@@ -399,6 +447,17 @@ class VaultStore {
   }
 
   Future<void> save(Vault vault) async {
+    // A copy of a vault that has since gone (switched, closed, deleted).
+    if (vault.generation != _generation || _key == null) return;
+    // Saved meanwhile by another part of the app: that comes along, nothing is lost.
+    final now = _stamp();
+    if (_seen != null && now != null && now != _seen) {
+      try {
+        vault.absorb(await _read());
+      } catch (_) {
+        // unreadable right now: this save goes ahead as it is
+      }
+    }
     syncKeyWrap(vault);
     await _write(await seal(_key!, vault.encode()));
   }

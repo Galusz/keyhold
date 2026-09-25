@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,6 +8,18 @@ import 'package:flutter/services.dart';
 import '../core/drive.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
+
+File get _sheetFile => File('${Directory.systemTemp.path}${Platform.pathSeparator}keyhold-recovery-sheet.html');
+
+/// The printed page holds two rows of the recovery key: it goes once the
+/// browser has read it, and at every start in case that did not happen.
+void clearRecoverySheet() {
+  try {
+    if (_sheetFile.existsSync()) _sheetFile.deleteSync();
+  } catch (_) {
+    // still open somewhere; the next start tries again
+  }
+}
 
 /// The recovery key: shown only after the master password, printed as a
 /// sheet with its first two rows, the third copied by hand and then checked.
@@ -128,10 +141,12 @@ font:600 22px/38px ui-monospace,Consolas,monospace;text-align:center}
       await _print.invokeMethod('print', {'html': html, 'name': t.sheetTitle});
       return;
     }
-    // Windows: the browser prints it, "Save as PDF" included.
-    final file = File('${Directory.systemTemp.path}${Platform.pathSeparator}keyhold-recovery-sheet.html');
+    // Windows: the browser prints it, "Save as PDF" included. The page holds
+    // two rows of the key, so it goes once the browser has had time to read it.
+    final file = _sheetFile;
     await file.writeAsString(html);
     await _openInBrowser(Uri.file(file.path).toString());
+    Timer(const Duration(minutes: 2), clearRecoverySheet);
   }
 
   /// A .html file may open in an editor; the program that opens web links is a browser.

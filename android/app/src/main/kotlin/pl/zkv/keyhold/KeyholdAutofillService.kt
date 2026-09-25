@@ -124,9 +124,12 @@ class KeyholdAutofillService : AutofillService() {
             val title = login["title"] as? String ?: ""
             val username = login["username"] as? String
             val code = login["code"] as? String
+            val hasCode = login["hasCode"] == true
+            // With the fingerprint lock on, nothing secret is in the suggestion itself.
+            val locked = login["locked"] == true
             // On a two-factor step the suggestion says which code goes in.
-            val sub = if (form.usernames.isEmpty() && form.passwords.isEmpty() && code != null) {
-                getString(R.string.code_suggestion, "${code.take(3)} ${code.drop(3)}") +
+            val sub = if (form.usernames.isEmpty() && form.passwords.isEmpty() && hasCode) {
+                getString(R.string.code_suggestion, if (code != null) "${code.take(3)} ${code.drop(3)}" else "••• •••") +
                     if (login["unpaired"] == true) " · " + getString(R.string.not_tied_to_site) else ""
             } else {
                 username
@@ -136,9 +139,10 @@ class KeyholdAutofillService : AutofillService() {
 
             // Android keeps these suggestions for the whole page, so the digits
             // shown may be old by the time they are tapped: the code that goes
-            // in is worked out at that moment instead.
+            // in is worked out at that moment instead. Behind the lock, a login
+            // is filled at that moment too, after the finger.
             val id = login["id"] as? String
-            if (form.codes.isNotEmpty() && code != null && id != null) {
+            if (id != null && (locked || (form.codes.isNotEmpty() && hasCode))) {
                 for (field in form.ids) dataset.setValue(field, null)
                 dataset.setAuthentication(picker(form, entry = id))
                 response.addDataset(dataset.build())

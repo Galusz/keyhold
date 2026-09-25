@@ -49,6 +49,8 @@ class _DeleteVaultPageState extends State<DeleteVaultPage> {
       _busy = true;
       _error = null;
     });
+    // Nothing started from now on (a sync, a save from the browser) may bring the vault back.
+    widget.store.invalidate();
     try {
       // Google Drive first: if it cannot be reached, nothing is gone yet.
       if (_drive && widget.drive.connected) await widget.drive.deleteMine();
@@ -59,6 +61,18 @@ class _DeleteVaultPageState extends State<DeleteVaultPage> {
         _busy = false;
         _error = e is DriveError ? e.message : '$e';
       });
+      // The vault stays: after the reason is read, it opens again as it is.
+      if (mounted) {
+        await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(t.deleteVault),
+            content: Text(_error!),
+            actions: [FilledButton(onPressed: () => Navigator.pop(context), child: Text(t.done))],
+          ),
+        );
+      }
+      await widget.onDeleted();
       return;
     }
     setState(() => _done = true);

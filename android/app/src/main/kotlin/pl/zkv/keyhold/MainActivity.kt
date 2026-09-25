@@ -10,6 +10,7 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.Settings
 import android.view.autofill.AutofillManager
+import android.view.WindowManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -42,6 +43,19 @@ class MainActivity : FlutterFragmentActivity() {
 
         // The screen going dark locks Keyhold, when the fingerprint lock is on.
         val lock = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/lock")
+        // With the fingerprint lock on, no screenshot and no picture in the recent apps.
+        lock.setMethodCallHandler { call, result ->
+            if (call.method == "secure") {
+                if (call.arguments == true) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                }
+                result.success(null)
+            } else {
+                result.notImplemented()
+            }
+        }
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 lock.invokeMethod("screenOff", null)

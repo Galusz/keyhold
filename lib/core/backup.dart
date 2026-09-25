@@ -236,8 +236,12 @@ class BackupService {
     }
   }
 
+  /// Written to a file of its own and then put in place in one step: a crash
+  /// or a killed app never leaves half a settings file (which would forget the
+  /// backup places, Google Drive and the fingerprint lock).
   void saveSettings() {
-    _settingsFile.writeAsStringSync(jsonEncode({
+    final tmp = File('${_settingsFile.path}.${DateTime.now().microsecondsSinceEpoch}.tmp');
+    tmp.writeAsStringSync(jsonEncode({
       'backupTargets': targets,
       'remote': remote.toJson(),
       'bridgeToken': bridgeToken,
@@ -252,7 +256,8 @@ class BackupService {
       if (closed.isNotEmpty) 'closed': [for (final c in closed) c.toJson()],
       'lastBackupAt': status.at?.toIso8601String(),
       'lastBackupTargets': status.targets,
-    }));
+    }), flush: true);
+    tmp.renameSync(_settingsFile.path);
   }
 
   Future<BackupStatus> run(File vault, String tag) async {

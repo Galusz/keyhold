@@ -3,6 +3,7 @@ package pl.zkv.keyhold
 import android.content.Intent
 import android.os.Build
 import android.service.autofill.Dataset
+import android.view.WindowManager
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
@@ -20,6 +21,8 @@ open class AutofillActivity : FlutterFragmentActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        // Logins and codes are on show here: never in a screenshot or the recent apps.
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         Keystore.register(flutterEngine)
         Fingerprint.register(this, flutterEngine)
         // A login kept from here is saved here, and its backup copies too.

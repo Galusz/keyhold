@@ -21,6 +21,7 @@ import 'extension_page.dart';
 import 'import_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
+import 'recovery_page.dart';
 import 'backup_page.dart';
 import 'copy_page.dart';
 import 'start_page.dart';
@@ -80,6 +81,7 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Future<void> _boot() async {
+    clearRecoverySheet();
     final state = await _store.init();
     if (state == VaultState.locked && mounted) {
       await Navigator.of(context).push(
@@ -135,6 +137,9 @@ class _VaultPageState extends State<VaultPage> {
     setState(() {
       _vault = Vault();
       _loading = true;
+      _search.clear();
+      _filter = EntryFilter.all;
+      _lastScan = null;
     });
     if (!await _ensureVault()) return;
     await _loadVault();
@@ -1186,6 +1191,10 @@ class _VaultPageState extends State<VaultPage> {
           },
           beforeClose: () async {
             _driveSoon?.cancel();
+            // A sync already running finishes first, then one last one.
+            while (_driveBusy) {
+              await Future<void>.delayed(const Duration(milliseconds: 100));
+            }
             await _syncDrive();
           },
           onSwitched: _reopen,

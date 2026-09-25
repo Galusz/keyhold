@@ -50,8 +50,11 @@ class LoginForm(
             val last = structures.last()
             val nodes = nodesOf(last)
 
-            var domain = nodes.firstNotNullOfOrNull { it.webDomain?.takeIf(String::isNotBlank) } ?: ""
-            if (domain.isEmpty() && last.activityComponent?.packageName in BROWSERS) {
+            // Only a browser is believed about which site is open: any other app
+            // could name a bank's domain for a page it shows itself.
+            val browser = last.activityComponent?.packageName in BROWSERS
+            var domain = if (browser) nodes.firstNotNullOfOrNull { it.webDomain?.takeIf(String::isNotBlank) } ?: "" else ""
+            if (domain.isEmpty() && browser) {
                 domain = hostOf(nodes.firstOrNull { it.idEntry in URL_BARS }?.text?.toString() ?: "")
             }
             domain = domain.lowercase().removePrefix("www.")
