@@ -367,5 +367,11 @@
   "phoneFoldersHint": "スマートフォン本体、メモリーカード、または Nextcloud や OneDrive など Android から保存できるアプリのフォルダを選んでください。",
   "copiesPlaces": "フォルダと自分のサーバー",
   "shareVaultCopy": "保管庫のコピーを共有",
-  "shareVaultHint": "保管庫ファイルはメールで送ったり「ファイル」に保存したりできます。開けるのはマスターパスワードかリカバリーキーだけです。"
+  "shareVaultHint": "保管庫ファイルはメールで送ったり「ファイル」に保存したりできます。開けるのはマスターパスワードかリカバリーキーだけです。",
+  "confirmFill": "{name} を入力するには確認してください",
+  "guardedSwitch": "入力時に指紋を求める",
+  "guardedSwitchHint": "パスワードやコードをページやアプリに入力する前に、スマホでは指紋、パソコンでは Windows Hello で確認します。",
+  "helloSwitch": "Windows Hello で Keyhold を開く",
+  "helloSwitchHint": "顔、指紋、または Windows の PIN。5 分間使わないとロックされます。ブラウザーでの入力は引き続き使えます。",
+  "helloConfirmHint": "Windows Hello で確認"
 }

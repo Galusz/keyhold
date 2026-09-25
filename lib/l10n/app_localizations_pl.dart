@@ -1386,4 +1386,26 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get shareVaultHint =>
       'Plik sejfu możesz też wysłać mailem albo zapisać w Plikach: otwiera się tylko hasłem głównym albo kluczem ratunkowym.';
+
+  @override
+  String confirmFill(String name) {
+    return 'Potwierdź, aby wpisać: $name';
+  }
+
+  @override
+  String get guardedSwitch => 'Pytaj o odcisk przy wypełnianiu';
+
+  @override
+  String get guardedSwitchHint =>
+      'Odcisk palca na telefonie, Windows Hello na komputerze — zanim hasło lub kod trafi do strony albo aplikacji.';
+
+  @override
+  String get helloSwitch => 'Otwieraj Keyhold przez Windows Hello';
+
+  @override
+  String get helloSwitchHint =>
+      'Twarz, odcisk palca lub PIN Windowsa. Blokuje się po 5 minutach bez używania. Wypełnianie w przeglądarce nadal działa.';
+
+  @override
+  String get helloConfirmHint => 'Potwierdź przez Windows Hello';
 }

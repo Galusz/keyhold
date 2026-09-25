@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../core/drive.dart';
@@ -5,6 +7,7 @@ import '../core/models.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
 import 'delete_vault_page.dart';
+import 'owner.dart';
 import 'password_page.dart';
 import 'recovery_page.dart';
 import 'start_page.dart';
@@ -132,6 +135,25 @@ class _VaultInfoPageState extends State<VaultInfoPage> {
             t.recoveryKeyHint,
             () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => RecoveryPage(store: store))),
           ),
+          // The phone's fingerprint lock sits with the phone's settings.
+          if (Platform.isWindows)
+            Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: SwitchListTile(
+                secondary: const Icon(Icons.fingerprint),
+                value: store.backup.fingerprintLock,
+                title: Text(t.helloSwitch),
+                subtitle: Text(t.helloSwitchHint),
+                onChanged: (on) async {
+                  // Turning it on or off both need the owner.
+                  if (!await confirmOwner(context, store, hint: t.helloConfirmHint)) return;
+                  store.backup
+                    ..fingerprintLock = on
+                    ..saveSettings();
+                  if (mounted) setState(() {});
+                },
+              ),
+            ),
           const SizedBox(height: 16),
           Text(t.otherVaults, style: theme.textTheme.titleSmall),
           const SizedBox(height: 8),

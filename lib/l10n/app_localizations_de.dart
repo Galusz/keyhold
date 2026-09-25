@@ -1376,4 +1376,26 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get shareVaultHint =>
       'Du kannst die Tresordatei auch mailen oder in Dateien ablegen: Sie öffnet sich nur mit dem Master-Passwort oder dem Wiederherstellungsschlüssel.';
+
+  @override
+  String confirmFill(String name) {
+    return 'Bestätigen, um $name auszufüllen';
+  }
+
+  @override
+  String get guardedSwitch => 'Beim Ausfüllen nach Fingerabdruck fragen';
+
+  @override
+  String get guardedSwitchHint =>
+      'Fingerabdruck auf dem Handy, Windows Hello am Computer – bevor Passwort oder Code in eine Seite oder App gelangt.';
+
+  @override
+  String get helloSwitch => 'Keyhold mit Windows Hello öffnen';
+
+  @override
+  String get helloSwitchHint =>
+      'Gesicht, Fingerabdruck oder Windows-PIN. Sperrt nach 5 Minuten ohne Nutzung. Das Ausfüllen im Browser funktioniert weiter.';
+
+  @override
+  String get helloConfirmHint => 'Mit Windows Hello bestätigen';
 }

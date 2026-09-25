@@ -859,5 +859,18 @@
   "phoneFoldersHint": "Pick a folder in the phone, on its memory card, or of an app such as Nextcloud or OneDrive that lets Android save there.",
   "copiesPlaces": "Folders and your server",
   "shareVaultCopy": "Share a copy of the vault",
-  "shareVaultHint": "You can also mail the vault file or keep it in Files: it opens only with the master password or the recovery key."
+  "shareVaultHint": "You can also mail the vault file or keep it in Files: it opens only with the master password or the recovery key.",
+  "confirmFill": "Confirm to fill in {name}",
+  "@confirmFill": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "guardedSwitch": "Ask for a fingerprint when filling in",
+  "guardedSwitchHint": "A fingerprint on the phone, Windows Hello on the computer — before the password or code goes into a page or an app.",
+  "helloSwitch": "Open Keyhold with Windows Hello",
+  "helloSwitchHint": "Face, fingerprint or Windows PIN. Locks after 5 minutes without use. Filling in from the browser keeps working.",
+  "helloConfirmHint": "Confirm with Windows Hello"
 }

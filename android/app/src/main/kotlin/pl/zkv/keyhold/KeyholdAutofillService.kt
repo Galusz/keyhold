@@ -125,7 +125,7 @@ class KeyholdAutofillService : AutofillService() {
             val username = login["username"] as? String
             val code = login["code"] as? String
             val hasCode = login["hasCode"] == true
-            // With the fingerprint lock on, nothing secret is in the suggestion itself.
+            // A login marked to ask for the finger: nothing secret is in the suggestion itself.
             val locked = login["locked"] == true
             // On a two-factor step the suggestion says which code goes in.
             val sub = if (form.usernames.isEmpty() && form.passwords.isEmpty() && hasCode) {
@@ -134,13 +134,13 @@ class KeyholdAutofillService : AutofillService() {
             } else {
                 username
             }
-            val dataset = Dataset.Builder(presentation(this, title, sub))
-            inlinePresentation(inline, shown, title, sub, pinned = false)?.let { dataset.setInlinePresentation(it) }
+            val dataset = Dataset.Builder(presentation(this, title, sub, guarded = locked))
+            inlinePresentation(inline, shown, title, sub, pinned = false, guarded = locked)?.let { dataset.setInlinePresentation(it) }
 
             // Android keeps these suggestions for the whole page, so the digits
             // shown may be old by the time they are tapped: the code that goes
-            // in is worked out at that moment instead. Behind the lock, a login
-            // is filled at that moment too, after the finger.
+            // in is worked out at that moment instead. A marked login is
+            // filled at that moment too, after the finger.
             val id = login["id"] as? String
             if (id != null && (locked || (form.codes.isNotEmpty() && hasCode))) {
                 for (field in form.ids) dataset.setValue(field, null)
@@ -219,6 +219,7 @@ class KeyholdAutofillService : AutofillService() {
         title: String,
         sub: String?,
         pinned: Boolean,
+        guarded: Boolean = false,
     ): InlinePresentation? {
         if (request == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
         val specs = request.inlinePresentationSpecs
@@ -234,6 +235,7 @@ class KeyholdAutofillService : AutofillService() {
             .setTitle(title)
             .setStartIcon(Icon.createWithResource(this, R.mipmap.ic_launcher))
             .apply { if (!sub.isNullOrEmpty()) setSubtitle(sub) }
+            .apply { if (guarded) setEndIcon(Icon.createWithResource(this@KeyholdAutofillService, R.drawable.ic_guarded)) }
             .build()
         return InlinePresentation(content.slice, spec, pinned)
     }
@@ -273,9 +275,10 @@ class KeyholdAutofillService : AutofillService() {
     }
 
     companion object {
-        fun presentation(context: Context, text: String, sub: String? = null, search: Boolean = false) =
+        fun presentation(context: Context, text: String, sub: String? = null, search: Boolean = false, guarded: Boolean = false) =
             RemoteViews(context.packageName, if (search) R.layout.autofill_search else R.layout.autofill_item).apply {
                 setTextViewText(R.id.text, text)
+                if (guarded) setViewVisibility(R.id.guarded, View.VISIBLE)
                 if (sub.isNullOrEmpty()) {
                     setViewVisibility(R.id.sub, View.GONE)
                 } else {

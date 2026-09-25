@@ -1403,4 +1403,26 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get shareVaultHint =>
       'Você também pode enviar o arquivo por e-mail ou guardá-lo em Arquivos: ele só abre com a senha mestra ou a chave de recuperação.';
+
+  @override
+  String confirmFill(String name) {
+    return 'Confirme para preencher $name';
+  }
+
+  @override
+  String get guardedSwitch => 'Pedir a impressão digital ao preencher';
+
+  @override
+  String get guardedSwitchHint =>
+      'Impressão digital no celular, Windows Hello no computador, antes de a senha ou o código ir para uma página ou app.';
+
+  @override
+  String get helloSwitch => 'Abrir o Keyhold com o Windows Hello';
+
+  @override
+  String get helloSwitchHint =>
+      'Rosto, impressão digital ou PIN do Windows. Bloqueia após 5 minutos sem uso. O preenchimento no navegador continua funcionando.';
+
+  @override
+  String get helloConfirmHint => 'Confirme com o Windows Hello';
 }

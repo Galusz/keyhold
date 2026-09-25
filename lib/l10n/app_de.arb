@@ -367,5 +367,11 @@
   "phoneFoldersHint": "Wähle einen Ordner im Smartphone, auf der Speicherkarte oder einer App wie Nextcloud oder OneDrive, in die Android speichern darf.",
   "copiesPlaces": "Ordner und dein Server",
   "shareVaultCopy": "Kopie des Tresors teilen",
-  "shareVaultHint": "Du kannst die Tresordatei auch mailen oder in Dateien ablegen: Sie öffnet sich nur mit dem Master-Passwort oder dem Wiederherstellungsschlüssel."
+  "shareVaultHint": "Du kannst die Tresordatei auch mailen oder in Dateien ablegen: Sie öffnet sich nur mit dem Master-Passwort oder dem Wiederherstellungsschlüssel.",
+  "confirmFill": "Bestätigen, um {name} auszufüllen",
+  "guardedSwitch": "Beim Ausfüllen nach Fingerabdruck fragen",
+  "guardedSwitchHint": "Fingerabdruck auf dem Handy, Windows Hello am Computer – bevor Passwort oder Code in eine Seite oder App gelangt.",
+  "helloSwitch": "Keyhold mit Windows Hello öffnen",
+  "helloSwitchHint": "Gesicht, Fingerabdruck oder Windows-PIN. Sperrt nach 5 Minuten ohne Nutzung. Das Ausfüllen im Browser funktioniert weiter.",
+  "helloConfirmHint": "Mit Windows Hello bestätigen"
 }

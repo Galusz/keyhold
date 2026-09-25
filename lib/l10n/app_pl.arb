@@ -367,5 +367,11 @@
   "phoneFoldersHint": "Wybierz folder w telefonie, na karcie pamięci albo aplikacji takiej jak Nextcloud czy OneDrive, która pozwala Androidowi tam zapisywać.",
   "copiesPlaces": "Foldery i Twój serwer",
   "shareVaultCopy": "Udostępnij kopię sejfu",
-  "shareVaultHint": "Plik sejfu możesz też wysłać mailem albo zapisać w Plikach: otwiera się tylko hasłem głównym albo kluczem ratunkowym."
+  "shareVaultHint": "Plik sejfu możesz też wysłać mailem albo zapisać w Plikach: otwiera się tylko hasłem głównym albo kluczem ratunkowym.",
+  "confirmFill": "Potwierdź, aby wpisać: {name}",
+  "guardedSwitch": "Pytaj o odcisk przy wypełnianiu",
+  "guardedSwitchHint": "Odcisk palca na telefonie, Windows Hello na komputerze — zanim hasło lub kod trafi do strony albo aplikacji.",
+  "helloSwitch": "Otwieraj Keyhold przez Windows Hello",
+  "helloSwitchHint": "Twarz, odcisk palca lub PIN Windowsa. Blokuje się po 5 minutach bez używania. Wypełnianie w przeglądarce nadal działa.",
+  "helloConfirmHint": "Potwierdź przez Windows Hello"
 }

@@ -367,5 +367,11 @@
   "phoneFoldersHint": "Choisissez un dossier du téléphone, de la carte mémoire ou d’une app comme Nextcloud ou OneDrive qui laisse Android y enregistrer.",
   "copiesPlaces": "Dossiers et votre serveur",
   "shareVaultCopy": "Partager une copie du coffre-fort",
-  "shareVaultHint": "Vous pouvez aussi envoyer le fichier par e-mail ou le garder dans Fichiers : il ne s’ouvre qu’avec le mot de passe principal ou la clé de récupération."
+  "shareVaultHint": "Vous pouvez aussi envoyer le fichier par e-mail ou le garder dans Fichiers : il ne s’ouvre qu’avec le mot de passe principal ou la clé de récupération.",
+  "confirmFill": "Confirmez pour remplir {name}",
+  "guardedSwitch": "Demander l'empreinte au remplissage",
+  "guardedSwitchHint": "Empreinte sur le téléphone, Windows Hello sur l'ordinateur, avant que le mot de passe ou le code n'aille dans une page ou une appli.",
+  "helloSwitch": "Ouvrir Keyhold avec Windows Hello",
+  "helloSwitchHint": "Visage, empreinte ou code PIN Windows. Se verrouille après 5 minutes sans utilisation. Le remplissage dans le navigateur continue de fonctionner.",
+  "helloConfirmHint": "Confirmez avec Windows Hello"
 }

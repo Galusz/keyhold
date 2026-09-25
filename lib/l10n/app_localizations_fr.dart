@@ -1413,4 +1413,26 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get shareVaultHint =>
       'Vous pouvez aussi envoyer le fichier par e-mail ou le garder dans Fichiers : il ne s’ouvre qu’avec le mot de passe principal ou la clé de récupération.';
+
+  @override
+  String confirmFill(String name) {
+    return 'Confirmez pour remplir $name';
+  }
+
+  @override
+  String get guardedSwitch => 'Demander l\'empreinte au remplissage';
+
+  @override
+  String get guardedSwitchHint =>
+      'Empreinte sur le téléphone, Windows Hello sur l\'ordinateur, avant que le mot de passe ou le code n\'aille dans une page ou une appli.';
+
+  @override
+  String get helloSwitch => 'Ouvrir Keyhold avec Windows Hello';
+
+  @override
+  String get helloSwitchHint =>
+      'Visage, empreinte ou code PIN Windows. Se verrouille après 5 minutes sans utilisation. Le remplissage dans le navigateur continue de fonctionner.';
+
+  @override
+  String get helloConfirmHint => 'Confirmez avec Windows Hello';
 }

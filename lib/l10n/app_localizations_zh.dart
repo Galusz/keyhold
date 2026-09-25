@@ -1302,4 +1302,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shareVaultHint => '您也可以通过邮件发送密码库文件或保存到“文件”中：它只能用主密码或恢复密钥打开。';
+
+  @override
+  String confirmFill(String name) {
+    return '确认以填写 $name';
+  }
+
+  @override
+  String get guardedSwitch => '填写时要求指纹';
+
+  @override
+  String get guardedSwitchHint =>
+      '先在手机上验证指纹、在电脑上验证 Windows Hello，密码或验证码才会填入网页或应用。';
+
+  @override
+  String get helloSwitch => '使用 Windows Hello 打开 Keyhold';
+
+  @override
+  String get helloSwitchHint => '面部、指纹或 Windows PIN。5 分钟未使用后锁定。浏览器中的自动填写仍可使用。';
+
+  @override
+  String get helloConfirmHint => '使用 Windows Hello 确认';
 }

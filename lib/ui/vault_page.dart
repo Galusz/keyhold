@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
@@ -19,6 +20,7 @@ import '../l10n/l10n.dart';
 import 'entry_page.dart';
 import 'extension_page.dart';
 import 'import_page.dart';
+import 'owner.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
 import 'recovery_page.dart';
@@ -37,10 +39,11 @@ class VaultPage extends StatefulWidget {
   State<VaultPage> createState() => _VaultPageState();
 }
 
-class _VaultPageState extends State<VaultPage> {
+class _VaultPageState extends State<VaultPage> with WindowListener {
   final _store = VaultStore();
   final _search = TextEditingController();
   final _codes = <String, String>{};
+  final _next = <String, String>{};
 
   Vault _vault = Vault();
   Timer? _ticker;
@@ -63,14 +66,27 @@ class _VaultPageState extends State<VaultPage> {
   bool _scanning = false;
   int _left = 30;
 
+  /// With the Windows Hello lock on: shut after [_idleLock] without use.
+  bool _locked = false;
+  bool _askedOnFocus = false;
+  DateTime _lastUse = DateTime.now();
+  Future<bool>? _unlocking;
+  static const _idleLock = Duration(minutes: 5);
+
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
+    HardwareKeyboard.instance.addHandler(_used);
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_pointer);
     _boot();
   }
 
   @override
   void dispose() {
+    windowManager.removeListener(this);
+    HardwareKeyboard.instance.removeHandler(_used);
+    GestureBinding.instance.pointerRouter.removeGlobalRoute(_pointer);
     _ticker?.cancel();
     _watchTimer?.cancel();
     _driveTimer?.cancel();
@@ -92,13 +108,73 @@ class _VaultPageState extends State<VaultPage> {
     }
     if (!await _ensureVault()) return;
     await _loadVault();
+    if (_store.backup.fingerprintLock) {
+      setState(() => _locked = _askedOnFocus = true);
+      unawaited(_unlock());
+    }
     await _startBridge();
     await _startWatching();
     unawaited(_syncDrive());
     _driveTimer = Timer.periodic(const Duration(minutes: 5), (_) => _syncDrive());
     await _refreshCodes();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      _lockWhenIdle();
+      _refreshCodes();
+    });
   }
+
+  void _pointer(PointerEvent _) => _used();
+
+  bool _used([KeyEvent? _]) {
+    _lastUse = DateTime.now();
+    return false;
+  }
+
+  void _lockWhenIdle() {
+    if (!_store.backup.fingerprintLock || _locked || _unlocking != null) return;
+    if (DateTime.now().difference(_lastUse) < _idleLock) return;
+    // Nothing stays open behind the lock: entries, settings and pages close.
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    setState(() {
+      _locked = true;
+      _askedOnFocus = false;
+    });
+  }
+
+  /// Windows Hello once when Keyhold comes back to the front; after that, the button.
+  @override
+  void onWindowFocus() {
+    if (!_locked || _askedOnFocus) return;
+    _askedOnFocus = true;
+    _unlock();
+  }
+
+  Future<bool> _unlock() => _unlocking ??= _askToUnlock().whenComplete(() => _unlocking = null);
+
+  Future<bool> _askToUnlock() async {
+    final ok = await _confirmOwner(t.fingerprintUnlockHint);
+    if (ok && mounted) {
+      setState(() => _locked = false);
+      _used();
+    }
+    return ok;
+  }
+
+  Future<void> _showWindow() async {
+    if (await windowManager.isMinimized()) await windowManager.restore();
+    await windowManager.show();
+    await windowManager.focus();
+  }
+
+  /// Windows Hello, or the vault's password on a computer without it.
+  Future<bool> _confirmOwner(String hint) async {
+    if (!mounted) return false;
+    final ok = await confirmOwner(context, _store, hint: hint, beforePassword: _showWindow);
+    if (ok) _used();
+    return ok;
+  }
+
+  String _fillHint(VaultEntry e) => t.confirmFill(e.title.isEmpty ? t.noTitle : e.title);
 
   /// A vault to work with: an empty device starts with a new vault or one it
   /// already has somewhere, and a vault from before master passwords were
@@ -123,6 +199,7 @@ class _VaultPageState extends State<VaultPage> {
     if (_vault.splitCodes() || grouped) await _store.save(_vault);
     _store.icons.fetchAll(_vault.visible);
     _codes.clear();
+    _next.clear();
     _codeWindow = -1;
     _revision++;
     _selected.clear();
@@ -244,6 +321,7 @@ class _VaultPageState extends State<VaultPage> {
         _store.backup.autoSave = on;
         _store.backup.saveSettings();
       }
+      ..confirm = ((entry) => _confirmOwner(_fillHint(entry)))
       ..onPair = (id, pageUrl) async {
         final entry = _vault.entries[id];
         if (entry == null || entry.deleted) return;
@@ -254,9 +332,8 @@ class _VaultPageState extends State<VaultPage> {
       ..onOpen = (id) async {
         final entry = _vault.entries[id];
         if (entry == null) return;
-        if (await windowManager.isMinimized()) await windowManager.restore();
-        await windowManager.show();
-        await windowManager.focus();
+        await _showWindow();
+        if (_locked && !await _unlock()) return;
         if (mounted) await _open(entry, isNew: false);
       };
     try {
@@ -381,10 +458,12 @@ class _VaultPageState extends State<VaultPage> {
     final window = DateTime.now().millisecondsSinceEpoch ~/ 30000;
     if (window != _codeWindow) {
       _codeWindow = window;
+      final next = DateTime.now().add(const Duration(seconds: 30));
       for (final e in _vault.visible) {
         final secret = e.totpSecret;
         if (secret == null || secret.isEmpty) continue;
         _codes[e.id] = await totpCode(secret);
+        _next[e.id] = await totpCode(secret, at: next);
       }
     }
     if (mounted) setState(() => _left = secondsLeft());
@@ -464,6 +543,7 @@ class _VaultPageState extends State<VaultPage> {
   Future<void> _autoType(VaultEntry entry, {bool codeOnly = false}) async {
     final code = _codes[entry.id] ?? _codes[entry.twoFactor];
     if (codeOnly && (code == null || code.isEmpty)) return;
+    if (_vault.guarded(entry) && !await _confirmOwner(_fillHint(entry))) return;
 
     await windowManager.hide();
     await Future<void>.delayed(const Duration(milliseconds: 250));
@@ -714,6 +794,26 @@ class _VaultPageState extends State<VaultPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_locked) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.lock_outline, size: 64),
+              const SizedBox(height: 16),
+              Text(t.locked, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _unlock,
+                icon: const Icon(Icons.fingerprint),
+                label: Text(t.unlock),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -1292,6 +1392,7 @@ class _VaultPageState extends State<VaultPage> {
   Widget _row(VaultEntry e) {
     // A login shows the code pinned to it, like the code's own row.
     final code = _codes[e.id] ?? _codes[e.twoFactor];
+    final next = _left <= 10 ? _next[e.id] ?? _next[e.twoFactor] : null;
     final selected = _selected.contains(e.id);
     final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     return ListTile(
@@ -1310,8 +1411,11 @@ class _VaultPageState extends State<VaultPage> {
           ),
         ),
       ),
-      title: Text(
-        e.title.isEmpty ? t.noTitle : e.title,
+      title: Text.rich(
+        TextSpan(children: [
+          TextSpan(text: e.title.isEmpty ? t.noTitle : e.title),
+          if (_vault.guarded(e)) const WidgetSpan(child: GuardedMark()),
+        ]),
       ),
       subtitle: e.isCode
           ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
@@ -1344,13 +1448,32 @@ class _VaultPageState extends State<VaultPage> {
                       color: _left <= 5 ? Theme.of(context).colorScheme.error : null,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
+                  // The next code sits in the room the shrinking bar leaves;
+                  // the room is always there, so the code never moves.
                   SizedBox(
                     width: 84,
-                    child: LinearProgressIndicator(
-                      value: _left / 30,
-                      minHeight: 2,
-                      color: _left <= 5 ? Theme.of(context).colorScheme.error : null,
+                    height: 16,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            width: 84 * _left / 30,
+                            height: 2,
+                            color: _left <= 5 ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        if (next != null)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              '${next.substring(0, 3)} ${next.substring(3)}',
+                              style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: Theme.of(context).hintColor),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
@@ -1374,7 +1497,10 @@ class _VaultPageState extends State<VaultPage> {
             IconButton(
               tooltip: t.copyPassword,
               icon: const Icon(Icons.copy_outlined),
-              onPressed: () => _copy(t.password, e.password),
+              onPressed: () async {
+                if (_vault.guarded(e) && !await _confirmOwner(t.helloConfirmHint)) return;
+                _copy(t.password, e.password);
+              },
             ),
           ],
         ],

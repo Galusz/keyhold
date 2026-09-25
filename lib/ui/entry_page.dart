@@ -38,6 +38,7 @@ class _EntryPageState extends State<EntryPage> {
   late final TextEditingController _group;
   bool _showPassword = false;
   bool _showKey = false;
+  late bool _guarded = widget.entry.guarded;
 
   /// The login's two-factor code, by id.
   late String _twoFactor;
@@ -131,6 +132,7 @@ class _EntryPageState extends State<EntryPage> {
     final e = widget.entry;
     e.title = _title.text.trim();
     e.notes = _notes.text;
+    e.guarded = _guarded;
 
     if (_isCode) {
       _addSite();
@@ -265,8 +267,19 @@ class _EntryPageState extends State<EntryPage> {
           IconButton(tooltip: t.add, icon: const Icon(Icons.add), onPressed: _addSite),
         ],
       ),
+      const SizedBox(height: 16),
+      _guardSwitch(),
     ];
   }
+
+  Widget _guardSwitch() => SwitchListTile(
+        contentPadding: EdgeInsets.zero,
+        secondary: const Icon(Icons.fingerprint),
+        value: _guarded,
+        onChanged: (on) => setState(() => _guarded = on),
+        title: Text(t.guardedSwitch),
+        subtitle: Text(t.guardedSwitchHint),
+      );
 
   List<Widget> _loginFields() {
     final code = widget.vault.entries[_twoFactor];
@@ -342,6 +355,8 @@ class _EntryPageState extends State<EntryPage> {
         maxLines: 5,
         decoration: InputDecoration(labelText: t.notes),
       ),
+      const SizedBox(height: 16),
+      _guardSwitch(),
     ];
   }
 }

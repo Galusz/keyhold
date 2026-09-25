@@ -367,5 +367,11 @@
   "phoneFoldersHint": "Escolha uma pasta do telefone, do cartão de memória ou de um app como Nextcloud ou OneDrive que deixe o Android salvar lá.",
   "copiesPlaces": "Pastas e seu servidor",
   "shareVaultCopy": "Compartilhar uma cópia do cofre",
-  "shareVaultHint": "Você também pode enviar o arquivo por e-mail ou guardá-lo em Arquivos: ele só abre com a senha mestra ou a chave de recuperação."
+  "shareVaultHint": "Você também pode enviar o arquivo por e-mail ou guardá-lo em Arquivos: ele só abre com a senha mestra ou a chave de recuperação.",
+  "confirmFill": "Confirme para preencher {name}",
+  "guardedSwitch": "Pedir a impressão digital ao preencher",
+  "guardedSwitchHint": "Impressão digital no celular, Windows Hello no computador, antes de a senha ou o código ir para uma página ou app.",
+  "helloSwitch": "Abrir o Keyhold com o Windows Hello",
+  "helloSwitchHint": "Rosto, impressão digital ou PIN do Windows. Bloqueia após 5 minutos sem uso. O preenchimento no navegador continua funcionando.",
+  "helloConfirmHint": "Confirme com o Windows Hello"
 }

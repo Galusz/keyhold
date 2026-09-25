@@ -57,6 +57,13 @@ add_subdirectory("runner")
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
+# Windows Hello's plugin still uses the old /await coroutines, which Visual
+# Studio 18 refuses unless told to let them through.
+# EXPIRES: when local_auth_windows builds without /await (checked with 2.0.2).
+if(TARGET local_auth_windows_plugin)
+  target_compile_definitions(local_auth_windows_plugin PRIVATE _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+endif()
+
 
 # === Installation ===
 # Support files are copied into place next to the executable, so that it can

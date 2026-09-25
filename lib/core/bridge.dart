@@ -52,6 +52,9 @@ class BrowserBridge {
   /// Ties a code that has no site yet to the page it was just used on.
   void Function(String id, String pageUrl)? onPair;
 
+  /// Asks the owner (Windows Hello) before a marked entry's password or code leaves.
+  Future<bool> Function(VaultEntry entry)? confirm;
+
   /// PNG of a site's icon when Keyhold already has one.
   final Uint8List? Function(String address) iconOf;
 
@@ -113,7 +116,7 @@ class BrowserBridge {
         case '/fill':
           await _json(response, HttpStatus.ok, await _fill(payload['id'] as String? ?? ''));
         case '/code':
-          await _json(response, HttpStatus.ok, await _code(payload['id'] as String? ?? ''));
+          await _json(response, HttpStatus.ok, await _code(payload['id'] as String? ?? '', use: payload['use'] == true));
         case '/never':
           final host = hostOf(payload['url'] as String? ?? '');
           final never = payload['never'] == true;
@@ -261,6 +264,7 @@ class BrowserBridge {
                 'hasCode': (vault().secretFor(e) ?? '').isNotEmpty,
                 'isCode': e.isCode,
                 'linked': e.twoFactor.isNotEmpty,
+                'guarded': vault().guarded(e),
               })
           .toList(),
     };
@@ -273,6 +277,7 @@ class BrowserBridge {
         'hasCode': true,
         'paired': vault().sitesOf(e).isNotEmpty,
         'icon': _icon(vault().sitesOf(e).firstOrNull ?? ''),
+        'guarded': vault().guarded(e),
       };
 
   String? _icon(String url) {
@@ -283,6 +288,7 @@ class BrowserBridge {
   Future<Map<String, dynamic>> _fill(String id) async {
     final entry = vault().entries[id];
     if (entry == null || entry.deleted) return {'error': 'not found'};
+    if (vault().guarded(entry) && !(await confirm?.call(entry) ?? false)) return {'error': 'denied'};
 
     final secret = vault().secretFor(entry);
     return {
@@ -292,11 +298,17 @@ class BrowserBridge {
     };
   }
 
-  Future<Map<String, dynamic>> _code(String id) async {
+  /// A code on show in the extension's list, or — with [use] — going into the page.
+  Future<Map<String, dynamic>> _code(String id, {required bool use}) async {
     final entry = vault().entries[id];
     final secret = entry == null ? null : vault().secretFor(entry);
     if (entry == null || entry.deleted || secret == null || secret.isEmpty) {
       return {'error': 'not found'};
+    }
+    // A marked code is listed without its digits; they leave once the owner says so.
+    if (vault().guarded(entry)) {
+      if (!use) return {'guarded': true, 'left': secondsLeft()};
+      if (!(await confirm?.call(entry) ?? false)) return {'error': 'denied'};
     }
     return {'code': await totpCode(secret), 'left': secondsLeft()};
   }

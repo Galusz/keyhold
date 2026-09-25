@@ -367,5 +367,11 @@
   "phoneFoldersHint": "Elige una carpeta del teléfono, de la tarjeta de memoria o de una app como Nextcloud u OneDrive que permita a Android guardar ahí.",
   "copiesPlaces": "Carpetas y tu servidor",
   "shareVaultCopy": "Compartir una copia de la caja fuerte",
-  "shareVaultHint": "También puedes enviar el archivo por correo o guardarlo en Archivos: solo se abre con la contraseña maestra o la clave de recuperación."
+  "shareVaultHint": "También puedes enviar el archivo por correo o guardarlo en Archivos: solo se abre con la contraseña maestra o la clave de recuperación.",
+  "confirmFill": "Confirma para rellenar {name}",
+  "guardedSwitch": "Pedir la huella al rellenar",
+  "guardedSwitchHint": "Huella en el móvil, Windows Hello en el ordenador, antes de que la contraseña o el código entren en una página o app.",
+  "helloSwitch": "Abrir Keyhold con Windows Hello",
+  "helloSwitchHint": "Cara, huella o PIN de Windows. Se bloquea tras 5 minutos sin uso. El relleno en el navegador sigue funcionando.",
+  "helloConfirmHint": "Confirma con Windows Hello"
 }

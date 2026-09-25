@@ -1404,4 +1404,26 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get shareVaultHint =>
       'También puedes enviar el archivo por correo o guardarlo en Archivos: solo se abre con la contraseña maestra o la clave de recuperación.';
+
+  @override
+  String confirmFill(String name) {
+    return 'Confirma para rellenar $name';
+  }
+
+  @override
+  String get guardedSwitch => 'Pedir la huella al rellenar';
+
+  @override
+  String get guardedSwitchHint =>
+      'Huella en el móvil, Windows Hello en el ordenador, antes de que la contraseña o el código entren en una página o app.';
+
+  @override
+  String get helloSwitch => 'Abrir Keyhold con Windows Hello';
+
+  @override
+  String get helloSwitchHint =>
+      'Cara, huella o PIN de Windows. Se bloquea tras 5 minutos sin uso. El relleno en el navegador sigue funcionando.';
+
+  @override
+  String get helloConfirmHint => 'Confirma con Windows Hello';
 }

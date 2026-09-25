@@ -367,5 +367,11 @@
   "phoneFoldersHint": "Scegli una cartella del telefono, della scheda di memoria o di un’app come Nextcloud o OneDrive che permette ad Android di salvarci.",
   "copiesPlaces": "Cartelle e il tuo server",
   "shareVaultCopy": "Condividi una copia della cassaforte",
-  "shareVaultHint": "Puoi anche inviare il file per e-mail o tenerlo in File: si apre solo con la password principale o la chiave di recupero."
+  "shareVaultHint": "Puoi anche inviare il file per e-mail o tenerlo in File: si apre solo con la password principale o la chiave di recupero.",
+  "confirmFill": "Conferma per compilare {name}",
+  "guardedSwitch": "Chiedi l'impronta durante la compilazione",
+  "guardedSwitchHint": "Impronta sul telefono, Windows Hello sul computer, prima che la password o il codice finiscano in una pagina o app.",
+  "helloSwitch": "Apri Keyhold con Windows Hello",
+  "helloSwitchHint": "Volto, impronta o PIN di Windows. Si blocca dopo 5 minuti di inutilizzo. La compilazione nel browser continua a funzionare.",
+  "helloConfirmHint": "Conferma con Windows Hello"
 }

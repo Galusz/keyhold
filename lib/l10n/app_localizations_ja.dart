@@ -1321,4 +1321,26 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get shareVaultHint =>
       '保管庫ファイルはメールで送ったり「ファイル」に保存したりできます。開けるのはマスターパスワードかリカバリーキーだけです。';
+
+  @override
+  String confirmFill(String name) {
+    return '$name を入力するには確認してください';
+  }
+
+  @override
+  String get guardedSwitch => '入力時に指紋を求める';
+
+  @override
+  String get guardedSwitchHint =>
+      'パスワードやコードをページやアプリに入力する前に、スマホでは指紋、パソコンでは Windows Hello で確認します。';
+
+  @override
+  String get helloSwitch => 'Windows Hello で Keyhold を開く';
+
+  @override
+  String get helloSwitchHint =>
+      '顔、指紋、または Windows の PIN。5 分間使わないとロックされます。ブラウザーでの入力は引き続き使えます。';
+
+  @override
+  String get helloConfirmHint => 'Windows Hello で確認';
 }

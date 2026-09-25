@@ -13,23 +13,13 @@ import 'backup_page.dart';
 import 'copy_page.dart';
 import 'entry_page.dart';
 import 'import_page.dart';
+import 'owner.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
 import 'start_page.dart';
 import 'sync_page.dart';
 import 'vault_info_page.dart';
 import 'vault_page.dart' show SiteAvatar;
-
-/// A fingerprint, or the phone's own PIN or pattern when that fails.
-Future<bool> askFingerprint([String? hint]) async {
-  try {
-    return await const MethodChannel('keyhold/fingerprint')
-            .invokeMethod<bool>('ask', {'title': t.fingerprintTitle, 'hint': hint ?? t.fingerprintUnlockHint}) ??
-        false;
-  } catch (_) {
-    return false;
-  }
-}
 
 /// Keyhold on a phone: mostly an authenticator, with the same vault as the
 /// computer kept in step through the user's Google Drive.
@@ -109,7 +99,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   Future<void> _unlock() async {
     if (_unlocking) return;
     _unlocking = true;
-    final ok = await askFingerprint();
+    final ok = await confirmOwner(context, _store);
     _unlocking = false;
     if (ok && mounted) setState(() => _locked = false);
   }
@@ -568,8 +558,11 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
         icons: _store.icons,
         address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
       ),
-      title: Text(
-        e.title.isEmpty ? t.noTitle : e.title,
+      title: Text.rich(
+        TextSpan(children: [
+          TextSpan(text: e.title.isEmpty ? t.noTitle : e.title),
+          if (_vault.guarded(e)) const WidgetSpan(child: GuardedMark()),
+        ]),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -848,7 +841,7 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
             subtitle: Text(t.fingerprintSwitchHint),
             onChanged: (on) async {
               // Turning it on or off both need the owner's finger.
-              if (!await askFingerprint(t.fingerprintConfirmHint)) return;
+              if (!await confirmOwner(context, widget.store, hint: t.fingerprintConfirmHint)) return;
               widget.store.backup
                 ..fingerprintLock = on
                 ..saveSettings();

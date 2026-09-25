@@ -9,7 +9,7 @@ import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../l10n/l10n.dart';
-import 'mobile_page.dart' show askFingerprint;
+import 'owner.dart';
 import 'vault_page.dart' show SiteAvatar;
 
 /// Logins for a web page ([site]) or an app ([app]). An app has no address:
@@ -47,9 +47,6 @@ Future<void> serveAutofillLookups() async {
       if (await opened != VaultState.open) return <Object>[];
       vault = await store.load();
     }
-    // With the fingerprint lock on, the suggestions only name the logins:
-    // the password or the code goes in after the finger.
-    final locked = store.backup.fingerprintLock;
     final wantsCode = args['wantsCode'] == true;
     final matches = autofillMatches(vault, args['domain'] as String? ?? '', args['app'] as String? ?? '');
     // A code field with no code for this site: the codes not tied to any site yet.
@@ -60,16 +57,20 @@ Future<void> serveAutofillLookups() async {
     final offered = wantsCode
         ? [...matches.where((e) => e.twoFactor.isEmpty), ...unpaired]
         : matches.where((e) => !e.isCode).toList();
+    // A login or code marked to ask for the finger is only named here: its
+    // password or code goes in after the finger.
     return [
       for (final e in offered)
         {
           'id': e.id,
           'title': e.title,
           'username': e.username,
-          'password': locked ? null : e.password,
-          'code': locked || !wantsCode || (vault.secretFor(e) ?? '').isEmpty ? null : await totpCode(vault.secretFor(e)!),
+          'password': vault.guarded(e) ? null : e.password,
+          'code': vault.guarded(e) || !wantsCode || (vault.secretFor(e) ?? '').isEmpty
+              ? null
+              : await totpCode(vault.secretFor(e)!),
           'hasCode': wantsCode && (vault.secretFor(e) ?? '').isNotEmpty,
-          'locked': locked,
+          'locked': vault.guarded(e),
           'unpaired': unpaired.contains(e),
         },
     ];
@@ -134,7 +135,8 @@ class _AutofillPageState extends State<AutofillPage> {
       return;
     }
     // The whole vault on show: the fingerprint lock applies here too.
-    if (_store.backup.fingerprintLock && !await askFingerprint()) {
+    if (!mounted) return;
+    if (_store.backup.fingerprintLock && !await confirmOwner(context, _store)) {
       await _channel.invokeMethod('close');
       return;
     }
@@ -143,11 +145,13 @@ class _AutofillPageState extends State<AutofillPage> {
 
   /// Behind a suggestion that fills at the moment it is tapped: a
   /// two-factor code of this very moment (or — quietly — the next one when
-  /// this one is in its last second), or, with the fingerprint lock on, any
-  /// login once the finger is there.
+  /// this one is in its last second), or a login marked to ask for the
+  /// finger, once the finger is there.
   Future<void> _fillEntry(String id) async {
     final e = _vault.entries[id];
-    if (e == null || e.deleted || (_store.backup.fingerprintLock && !await askFingerprint())) {
+    if (e == null ||
+        e.deleted ||
+        (_vault.guarded(e) && !await confirmOwner(context, _store, hint: t.confirmFill(e.title.isEmpty ? t.noTitle : e.title)))) {
       await _channel.invokeMethod('close');
       return;
     }

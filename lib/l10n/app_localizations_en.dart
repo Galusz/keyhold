@@ -1360,4 +1360,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get shareVaultHint =>
       'You can also mail the vault file or keep it in Files: it opens only with the master password or the recovery key.';
+
+  @override
+  String confirmFill(String name) {
+    return 'Confirm to fill in $name';
+  }
+
+  @override
+  String get guardedSwitch => 'Ask for a fingerprint when filling in';
+
+  @override
+  String get guardedSwitchHint =>
+      'A fingerprint on the phone, Windows Hello on the computer — before the password or code goes into a page or an app.';
+
+  @override
+  String get helloSwitch => 'Open Keyhold with Windows Hello';
+
+  @override
+  String get helloSwitchHint =>
+      'Face, fingerprint or Windows PIN. Locks after 5 minutes without use. Filling in from the browser keeps working.';
+
+  @override
+  String get helloConfirmHint => 'Confirm with Windows Hello';
 }

@@ -1396,4 +1396,26 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get shareVaultHint =>
       'Puoi anche inviare il file per e-mail o tenerlo in File: si apre solo con la password principale o la chiave di recupero.';
+
+  @override
+  String confirmFill(String name) {
+    return 'Conferma per compilare $name';
+  }
+
+  @override
+  String get guardedSwitch => 'Chiedi l\'impronta durante la compilazione';
+
+  @override
+  String get guardedSwitchHint =>
+      'Impronta sul telefono, Windows Hello sul computer, prima che la password o il codice finiscano in una pagina o app.';
+
+  @override
+  String get helloSwitch => 'Apri Keyhold con Windows Hello';
+
+  @override
+  String get helloSwitchHint =>
+      'Volto, impronta o PIN di Windows. Si blocca dopo 5 minuti di inutilizzo. La compilazione nel browser continua a funzionare.';
+
+  @override
+  String get helloConfirmHint => 'Conferma con Windows Hello';
 }

@@ -2319,6 +2319,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can also mail the vault file or keep it in Files: it opens only with the master password or the recovery key.'**
   String get shareVaultHint;
+
+  /// No description provided for @confirmFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to fill in {name}'**
+  String confirmFill(String name);
+
+  /// No description provided for @guardedSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for a fingerprint when filling in'**
+  String get guardedSwitch;
+
+  /// No description provided for @guardedSwitchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A fingerprint on the phone, Windows Hello on the computer — before the password or code goes into a page or an app.'**
+  String get guardedSwitchHint;
+
+  /// No description provided for @helloSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Keyhold with Windows Hello'**
+  String get helloSwitch;
+
+  /// No description provided for @helloSwitchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Face, fingerprint or Windows PIN. Locks after 5 minutes without use. Filling in from the browser keeps working.'**
+  String get helloSwitchHint;
+
+  /// No description provided for @helloConfirmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm with Windows Hello'**
+  String get helloConfirmHint;
 }
 
 class _AppLocalizationsDelegate

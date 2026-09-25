@@ -31,4 +31,13 @@
             android:alpha="0.7"
             android:textSize="13sp" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/guarded"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_guarded"
+        android:visibility="gone" />
 </LinearLayout>

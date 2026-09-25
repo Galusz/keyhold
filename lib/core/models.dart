@@ -45,6 +45,10 @@ class VaultEntry {
   int updatedAt;
   bool deleted;
 
+  /// Filling it in somewhere asks for the owner first: a finger on the
+  /// phone, Windows Hello on the computer.
+  bool guarded;
+
   VaultEntry({
     required this.id,
     this.title = '',
@@ -58,6 +62,7 @@ class VaultEntry {
     List<String>? sites,
     int? updatedAt,
     this.deleted = false,
+    this.guarded = false,
   })  : sites = sites ?? [],
         updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
 
@@ -74,6 +79,7 @@ class VaultEntry {
         if (sites.isNotEmpty) 'sites': sites,
         'updatedAt': updatedAt,
         if (deleted) 'deleted': true,
+        if (guarded) 'guarded': true,
       };
 
   factory VaultEntry.fromJson(Map<String, dynamic> j) => VaultEntry(
@@ -89,6 +95,7 @@ class VaultEntry {
         sites: (j['sites'] as List<dynamic>?)?.cast<String>().toList(),
         updatedAt: (j['updatedAt'] ?? 0) as int,
         deleted: (j['deleted'] ?? false) as bool,
+        guarded: (j['guarded'] ?? false) as bool,
       );
 
   void touch() => updatedAt = DateTime.now().millisecondsSinceEpoch;
@@ -323,6 +330,14 @@ class Vault {
     if ((e.totpSecret ?? '').isNotEmpty) return e.totpSecret;
     final code = entries[e.twoFactor];
     return code == null || code.deleted ? null : code.totpSecret;
+  }
+
+  /// Whether filling in [e] asks for the owner first: marked so itself, or
+  /// its two-factor code is.
+  bool guarded(VaultEntry e) {
+    if (e.guarded) return true;
+    final code = entries[e.twoFactor];
+    return code != null && !code.deleted && code.guarded;
   }
 
   /// The logins pointing at a code.

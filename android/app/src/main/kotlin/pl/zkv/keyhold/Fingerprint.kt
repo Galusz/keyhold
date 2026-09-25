@@ -11,7 +11,9 @@ import io.flutter.plugin.common.MethodChannel
 
 /// The phone's own fingerprint panel: under the system's icon and app name the
 /// title and one line Keyhold sends in the user's language, the rest is the
-/// system's. The phone's PIN or pattern stands in when the finger fails.
+/// system's. The phone's PIN or pattern stands in when the finger fails; a
+/// phone with no screen lock answers null, and Keyhold asks for the vault's
+/// password instead.
 object Fingerprint {
     private const val ALLOWED = BIOMETRIC_WEAK or DEVICE_CREDENTIAL
 
@@ -23,7 +25,7 @@ object Fingerprint {
                     return@setMethodCallHandler
                 }
                 if (BiometricManager.from(activity).canAuthenticate(ALLOWED) != BiometricManager.BIOMETRIC_SUCCESS) {
-                    result.success(false)
+                    result.success(null)
                     return@setMethodCallHandler
                 }
                 val callback = object : BiometricPrompt.AuthenticationCallback() {

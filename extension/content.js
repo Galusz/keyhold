@@ -300,7 +300,8 @@ async function openMenu(field, allCodes) {
     text.className = 'text';
     const title = document.createElement('div');
     title.className = 'title';
-    title.textContent = entry.title;
+    // Marked to ask for Windows Hello before it goes in.
+    title.textContent = entry.guarded ? `${entry.title} 🔒` : entry.title;
     const sub = document.createElement('div');
     sub.className = 'sub';
     sub.textContent = entry.unpaired ? `${entry.username || ''} · ${t('notTiedToSite')}` : entry.username || '';
@@ -384,6 +385,7 @@ async function openMenu(field, allCodes) {
           items.map(async (entry, i) => {
             if (entry.all) return;
             const r = await api.runtime.sendMessage({ type: 'code', id: entry.id });
+            if (menu && r && r.guarded) rows[i].code.firstChild.textContent = '🔒';
             if (!menu || !r || !r.code) return;
             menu.codes[i] = r.code;
             rows[i].code.firstChild.textContent = `${r.code.slice(0, 3)} ${r.code.slice(3)}`;
@@ -413,8 +415,13 @@ async function pick(index) {
       openMenu(field, (all && all.codes) || []);
       return;
     }
-    const code = codes[index];
+    let code = codes[index];
     closeMenu();
+    // A marked code comes only after Windows Hello.
+    if (!code && entry.guarded) {
+      const r = await api.runtime.sendMessage({ type: 'code', id: entry.id, use: true });
+      code = r && r.code;
+    }
     if (code) fillCode(field, code);
     // A code with no site yet: the lock asks whether it belongs here from now on.
     api.runtime.sendMessage({ type: 'pin-offer', id: entry.id }).catch(() => {});

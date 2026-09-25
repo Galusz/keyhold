@@ -5,10 +5,13 @@ const api = globalThis.browser ?? chrome;
 const BRIDGE = 'http://127.0.0.1:19919';
 // Keyhold on this computer answers a question within milliseconds, while
 // Windows takes seconds to give up on a closed port: an app that is off counts
-// as off at once. Saving waits longer, as the app copies the vault to its backups.
+// as off at once. Saving waits longer, as the app copies the vault to its backups;
+// a password or code marked to ask for Windows Hello waits for the owner.
 const APP_WAIT = 200;
 const SAVE_WAIT = 30 * 1000;
-const QUESTIONS = ['/lookup', '/codes', '/fill', '/code', '/entry'];
+const CONFIRM_WAIT = 60 * 1000;
+const QUESTIONS = ['/lookup', '/codes', '/entry'];
+const CONFIRMS = ['/fill', '/code'];
 // An app that did not answer is not asked again for a while: every question of
 // a page or the popup would wait out the limit again.
 const APP_RETRY = 20 * 1000;
@@ -53,7 +56,7 @@ async function callApp(path, body) {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-keyhold-token': token },
       body: JSON.stringify(body || {}),
-      signal: AbortSignal.timeout(QUESTIONS.includes(path) ? APP_WAIT : SAVE_WAIT),
+      signal: AbortSignal.timeout(QUESTIONS.includes(path) ? APP_WAIT : CONFIRMS.includes(path) ? CONFIRM_WAIT : SAVE_WAIT),
     });
     if (!response.ok) {
       return { error: response.status === 401 ? 'bad token' : 'app error' };
@@ -282,7 +285,7 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
   const routes = {
     lookup: () => call('/lookup', { url: pageUrl(message, sender) }),
     fill: async () => ((await allowed(message, sender)) ? call('/fill', { id: message.id }) : { error: 'denied' }),
-    code: async () => ((await allowedCode(message, sender)) ? call('/code', { id: message.id }) : { error: 'denied' }),
+    code: async () => ((await allowedCode(message, sender)) ? call('/code', { id: message.id, use: message.use === true }) : { error: 'denied' }),
     codes: () => call('/codes'),
     'pin-offer': () => offerPin(message, sender),
     save: () => save(message, sender),
