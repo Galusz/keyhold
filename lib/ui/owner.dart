@@ -110,38 +110,51 @@ class _PasswordCheckState extends State<_PasswordCheck> {
   }
 }
 
-/// The small fingerprint after an entry's name, right on the list: lit when
-/// the entry asks for the owner before it is filled in, tapped to change that.
-class GuardToggle extends StatelessWidget {
-  const GuardToggle({super.key, required this.on, required this.onTap});
+/// An entry's avatar with a small fingerprint in its corner: lit when the
+/// entry asks for the owner before it is filled in, tapped to change that.
+class GuardedAvatar extends StatelessWidget {
+  const GuardedAvatar({super.key, required this.avatar, required this.on, required this.onTap});
 
+  final Widget avatar;
   final bool on;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return IconButton(
-      tooltip: t.guardedSwitch,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-      iconSize: 18,
-      isSelected: on,
-      icon: Icon(Icons.fingerprint, color: theme.hintColor.withValues(alpha: 0.35)),
-      selectedIcon: Icon(Icons.fingerprint, color: theme.colorScheme.primary),
-      onPressed: onTap,
+    final scheme = Theme.of(context).colorScheme;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        avatar,
+        Positioned(
+          right: -4,
+          bottom: -4,
+          child: Tooltip(
+            message: t.guardedSwitch,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: on ? scheme.primary : scheme.surface,
+                  border: Border.all(color: on ? scheme.surface : scheme.outlineVariant, width: 1.5),
+                ),
+                child: Icon(
+                  Icons.fingerprint,
+                  size: 13,
+                  color: on ? scheme.onPrimary : scheme.onSurfaceVariant.withValues(alpha: 0.45),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
-
-/// A title with the fingerprint toggle after it; a long title gives way, the toggle stays.
-Widget titleWithGuard(String title, {required bool on, required VoidCallback onTap}) => Row(
-      children: [
-        Flexible(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis)),
-        GuardToggle(on: on, onTap: onTap),
-      ],
-    );
 
 /// Marking an entry is free; taking the mark off needs the owner.
 Future<bool> toggleGuard(BuildContext context, VaultStore store, VaultEntry e) async {

@@ -559,17 +559,24 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       onLongPress: () => _details(e),
       // Tall enough for the countdown hanging under the code.
       minTileHeight: code == null ? null : 64,
-      leading: SiteAvatar(
-        entry: e,
-        icons: _store.icons,
-        address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
-      ),
-      title: titleWithGuard(e.title.isEmpty ? t.noTitle : e.title, on: e.guarded, onTap: () async {
+      leading: GuardedAvatar(
+        avatar: SiteAvatar(
+          entry: e,
+          icons: _store.icons,
+          address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
+        ),
+        on: e.guarded, onTap: () async {
         if (!await toggleGuard(context, _store, e)) return;
         _vault.put(e);
         await _persist();
         if (mounted) setState(() {});
-      }),
+      },
+      ),
+      title: Text(
+        e.title.isEmpty ? t.noTitle : e.title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       subtitle: e.isCode
           ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
           : Text(

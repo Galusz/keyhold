@@ -1398,25 +1398,30 @@ class _VaultPageState extends State<VaultPage> with WindowListener {
     return ListTile(
       selected: selected,
       onTap: () => _selected.isEmpty ? _open(e, isNew: false) : _toggle(e),
-      leading: Tooltip(
-        message: t.select,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: () => _toggle(e),
-          child: SiteAvatar(
-            entry: e,
-            icons: _store.icons,
-            address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
-            child: selected ? const Icon(Icons.check) : null,
+      leading: GuardedAvatar(
+        avatar: Tooltip(
+          message: t.select,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () => _toggle(e),
+            child: SiteAvatar(
+              entry: e,
+              icons: _store.icons,
+              address: e.isCode ? (_vault.sitesOf(e).firstOrNull ?? '') : null,
+              child: selected ? const Icon(Icons.check) : null,
+            ),
           ),
         ),
-      ),
-      title: titleWithGuard(e.title.isEmpty ? t.noTitle : e.title, on: e.guarded, onTap: () async {
+        on: e.guarded, onTap: () async {
         if (!await toggleGuard(context, _store, e)) return;
         _vault.put(e);
         await _persist();
         if (mounted) setState(() {});
-      }),
+      },
+      ),
+      title: Text(
+        e.title.isEmpty ? t.noTitle : e.title,
+      ),
       subtitle: e.isCode
           ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
           : Text(
