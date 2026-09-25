@@ -251,7 +251,6 @@
   "deleteThisCode": "Supprimer ce code de double authentification ?",
   "deleteCodeWarning": "Il disparaît de tous vos appareils. Sans lui, vous ne pourrez plus vous connecter là où il sert.",
   "deleteLoginWarning": "Il disparaît de tous vos appareils.",
-  "nextCode": "puis {code}",
   "recoverySheet": "Fiche de récupération",
   "print": "Imprimer",
   "done": "Terminé",

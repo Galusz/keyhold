@@ -251,7 +251,6 @@
   "deleteThisCode": "Eliminare questo codice a due fattori?",
   "deleteCodeWarning": "Sparisce da tutti i tuoi dispositivi. Senza di esso non puoi accedere dove viene usato.",
   "deleteLoginWarning": "Spariscono da tutti i tuoi dispositivi.",
-  "nextCode": "prossimo {code}",
   "recoverySheet": "Foglio di recupero",
   "print": "Stampa",
   "done": "Fatto",

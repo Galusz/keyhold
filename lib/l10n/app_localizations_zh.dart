@@ -909,11 +909,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteLoginWarning => '它会从您的所有设备上消失。';
 
   @override
-  String nextCode(String code) {
-    return '下一个 $code';
-  }
-
-  @override
   String get recoverySheet => '恢复单';
 
   @override

@@ -251,7 +251,6 @@
   "deleteThisCode": "Excluir este código de dois fatores?",
   "deleteCodeWarning": "Ele some de todos os seus dispositivos. Sem ele, você não consegue fazer login onde ele é usado.",
   "deleteLoginWarning": "Ele some de todos os seus dispositivos.",
-  "nextCode": "próximo {code}",
   "recoverySheet": "Folha de recuperação",
   "print": "Imprimir",
   "done": "Concluído",

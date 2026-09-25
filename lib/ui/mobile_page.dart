@@ -540,7 +540,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   Widget _row(VaultEntry e) {
     final code = _codes[e.id] ?? _codes[e.twoFactor];
-    final next = _left <= 5 ? _next[e.id] ?? _next[e.twoFactor] : null;
+    final next = _left <= 10 ? _next[e.id] ?? _next[e.twoFactor] : null;
     final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     final warn = _left <= 5 ? Theme.of(context).colorScheme.error : null;
     return ListTile(
@@ -574,17 +574,35 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
                   style: TextStyle(fontFamily: 'monospace', fontSize: 22, letterSpacing: 1, color: warn),
                 ),
                 const SizedBox(height: 4),
+                // The next code sits in the room the shrinking bar leaves: nothing above it moves.
                 SizedBox(
-                  width: 90,
-                  child: LinearProgressIndicator(value: _left / 30, minHeight: 2, color: warn),
-                ),
-                if (next != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    t.nextCode('${next.substring(0, 3)} ${next.substring(3)}'),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
+                  width: 100,
+                  height: 14,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: 100 * _left / 30,
+                          height: 2,
+                          color: warn ?? Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      if (next != null)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            '${next.substring(0, 3)} ${next.substring(3)}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontFamily: 'monospace',
+                                  fontSize: 11,
+                                  color: Theme.of(context).hintColor,
+                                ),
+                          ),
+                        ),
+                    ],
                   ),
-                ],
+                ),
               ],
             ),
     );

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="search_all_logins">Alle Zugangsdaten durchsuchen</string>
+    <string name="search_all_logins">Im Tresor suchen</string>
     <string name="code_suggestion">2FA-Code %1$s</string>
     <string name="not_tied_to_site">noch keiner Website zugeordnet</string>
 </resources>

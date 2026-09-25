@@ -629,14 +629,6 @@
   "deleteThisCode": "Delete this two-factor code?",
   "deleteCodeWarning": "It disappears from all your devices. Without it you cannot sign in where it is used.",
   "deleteLoginWarning": "It disappears from all your devices.",
-  "nextCode": "next {code}",
-  "@nextCode": {
-    "placeholders": {
-      "code": {
-        "type": "String"
-      }
-    }
-  },
   "recoverySheet": "Recovery sheet",
   "recoveryIntro": "This key opens your vault if you ever forget the master password. Print the sheet, copy the last row onto it by hand, and keep it at home.",
   "print": "Print",

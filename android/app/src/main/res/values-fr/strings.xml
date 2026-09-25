@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="search_all_logins">Rechercher dans tous les identifiants</string>
+    <string name="search_all_logins">Chercher dans le coffre-fort</string>
     <string name="code_suggestion">Code 2FA %1$s</string>
     <string name="not_tied_to_site">pas encore lié à un site</string>
 </resources>

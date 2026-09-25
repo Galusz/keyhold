@@ -251,7 +251,6 @@
   "deleteThisCode": "删除此双重验证码？",
   "deleteCodeWarning": "它会从您的所有设备上消失。没有它，您将无法在用到它的地方登录。",
   "deleteLoginWarning": "它会从您的所有设备上消失。",
-  "nextCode": "下一个 {code}",
   "recoverySheet": "恢复单",
   "print": "打印",
   "done": "完成",

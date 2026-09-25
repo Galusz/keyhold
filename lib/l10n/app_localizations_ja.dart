@@ -917,11 +917,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteLoginWarning => 'すべてのデバイスから削除されます。';
 
   @override
-  String nextCode(String code) {
-    return '次：$code';
-  }
-
-  @override
   String get recoverySheet => 'リカバリーシート';
 
   @override

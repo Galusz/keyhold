@@ -23,6 +23,28 @@ img.Image draw(int size, {int color = accent}) => _smaller(_lock(master, color),
 
 img.Image drawStop(int size) => _smaller(_stop(master), size);
 
+/// Android's two-layer icon: the lock alone on a clear layer, over a
+/// background colour the launcher cuts to its own shape, so no edge of a
+/// drawn square shows. The lock stays inside the middle circle of 66 of the
+/// 108 units, which no launcher cuts into.
+img.Image drawForeground(int size, {bool mono = false}) {
+  final lock = _lock(master, accent);
+  final a = rgba(accent);
+  for (final p in lock) {
+    final isLock = p.a > 0 && p.r == a.r && p.g == a.g && p.b == a.b;
+    if (!isLock) {
+      p.setRgba(0, 0, 0, 0);
+    } else if (mono) {
+      p.setRgba(255, 255, 255, 255);
+    }
+  }
+  final side = master * 108 ~/ 84;
+  final layer = img.Image(width: side, height: side, numChannels: 4);
+  img.fill(layer, color: img.ColorRgba8(0, 0, 0, 0));
+  img.compositeImage(layer, lock, dstX: (side - master) ~/ 2, dstY: (side - master) ~/ 2);
+  return _smaller(layer, size);
+}
+
 img.Image _lock(int size, int color) {
   final s = size / 256.0;
   final canvas = img.Image(width: size, height: size, numChannels: 4);
@@ -93,6 +115,11 @@ void main() {
   File('assets/icon.png').writeAsBytesSync(img.encodePng(draw(512)));
   for (final (folder, size) in [('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('xxxhdpi', 192)]) {
     File('android/app/src/main/res/mipmap-$folder/ic_launcher.png').writeAsBytesSync(img.encodePng(draw(size)));
+    final layer = size * 108 ~/ 48;
+    File('android/app/src/main/res/mipmap-$folder/ic_launcher_foreground.png')
+        .writeAsBytesSync(img.encodePng(drawForeground(layer)));
+    File('android/app/src/main/res/mipmap-$folder/ic_launcher_monochrome.png')
+        .writeAsBytesSync(img.encodePng(drawForeground(layer, mono: true)));
   }
   Directory('extension/icons').createSync(recursive: true);
   for (final size in [16, 32, 48, 128]) {

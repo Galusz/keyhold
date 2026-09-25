@@ -169,15 +169,14 @@ const Standalone = (() => {
   const IDLE_LOCK = 30 * 60 * 1000;
 
   async function vault() {
-    const { dek: open, usedAt } = await session.get(['dek', 'usedAt']);
-    if (open && usedAt && Date.now() - usedAt > IDLE_LOCK) {
+    const { dek, usedAt } = await session.get(['dek', 'usedAt']);
+    if (dek && usedAt && Date.now() - usedAt > IDLE_LOCK) {
       loaded = null;
       await session.remove(['dek', 'aloneOffers', 'usedAt']);
       return null;
     }
-    if (open && (!usedAt || Date.now() - usedAt > 60 * 1000)) await session.set({ usedAt: Date.now() });
+    if (dek && (!usedAt || Date.now() - usedAt > 60 * 1000)) await session.set({ usedAt: Date.now() });
     if (loaded) return loaded;
-    const { dek } = await session.get('dek');
     const { vaultFile } = await local.get('vaultFile');
     if (!dek || !vaultFile) return null;
     const parts = parse(fromB64(vaultFile));

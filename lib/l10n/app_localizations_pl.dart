@@ -960,11 +960,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get deleteLoginWarning => 'Znikną ze wszystkich urządzeń.';
 
   @override
-  String nextCode(String code) {
-    return 'następny $code';
-  }
-
-  @override
   String get recoverySheet => 'Zestaw ratunkowy';
 
   @override

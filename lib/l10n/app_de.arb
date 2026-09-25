@@ -251,7 +251,6 @@
   "deleteThisCode": "Diesen Zwei-Faktor-Code löschen?",
   "deleteCodeWarning": "Er verschwindet von allen deinen Geräten. Ohne ihn kannst du dich dort, wo er genutzt wird, nicht mehr anmelden.",
   "deleteLoginWarning": "Sie verschwinden von allen deinen Geräten.",
-  "nextCode": "nächster {code}",
   "recoverySheet": "Notfallblatt",
   "print": "Drucken",
   "done": "Fertig",

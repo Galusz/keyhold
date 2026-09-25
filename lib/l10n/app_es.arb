@@ -251,7 +251,6 @@
   "deleteThisCode": "¿Eliminar este código de dos factores?",
   "deleteCodeWarning": "Desaparece de todos tus dispositivos. Sin él no podrás iniciar sesión donde se usa.",
   "deleteLoginWarning": "Desaparece de todos tus dispositivos.",
-  "nextCode": "siguiente {code}",
   "recoverySheet": "Hoja de recuperación",
   "print": "Imprimir",
   "done": "Listo",

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="search_all_logins">Pesquisar todos os logins</string>
+    <string name="search_all_logins">Pesquisar no cofre</string>
     <string name="code_suggestion">Código 2FA %1$s</string>
     <string name="not_tied_to_site">ainda não fixado em um site</string>
 </resources>

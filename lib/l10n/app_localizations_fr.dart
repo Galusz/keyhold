@@ -987,11 +987,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteLoginWarning => 'Il disparaît de tous vos appareils.';
 
   @override
-  String nextCode(String code) {
-    return 'puis $code';
-  }
-
-  @override
   String get recoverySheet => 'Fiche de récupération';
 
   @override

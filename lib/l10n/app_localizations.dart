@@ -1624,12 +1624,6 @@ abstract class AppLocalizations {
   /// **'It disappears from all your devices.'**
   String get deleteLoginWarning;
 
-  /// No description provided for @nextCode.
-  ///
-  /// In en, this message translates to:
-  /// **'next {code}'**
-  String nextCode(String code);
-
   /// No description provided for @recoverySheet.
   ///
   /// In en, this message translates to:

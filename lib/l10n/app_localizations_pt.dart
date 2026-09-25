@@ -980,11 +980,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteLoginWarning => 'Ele some de todos os seus dispositivos.';
 
   @override
-  String nextCode(String code) {
-    return 'próximo $code';
-  }
-
-  @override
   String get recoverySheet => 'Folha de recuperação';
 
   @override

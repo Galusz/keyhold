@@ -251,7 +251,6 @@
   "deleteThisCode": "この 2 段階認証コードを削除しますか？",
   "deleteCodeWarning": "すべてのデバイスから削除されます。このコードがないと、使用しているサイトにログインできなくなります。",
   "deleteLoginWarning": "すべてのデバイスから削除されます。",
-  "nextCode": "次：{code}",
   "recoverySheet": "リカバリーシート",
   "print": "印刷",
   "done": "完了",

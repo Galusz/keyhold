@@ -251,7 +251,6 @@
   "deleteThisCode": "Usunąć ten kod weryfikacyjny?",
   "deleteCodeWarning": "Zniknie ze wszystkich urządzeń. Bez niego nie zalogujesz się tam, gdzie jest używany.",
   "deleteLoginWarning": "Znikną ze wszystkich urządzeń.",
-  "nextCode": "następny {code}",
   "recoverySheet": "Zestaw ratunkowy",
   "print": "Drukuj",
   "done": "Gotowe",
