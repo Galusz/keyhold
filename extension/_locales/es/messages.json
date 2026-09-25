@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "No se puede conectar con Google Drive"
   },
-  "setPasswordInApp": {
-    "message": "Primero configura una contraseña maestra en la app Keyhold"
-  },
   "signInWindowOpen": {
     "message": "Aún hay una ventana de inicio de sesión de Google abierta. Ciérrala y vuelve a intentarlo."
   },
   "wrongMasterPassword": {
     "message": "Contraseña maestra incorrecta"
+  },
+  "noVaultMatches": {
+    "message": "Ninguna caja fuerte de tu Google Drive se abre con esta contraseña"
   }
 }

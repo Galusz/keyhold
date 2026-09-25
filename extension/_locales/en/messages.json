@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "Google Drive is not reachable"
   },
-  "setPasswordInApp": {
-    "message": "Set a master password in the Keyhold app first"
-  },
   "signInWindowOpen": {
     "message": "A Google sign-in window is still open. Close it and try again."
   },
   "wrongMasterPassword": {
     "message": "Wrong master password"
+  },
+  "noVaultMatches": {
+    "message": "No vault in your Google Drive opens with this password"
   }
 }

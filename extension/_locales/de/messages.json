@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "Google Drive ist nicht erreichbar"
   },
-  "setPasswordInApp": {
-    "message": "Zuerst in der Keyhold-App ein Master-Passwort festlegen"
-  },
   "signInWindowOpen": {
     "message": "Ein Google-Anmeldefenster ist noch offen. Schließen und erneut versuchen."
   },
   "wrongMasterPassword": {
     "message": "Falsches Master-Passwort"
+  },
+  "noVaultMatches": {
+    "message": "Kein Tresor in deinem Google Drive lässt sich mit diesem Passwort öffnen"
   }
 }

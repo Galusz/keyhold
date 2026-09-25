@@ -37,9 +37,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get change => 'Ändern';
 
   @override
-  String get connect => 'Verbinden';
-
-  @override
   String get disconnect => 'Trennen';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get masterPassword => 'Master-Passwort';
 
   @override
-  String get setMasterPassword => 'Master-Passwort festlegen';
-
-  @override
   String copied(String what) {
     return '$what kopiert';
   }
@@ -94,13 +88,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String driveNotConnected(String error) {
     return 'Google Drive wurde nicht verbunden: $error';
   }
-
-  @override
-  String get masterPasswordOfVault => 'Master-Passwort deines Tresors';
-
-  @override
-  String get masterPasswordFromComputer =>
-      'Das Passwort aus Keyhold auf deinem Computer';
 
   @override
   String get scanQr => 'QR-Code scannen';
@@ -176,14 +163,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      'Deine Passwörter und Zwei-Faktor-Codes – derselbe Tresor wie auf deinem Computer, synchron gehalten über dein eigenes Google Drive.';
-
-  @override
   String get connectDrive => 'Google Drive verbinden';
-
-  @override
-  String get startEmpty => 'Mit leerem Tresor starten';
 
   @override
   String codeSeconds(int seconds) {
@@ -208,9 +188,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get syncNow => 'Jetzt synchronisieren';
 
   @override
-  String get fingerprintLock => 'Fingerabdrucksperre';
-
-  @override
   String get fingerprintSwitch => 'Keyhold mit Fingerabdruck öffnen';
 
   @override
@@ -230,14 +207,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => 'Passwörter mit Keyhold ausfüllen';
-
-  @override
-  String get passwordSetPhone =>
-      'Festgelegt. Es öffnet diesen Tresor auf einem neuen Gerät.';
-
-  @override
-  String get passwordNotSetPhone =>
-      'Nicht festgelegt. Ein neues Gerät kann den Tresor sonst nicht öffnen.';
 
   @override
   String get deleteThisLogin => 'Diese Zugangsdaten löschen?';
@@ -313,15 +282,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get browserExtension => 'Browsererweiterung';
-
-  @override
-  String get backup => 'Sicherung';
-
-  @override
-  String get importCsv => 'Aus CSV importieren';
-
-  @override
-  String get changeMasterPassword => 'Master-Passwort ändern';
 
   @override
   String get addFile => 'Datei hinzufügen';
@@ -441,10 +401,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword =>
-      'Google Drive: Sicherung öffnen und Master-Passwort eingeben';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive: $problem';
   }
@@ -482,14 +438,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get off => 'Aus';
-
-  @override
-  String onWith(String detail) {
-    return 'An – $detail';
-  }
-
-  @override
-  String get join => 'Beitreten';
 
   @override
   String get synced => 'Synchronisiert';
@@ -531,18 +479,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get driveHoldsVault =>
-      'In Google Drive liegt bereits ein Keyhold-Tresor. Zum Beitreten wird sein Master-Passwort benötigt.';
-
-  @override
-  String get masterPasswordOfDriveVault =>
-      'Master-Passwort des Tresors in Google Drive';
-
-  @override
-  String get driveHint =>
-      'Speichert den verschlüsselten Tresor im Ordner „Keyhold“ in deinem eigenen Google Drive. So bleiben deine anderen Geräte synchron, und mit einem verlorenen Computer geht nichts verloren. Google kann ihn nicht lesen.';
-
-  @override
   String get driveNotInBuild =>
       'Google Drive ist in dieser Version nicht eingerichtet.';
 
@@ -577,10 +513,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get yourServer => 'Dein Server';
-
-  @override
-  String get foldersHint =>
-      'Bei jedem Speichern landet eine datierte Kopie in jedem Ordner, die letzten 30 bleiben erhalten.';
 
   @override
   String get noFolders => 'Keine Ordner – lokale Kopien sind aus';
@@ -868,21 +800,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Mit diesem Passwort lässt sich der Tresor nicht öffnen';
 
   @override
-  String get currentPasswordWrong => 'Das aktuelle Master-Passwort ist falsch';
-
-  @override
   String get unlockVault => 'Tresor entsperren';
 
   @override
   String get unlockHint =>
       'Dieser Tresor stammt von einem anderen Computer. Zum Öffnen hier das Master-Passwort eingeben.';
-
-  @override
-  String get masterPasswordHint =>
-      'Windows öffnet diesen Tresor automatisch für dich. Mit dem Master-Passwort kommst du nach einer Neuinstallation, auf einem neuen Computer oder auf deinem Smartphone wieder hinein.';
-
-  @override
-  String get currentMasterPassword => 'Aktuelles Master-Passwort';
 
   @override
   String get newMasterPassword => 'Neues Master-Passwort';
@@ -1011,64 +933,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => 'Passwörter importieren';
-
-  @override
-  String get importHint =>
-      'Passwörter aus dem Browser als CSV exportieren und die Datei hier laden. Exporte aus Chrome, Edge, Firefox, Bitwarden und KeePassXC funktionieren.';
-
-  @override
-  String get chooseCsv => 'CSV-Datei wählen';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Einträge bereit',
-      one: '1 Eintrag bereit',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Einträge bereit',
-      one: '1 Eintrag bereit',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: '$skipped leere Zeilen übersprungen',
-      one: '1 leere Zeile übersprungen',
-    );
-    return '$_temp0, $_temp1';
-  }
-
-  @override
-  String andMore(int count) {
-    return 'und $count weitere';
-  }
-
-  @override
-  String get deleteCsv => 'CSV-Datei nach dem Import löschen';
-
-  @override
   String get deleteCsvHint => 'Sie enthält alle Passwörter im Klartext';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count Einträge importieren',
-      one: '1 Eintrag importieren',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint =>
@@ -1088,13 +953,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String nextCode(String code) {
     return 'nächster $code';
   }
-
-  @override
-  String get noMasterPasswordBar =>
-      'Kein Master-Passwort: Deine Sicherungen lassen sich auf keinem anderen Computer öffnen. Zum Festlegen klicken.';
-
-  @override
-  String get printRecoverySheet => 'Notfallblatt drucken';
 
   @override
   String get recoverySheet => 'Notfallblatt';
@@ -1167,14 +1025,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deleteVault => 'Tresor löschen';
 
   @override
-  String get deleteVaultHint =>
-      'Alles, was Keyhold auf diesem Gerät speichert, wird gelöscht: Passwörter, Zwei-Faktor-Codes, Dateien und Einstellungen. Danach schließt sich Keyhold und startet leer.';
-
-  @override
-  String get deleteVaultDrive =>
-      'Auch aus Google Drive löschen (andere Geräte behalten ihre Kopie, bis du sie auch dort löschst)';
-
-  @override
   String get deleteVaultFolders =>
       'Auch die Kopien in den Sicherungsordnern löschen';
 
@@ -1185,19 +1035,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deleteVaultSureHint => 'Das lässt sich nicht rückgängig machen.';
 
   @override
-  String get vaultDeleted =>
-      'Der Tresor ist gelöscht. Keyhold wird jetzt geschlossen.';
-
-  @override
   String get recoveryGate =>
       'Master-Passwort eingeben, um den Wiederherstellungsschlüssel zu sehen.';
 
   @override
   String get showKey => 'Schlüssel anzeigen';
-
-  @override
-  String get recoveryNeedsPassword =>
-      'Zuerst ein Master-Passwort festlegen: Erst danach wird der Wiederherstellungsschlüssel angezeigt.';
 
   @override
   String get recoveryCopyRow =>
@@ -1249,9 +1091,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Kopie ließ sich nicht öffnen: falsches Passwort oder falscher Wiederherstellungsschlüssel, oder kein Keyhold-Tresor.';
 
   @override
-  String get openCopy => 'Sicherungskopie öffnen…';
-
-  @override
   String copyTitle(String name) {
     return 'Kopie: $name';
   }
@@ -1261,10 +1100,276 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nur zum Ansehen: Hier ändert sich nichts an deinem Tresor. Einzelne Einträge kannst du in deinen Tresor übernehmen.';
 
   @override
-  String get addToVault => 'In meinen Tresor übernehmen';
+  String get myVault => 'Mein Tresor';
 
   @override
-  String addedToVault(String name) {
-    return '„$name“ ist in deinem Tresor';
+  String get vaultTab => 'Tresor';
+
+  @override
+  String get syncTab => 'Sync';
+
+  @override
+  String get copiesTab => 'Sicherungen';
+
+  @override
+  String get startHint =>
+      'Deine Passwörter und Zwei-Faktor-Codes in einem Tresor: auf dem Computer, auf dem Smartphone und im Browser.';
+
+  @override
+  String get createVault => 'Neuen Tresor anlegen';
+
+  @override
+  String get openMyVault => 'Meinen Tresor öffnen';
+
+  @override
+  String get newVault => 'Neuer Tresor';
+
+  @override
+  String get vaultName => 'Name des Tresors';
+
+  @override
+  String get newVaultHint =>
+      'Das Master-Passwort öffnet diesen Tresor auf jedem deiner Geräte: Computer, Smartphone und Browser. Keyhold kann es nicht wiederherstellen; das kann der Wiederherstellungsschlüssel, den du gleich bekommst.';
+
+  @override
+  String get sealHint =>
+      'Dein Tresor hat noch kein Master-Passwort. Leg es jetzt fest: Es öffnet diesen Tresor auf deinen anderen Geräten und im Browser.';
+
+  @override
+  String get createVaultButton => 'Tresor anlegen';
+
+  @override
+  String get forgotPassword => 'Passwort vergessen?';
+
+  @override
+  String get usePassword => 'Master-Passwort verwenden';
+
+  @override
+  String get recoveryKey => 'Wiederherstellungsschlüssel';
+
+  @override
+  String get recoveryKeyFieldHint =>
+      'Die 36 Zeichen von deinem Notfallblatt; Leerzeichen spielen keine Rolle.';
+
+  @override
+  String get openVaultTitle => 'Tresor öffnen';
+
+  @override
+  String get openVaultHint =>
+      'Der Tresor öffnet sich so, wie er ist. Er wird nie mit einem anderen Tresor zusammengelegt.';
+
+  @override
+  String get fromDrive => 'Aus Google Drive';
+
+  @override
+  String get fromDriveHint =>
+      'Bei Google anmelden, dann das Master-Passwort des Tresors eingeben.';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email: das Master-Passwort des Tresors eingeben.';
   }
+
+  @override
+  String get fromFile => 'Aus einer Datei (.khd)';
+
+  @override
+  String get fromFileHint =>
+      'Eine Kopie aus einem Sicherungsordner, von einem USB-Stick oder einem alten Computer.';
+
+  @override
+  String get closedHere => 'Früher auf diesem Gerät geöffnet';
+
+  @override
+  String closedOn(String date) {
+    return 'geschlossen am $date';
+  }
+
+  @override
+  String get closedVaultGone =>
+      'Die Datei dieses Tresors ist nicht mehr auf diesem Gerät.';
+
+  @override
+  String get typeVaultPassword =>
+      'Gib das Master-Passwort des Tresors ein, den du öffnen willst. Keyhold probiert es an jedem Tresor in deinem Google Drive.';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return 'Dein Tresor wird gesucht: $at von $of';
+  }
+
+  @override
+  String get noVaultInDrive =>
+      'In diesem Google Drive gibt es noch keinen Keyhold-Tresor.';
+
+  @override
+  String get noVaultMatches =>
+      'Kein Tresor in deinem Google Drive lässt sich mit diesem Passwort öffnen.';
+
+  @override
+  String get sameVaultFile =>
+      'Diese Datei ist eine Kopie des Tresors, der gerade offen ist. Einträge daraus holst du über Sicherungen und dann Kopie ansehen.';
+
+  @override
+  String fileVaultPassword(String name) {
+    return 'Gib das Master-Passwort für $name ein.';
+  }
+
+  @override
+  String get driveFileUnreadable =>
+      'Die Datei dieses Tresors in Google Drive lässt sich nicht lesen. Keyhold lässt sie unverändert.';
+
+  @override
+  String get vaultInfoHint =>
+      'Dieser Tresor öffnet sich auf jedem Gerät mit seinem Master-Passwort. Wenn du das Passwort vergisst, öffnet der Wiederherstellungsschlüssel den Tresor und du wählst ein neues.';
+
+  @override
+  String get recoveryKeyHint =>
+      'Nach dem Master-Passwort angezeigt und gedruckt';
+
+  @override
+  String get otherVaults => 'Andere Tresore';
+
+  @override
+  String get openOtherVault => 'Anderen Tresor öffnen';
+
+  @override
+  String get openOtherVaultHint =>
+      'Aus Google Drive, aus einer Datei oder von diesem Gerät';
+
+  @override
+  String get createNewVaultHint => 'Leer, mit eigenem Master-Passwort';
+
+  @override
+  String closeVaultTitle(String name) {
+    return '„$name“ auf diesem Gerät schließen?';
+  }
+
+  @override
+  String get closeVaultHint =>
+      'Nichts wird gelöscht: Er bleibt in Google Drive, in den Sicherungskopien und in der Tresorliste dieses Geräts. Er öffnet sich wieder mit seinem Master-Passwort.';
+
+  @override
+  String get continueLabel => 'Weiter';
+
+  @override
+  String get renameVault => 'Tresor umbenennen';
+
+  @override
+  String get reviewCopy => 'Kopie ansehen';
+
+  @override
+  String get driveVaultHint =>
+      'Legt diesen Tresor als eigene verschlüsselte Datei im Ordner „Keyhold“ in deinem Google Drive ab. Deine anderen Geräte öffnen ihn mit seinem Master-Passwort. Mehrere Tresore können dasselbe Google Drive nutzen und vermischen sich nie. Google kann sie nicht lesen.';
+
+  @override
+  String get foldersSlotsHint =>
+      'Jedes Speichern aktualisiert in jedem Ordner bis zu 7 Kopien des Tresors: die neueste und welche von vor etwa einer Stunde, einem Tag, einer Woche, einem Monat, drei Monaten und einem Jahr.';
+
+  @override
+  String get deleteVaultHereHint =>
+      'Der Tresor wird von diesem Gerät gelöscht: Passwörter, Zwei-Faktor-Codes und Dateien. Früher hier geöffnete Tresore bleiben. Danach zeigt Keyhold den Startbildschirm.';
+
+  @override
+  String get deleteVaultDriveMine =>
+      'Auch aus Google Drive löschen (andere Tresore dort bleiben)';
+
+  @override
+  String get vaultDeletedHere => 'Der Tresor ist gelöscht.';
+
+  @override
+  String get menu => 'Menü';
+
+  @override
+  String get importTitle => 'Importieren';
+
+  @override
+  String get importMenuHint =>
+      'Passwörter und Codes aus anderen Apps oder einem anderen Tresor';
+
+  @override
+  String get importAnyHint =>
+      'Wähle einen Export aus einem anderen Passwort-Manager oder einer Authenticator-App, eine KeePass-Datenbank oder einen anderen Keyhold-Tresor. Keyhold erkennt die Datei selbst, und du hakst ab, was übernommen wird.';
+
+  @override
+  String get importReading => 'Datei wird gelesen…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return 'Passwort dieser $format-Datei';
+  }
+
+  @override
+  String get importWrongPassword => 'Dieses Passwort öffnet die Datei nicht.';
+
+  @override
+  String get importUnknown =>
+      'Keyhold erkennt diese Datei nicht. Exportiere noch einmal aus der anderen App, als CSV oder JSON.';
+
+  @override
+  String importNothing(String format) {
+    return '$format: In dieser Datei ist nichts, was Keyhold übernehmen kann.';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      'Diese KeePass-Datenbank nutzt etwas, das Keyhold nicht öffnen kann (eine Schlüsseldatei oder Twofish). Exportiere sie in KeePass als CSV.';
+
+  @override
+  String get bitwardenAccountLocked =>
+      'Dieser Bitwarden-Export öffnet sich nur mit deinem Bitwarden-Konto. Exportiere noch einmal als JSON, passwortgeschützt oder unverschlüsselt.';
+
+  @override
+  String get otpLinks => 'otpauth-Links';
+
+  @override
+  String get importPickHint =>
+      'Hake ab, was in deinen Tresor soll. Was du schon hast, ist nicht abgehakt.';
+
+  @override
+  String codesLeftOut(int count) {
+    return 'Ausgelassene Codes: $count. Keyhold erzeugt nur 6-stellige Codes alle 30 Sekunden, keine 8 Stellen, 60 Sekunden, Zähler oder Steam.';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return 'Ausgelassene Datensätze: $count (leere, Karten und Identitäten).';
+  }
+
+  @override
+  String get selectAll => 'Alle auswählen';
+
+  @override
+  String get alreadyInVault => 'schon im Tresor';
+
+  @override
+  String addSelected(int count) {
+    return 'Hinzufügen ($count)';
+  }
+
+  @override
+  String addedCount(int count) {
+    return 'Zum Tresor hinzugefügt: $count';
+  }
+
+  @override
+  String get deletePlainFile => 'Datei danach löschen';
+
+  @override
+  String get importPasswordsFrom => 'Passwörter';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome, Edge, Firefox und Safari (CSV), Bitwarden (CSV oder JSON), 1Password (.1pux oder CSV), KeePass und KeePassXC (.kdbx oder CSV), LastPass, Proton Pass, NordPass und Dashlane (CSV) sowie ein anderer Keyhold-Tresor (.khd).';
+
+  @override
+  String get importCodesFrom => 'Zwei-Faktor-Codes';
+
+  @override
+  String get importCodesList =>
+      'Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ und andOTP sowie jede Datei mit otpauth://-Links. Google Authenticator: dort den Export-QR-Code anzeigen und in Keyhold die QR-Code-Schaltfläche nutzen.';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator und Authy geben keine Codes heraus: Zwei-Faktor bei jedem Dienst neu einschalten und den neuen QR-Code scannen.';
 }

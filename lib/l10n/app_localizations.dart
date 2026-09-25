@@ -166,12 +166,6 @@ abstract class AppLocalizations {
   /// **'Change'**
   String get change;
 
-  /// No description provided for @connect.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect'**
-  String get connect;
-
   /// No description provided for @disconnect.
   ///
   /// In en, this message translates to:
@@ -238,12 +232,6 @@ abstract class AppLocalizations {
   /// **'Master password'**
   String get masterPassword;
 
-  /// No description provided for @setMasterPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Set master password'**
-  String get setMasterPassword;
-
   /// No description provided for @copied.
   ///
   /// In en, this message translates to:
@@ -273,18 +261,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Google Drive was not connected: {error}'**
   String driveNotConnected(String error);
-
-  /// No description provided for @masterPasswordOfVault.
-  ///
-  /// In en, this message translates to:
-  /// **'Master password of your vault'**
-  String get masterPasswordOfVault;
-
-  /// No description provided for @masterPasswordFromComputer.
-  ///
-  /// In en, this message translates to:
-  /// **'The one you set in Keyhold on your computer'**
-  String get masterPasswordFromComputer;
 
   /// No description provided for @scanQr.
   ///
@@ -394,23 +370,11 @@ abstract class AppLocalizations {
   /// **'Backed up to Google Drive {ago}'**
   String backedUpToDrive(String ago);
 
-  /// No description provided for @phoneWelcome.
-  ///
-  /// In en, this message translates to:
-  /// **'Your passwords and two-factor codes — the same vault as on your computer, kept in step through your own Google Drive.'**
-  String get phoneWelcome;
-
   /// No description provided for @connectDrive.
   ///
   /// In en, this message translates to:
   /// **'Connect Google Drive'**
   String get connectDrive;
-
-  /// No description provided for @startEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'Start with an empty vault'**
-  String get startEmpty;
 
   /// No description provided for @codeSeconds.
   ///
@@ -441,12 +405,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync now'**
   String get syncNow;
-
-  /// No description provided for @fingerprintLock.
-  ///
-  /// In en, this message translates to:
-  /// **'Fingerprint lock'**
-  String get fingerprintLock;
 
   /// No description provided for @fingerprintSwitch.
   ///
@@ -483,18 +441,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fill passwords with Keyhold'**
   String get fillWithKeyhold;
-
-  /// No description provided for @passwordSetPhone.
-  ///
-  /// In en, this message translates to:
-  /// **'Set. It opens this vault on a new device.'**
-  String get passwordSetPhone;
-
-  /// No description provided for @passwordNotSetPhone.
-  ///
-  /// In en, this message translates to:
-  /// **'Not set. Without it a new device cannot open the vault.'**
-  String get passwordNotSetPhone;
 
   /// No description provided for @deleteThisLogin.
   ///
@@ -621,24 +567,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browser extension'**
   String get browserExtension;
-
-  /// No description provided for @backup.
-  ///
-  /// In en, this message translates to:
-  /// **'Backup'**
-  String get backup;
-
-  /// No description provided for @importCsv.
-  ///
-  /// In en, this message translates to:
-  /// **'Import from CSV'**
-  String get importCsv;
-
-  /// No description provided for @changeMasterPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Change master password'**
-  String get changeMasterPassword;
 
   /// No description provided for @addFile.
   ///
@@ -814,12 +742,6 @@ abstract class AppLocalizations {
   /// **'Backed up {ago} — {targets}'**
   String backedUpTo(String ago, String targets);
 
-  /// No description provided for @driveNeedsPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Google Drive: open Backup and enter the master password'**
-  String get driveNeedsPassword;
-
   /// No description provided for @driveProblem.
   ///
   /// In en, this message translates to:
@@ -873,18 +795,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off'**
   String get off;
-
-  /// No description provided for @onWith.
-  ///
-  /// In en, this message translates to:
-  /// **'On — {detail}'**
-  String onWith(String detail);
-
-  /// No description provided for @join.
-  ///
-  /// In en, this message translates to:
-  /// **'Join'**
-  String get join;
 
   /// No description provided for @synced.
   ///
@@ -946,24 +856,6 @@ abstract class AppLocalizations {
   /// **'Logged in, but cannot write into \"{folder}\". Pick another folder.'**
   String cannotWriteFolder(String folder);
 
-  /// No description provided for @driveHoldsVault.
-  ///
-  /// In en, this message translates to:
-  /// **'Google Drive already holds a Keyhold vault. Its master password is needed to join it.'**
-  String get driveHoldsVault;
-
-  /// No description provided for @masterPasswordOfDriveVault.
-  ///
-  /// In en, this message translates to:
-  /// **'Master password of the vault in Google Drive'**
-  String get masterPasswordOfDriveVault;
-
-  /// No description provided for @driveHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Keeps the encrypted vault in a \"Keyhold\" folder in your own Google Drive, so your other devices stay in sync and a lost computer loses nothing. Google cannot read it.'**
-  String get driveHint;
-
   /// No description provided for @driveNotInBuild.
   ///
   /// In en, this message translates to:
@@ -999,12 +891,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your server'**
   String get yourServer;
-
-  /// No description provided for @foldersHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Every save drops a dated copy into each folder and keeps the last 30.'**
-  String get foldersHint;
 
   /// No description provided for @noFolders.
   ///
@@ -1480,12 +1366,6 @@ abstract class AppLocalizations {
   /// **'That password does not open this vault'**
   String get passwordDoesNotOpen;
 
-  /// No description provided for @currentPasswordWrong.
-  ///
-  /// In en, this message translates to:
-  /// **'The current master password is wrong'**
-  String get currentPasswordWrong;
-
   /// No description provided for @unlockVault.
   ///
   /// In en, this message translates to:
@@ -1497,18 +1377,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This vault came from another machine. Type the master password to open it here.'**
   String get unlockHint;
-
-  /// No description provided for @masterPasswordHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Windows opens this vault for you automatically. The master password is the way back in after a reinstall, on a new machine, or on your phone.'**
-  String get masterPasswordHint;
-
-  /// No description provided for @currentMasterPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Current master password'**
-  String get currentMasterPassword;
 
   /// No description provided for @newMasterPassword.
   ///
@@ -1726,59 +1594,11 @@ abstract class AppLocalizations {
   /// **'changed {day}'**
   String changedOn(String day);
 
-  /// No description provided for @importPasswords.
-  ///
-  /// In en, this message translates to:
-  /// **'Import passwords'**
-  String get importPasswords;
-
-  /// No description provided for @importHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Export your passwords from the browser as CSV, then load the file here. Chrome, Edge, Firefox, Bitwarden and KeePassXC exports all work.'**
-  String get importHint;
-
-  /// No description provided for @chooseCsv.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose CSV file'**
-  String get chooseCsv;
-
-  /// No description provided for @entriesReady.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 entry ready} other{{count} entries ready}}'**
-  String entriesReady(int count);
-
-  /// No description provided for @entriesReadySkipped.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 entry ready} other{{count} entries ready}}, {skipped, plural, =1{1 empty row skipped} other{{skipped} empty rows skipped}}'**
-  String entriesReadySkipped(int count, int skipped);
-
-  /// No description provided for @andMore.
-  ///
-  /// In en, this message translates to:
-  /// **'and {count} more'**
-  String andMore(int count);
-
-  /// No description provided for @deleteCsv.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete the CSV file after importing'**
-  String get deleteCsv;
-
   /// No description provided for @deleteCsvHint.
   ///
   /// In en, this message translates to:
   /// **'It holds every password in plain text'**
   String get deleteCsvHint;
-
-  /// No description provided for @importEntries.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{Import 1 entry} other{Import {count} entries}}'**
-  String importEntries(int count);
 
   /// No description provided for @cameraHint.
   ///
@@ -1809,18 +1629,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'next {code}'**
   String nextCode(String code);
-
-  /// No description provided for @noMasterPasswordBar.
-  ///
-  /// In en, this message translates to:
-  /// **'No master password: your backups cannot be opened on another computer. Click to set one.'**
-  String get noMasterPasswordBar;
-
-  /// No description provided for @printRecoverySheet.
-  ///
-  /// In en, this message translates to:
-  /// **'Print the recovery sheet'**
-  String get printRecoverySheet;
 
   /// No description provided for @recoverySheet.
   ///
@@ -1936,18 +1744,6 @@ abstract class AppLocalizations {
   /// **'Delete the vault'**
   String get deleteVault;
 
-  /// No description provided for @deleteVaultHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Everything Keyhold keeps on this device is erased: passwords, two-factor codes, files and settings. Keyhold then closes and starts empty.'**
-  String get deleteVaultHint;
-
-  /// No description provided for @deleteVaultDrive.
-  ///
-  /// In en, this message translates to:
-  /// **'Also delete it from Google Drive (other devices keep their own copy until you delete it there too)'**
-  String get deleteVaultDrive;
-
   /// No description provided for @deleteVaultFolders.
   ///
   /// In en, this message translates to:
@@ -1966,12 +1762,6 @@ abstract class AppLocalizations {
   /// **'This cannot be undone.'**
   String get deleteVaultSureHint;
 
-  /// No description provided for @vaultDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'The vault is deleted. Keyhold closes now.'**
-  String get vaultDeleted;
-
   /// No description provided for @recoveryGate.
   ///
   /// In en, this message translates to:
@@ -1983,12 +1773,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show the key'**
   String get showKey;
-
-  /// No description provided for @recoveryNeedsPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Set a master password first: the recovery key is shown only after it.'**
-  String get recoveryNeedsPassword;
 
   /// No description provided for @recoveryCopyRow.
   ///
@@ -2068,12 +1852,6 @@ abstract class AppLocalizations {
   /// **'This copy did not open: wrong password or recovery key, or not a Keyhold vault.'**
   String get copyNotOpened;
 
-  /// No description provided for @openCopy.
-  ///
-  /// In en, this message translates to:
-  /// **'Open a backup copy…'**
-  String get openCopy;
-
   /// No description provided for @copyTitle.
   ///
   /// In en, this message translates to:
@@ -2086,17 +1864,449 @@ abstract class AppLocalizations {
   /// **'Only for looking: nothing here changes your vault. Any single entry can be added to your vault.'**
   String get copyReadOnly;
 
-  /// No description provided for @addToVault.
+  /// No description provided for @myVault.
   ///
   /// In en, this message translates to:
-  /// **'Add to my vault'**
-  String get addToVault;
+  /// **'My vault'**
+  String get myVault;
 
-  /// No description provided for @addedToVault.
+  /// No description provided for @vaultTab.
   ///
   /// In en, this message translates to:
-  /// **'\"{name}\" is in your vault'**
-  String addedToVault(String name);
+  /// **'Vault'**
+  String get vaultTab;
+
+  /// No description provided for @syncTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get syncTab;
+
+  /// No description provided for @copiesTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get copiesTab;
+
+  /// No description provided for @startHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your passwords and two-factor codes in one vault: on your computer, on your phone and in your browser.'**
+  String get startHint;
+
+  /// No description provided for @createVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new vault'**
+  String get createVault;
+
+  /// No description provided for @openMyVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Open my vault'**
+  String get openMyVault;
+
+  /// No description provided for @newVault.
+  ///
+  /// In en, this message translates to:
+  /// **'New vault'**
+  String get newVault;
+
+  /// No description provided for @vaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault name'**
+  String get vaultName;
+
+  /// No description provided for @newVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The master password opens this vault on each of your devices: computer, phone and browser. Keyhold can\'t recover it; the recovery key you get next can.'**
+  String get newVaultHint;
+
+  /// No description provided for @sealHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your vault has no master password yet. Set it now: it opens this vault on your other devices and in the browser.'**
+  String get sealHint;
+
+  /// No description provided for @createVaultButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create the vault'**
+  String get createVaultButton;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot the password?'**
+  String get forgotPassword;
+
+  /// No description provided for @usePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the master password'**
+  String get usePassword;
+
+  /// No description provided for @recoveryKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery key'**
+  String get recoveryKey;
+
+  /// No description provided for @recoveryKeyFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The 36 characters from your recovery sheet; spaces don\'t matter.'**
+  String get recoveryKeyFieldHint;
+
+  /// No description provided for @openVaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a vault'**
+  String get openVaultTitle;
+
+  /// No description provided for @openVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The vault opens as it is. It is never merged with another vault.'**
+  String get openVaultHint;
+
+  /// No description provided for @fromDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'From Google Drive'**
+  String get fromDrive;
+
+  /// No description provided for @fromDriveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Google, then type the vault\'s master password.'**
+  String get fromDriveHint;
+
+  /// No description provided for @fromDriveAs.
+  ///
+  /// In en, this message translates to:
+  /// **'{email}: type the vault\'s master password.'**
+  String fromDriveAs(String email);
+
+  /// No description provided for @fromFile.
+  ///
+  /// In en, this message translates to:
+  /// **'From a file (.khd)'**
+  String get fromFile;
+
+  /// No description provided for @fromFileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A copy from a backup folder, a USB stick or an old computer.'**
+  String get fromFileHint;
+
+  /// No description provided for @closedHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened on this device before'**
+  String get closedHere;
+
+  /// No description provided for @closedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'closed {date}'**
+  String closedOn(String date);
+
+  /// No description provided for @closedVaultGone.
+  ///
+  /// In en, this message translates to:
+  /// **'That vault\'s file is no longer on this device.'**
+  String get closedVaultGone;
+
+  /// No description provided for @typeVaultPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the master password of the vault you want to open. Keyhold tries it on every vault in your Google Drive.'**
+  String get typeVaultPassword;
+
+  /// No description provided for @lookingForVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking for your vault: {at} of {of}'**
+  String lookingForVault(int at, int of);
+
+  /// No description provided for @noVaultInDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no Keyhold vault in this Google Drive yet.'**
+  String get noVaultInDrive;
+
+  /// No description provided for @noVaultMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No vault in your Google Drive opens with this password.'**
+  String get noVaultMatches;
+
+  /// No description provided for @sameVaultFile.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is a copy of the vault you have open. To take entries out of it, use Backups, then Review a copy.'**
+  String get sameVaultFile;
+
+  /// No description provided for @fileVaultPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the master password of {name}.'**
+  String fileVaultPassword(String name);
+
+  /// No description provided for @driveFileUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault\'s file in Google Drive can\'t be read. Keyhold leaves it as it is.'**
+  String get driveFileUnreadable;
+
+  /// No description provided for @vaultInfoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault opens with its master password on every device. If you forget the password, the recovery key opens the vault and you choose a new one.'**
+  String get vaultInfoHint;
+
+  /// No description provided for @recoveryKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown and printed after the master password'**
+  String get recoveryKeyHint;
+
+  /// No description provided for @otherVaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Other vaults'**
+  String get otherVaults;
+
+  /// No description provided for @openOtherVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Open another vault'**
+  String get openOtherVault;
+
+  /// No description provided for @openOtherVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'From Google Drive, from a file or from this device'**
+  String get openOtherVaultHint;
+
+  /// No description provided for @createNewVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty, with its own master password'**
+  String get createNewVaultHint;
+
+  /// No description provided for @closeVaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Close \"{name}\" on this device?'**
+  String closeVaultTitle(String name);
+
+  /// No description provided for @closeVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is deleted: it stays in Google Drive, in the backup copies and on this device\'s list of vaults. It opens again with its master password.'**
+  String get closeVaultHint;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueLabel;
+
+  /// No description provided for @renameVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename the vault'**
+  String get renameVault;
+
+  /// No description provided for @reviewCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Review a copy'**
+  String get reviewCopy;
+
+  /// No description provided for @driveVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps this vault as its own encrypted file in a \"Keyhold\" folder in your Google Drive. Your other devices open it with its master password. Several vaults can share one Google Drive; they never mix. Google cannot read them.'**
+  String get driveVaultHint;
+
+  /// No description provided for @foldersSlotsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Every save updates up to 7 copies of the vault in each folder: the latest one, and ones about an hour, a day, a week, a month, three months and a year old.'**
+  String get foldersSlotsHint;
+
+  /// No description provided for @deleteVaultHereHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The vault is erased from this device: passwords, two-factor codes and files. Vaults opened here before stay. Keyhold then shows its start screen.'**
+  String get deleteVaultHereHint;
+
+  /// No description provided for @deleteVaultDriveMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Also delete it from Google Drive (other vaults there stay)'**
+  String get deleteVaultDriveMine;
+
+  /// No description provided for @vaultDeletedHere.
+  ///
+  /// In en, this message translates to:
+  /// **'The vault is deleted.'**
+  String get vaultDeletedHere;
+
+  /// No description provided for @menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menu;
+
+  /// No description provided for @importTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importTitle;
+
+  /// No description provided for @importMenuHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords and codes from other apps or another vault'**
+  String get importMenuHint;
+
+  /// No description provided for @importAnyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an export from another password manager or authenticator app, a KeePass database or another Keyhold vault. Keyhold tells from the file what it is, and you tick what comes in.'**
+  String get importAnyHint;
+
+  /// No description provided for @importReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading the file…'**
+  String get importReading;
+
+  /// No description provided for @importPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Password of this {format} file'**
+  String importPasswordTitle(String format);
+
+  /// No description provided for @importWrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'That password doesn\'t open this file.'**
+  String get importWrongPassword;
+
+  /// No description provided for @importUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyhold doesn\'t recognise this file. Export again from the other app, as CSV or JSON.'**
+  String get importUnknown;
+
+  /// No description provided for @importNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'{format}: nothing in this file that Keyhold can keep.'**
+  String importNothing(String format);
+
+  /// No description provided for @keePassUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This KeePass database uses something Keyhold can\'t open (a key file or the Twofish cipher). Export it from KeePass as CSV instead.'**
+  String get keePassUnsupported;
+
+  /// No description provided for @bitwardenAccountLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This Bitwarden export only opens with your Bitwarden account. Export again as JSON, password protected or without encryption.'**
+  String get bitwardenAccountLocked;
+
+  /// No description provided for @otpLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'otpauth links'**
+  String get otpLinks;
+
+  /// No description provided for @importPickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tick what should go into your vault. Entries you already have are left unticked.'**
+  String get importPickHint;
+
+  /// No description provided for @codesLeftOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Codes left out: {count}. Keyhold makes 6-digit codes every 30 seconds only, not 8 digits, 60 seconds, counters or Steam.'**
+  String codesLeftOut(int count);
+
+  /// No description provided for @recordsLeftOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Records left out: {count} (empty ones, cards and identities).'**
+  String recordsLeftOut(int count);
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get selectAll;
+
+  /// No description provided for @alreadyInVault.
+  ///
+  /// In en, this message translates to:
+  /// **'already in your vault'**
+  String get alreadyInVault;
+
+  /// No description provided for @addSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Add ({count})'**
+  String addSelected(int count);
+
+  /// No description provided for @addedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to your vault: {count}'**
+  String addedCount(int count);
+
+  /// No description provided for @deletePlainFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the file afterwards'**
+  String get deletePlainFile;
+
+  /// No description provided for @importPasswordsFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords'**
+  String get importPasswordsFrom;
+
+  /// No description provided for @importPasswordsList.
+  ///
+  /// In en, this message translates to:
+  /// **'Chrome, Edge, Firefox and Safari (CSV), Bitwarden (CSV or JSON), 1Password (.1pux or CSV), KeePass and KeePassXC (.kdbx or CSV), LastPass, Proton Pass, NordPass and Dashlane (CSV), and another Keyhold vault (.khd).'**
+  String get importPasswordsList;
+
+  /// No description provided for @importCodesFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor codes'**
+  String get importCodesFrom;
+
+  /// No description provided for @importCodesList.
+  ///
+  /// In en, this message translates to:
+  /// **'Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ and andOTP, and any file of otpauth:// links. Google Authenticator: show its export QR code and use Keyhold\'s QR code button.'**
+  String get importCodesList;
+
+  /// No description provided for @importNoExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Microsoft Authenticator and Authy don\'t let codes out: turn two-factor on again at each service and scan its new QR code.'**
+  String get importNoExport;
 }
 
 class _AppLocalizationsDelegate

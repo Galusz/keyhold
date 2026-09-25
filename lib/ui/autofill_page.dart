@@ -33,7 +33,7 @@ Future<void> serveAutofillLookups() async {
   final opened = store.init();
 
   channel.setMethodCallHandler((call) async {
-    if (call.method != 'lookup' || !await opened) return <Object>[];
+    if (call.method != 'lookup' || await opened != VaultState.open) return <Object>[];
     final args = call.arguments as Map;
     // Read afresh every time: the app or a sync may have changed the vault.
     final vault = await store.load();
@@ -101,7 +101,7 @@ class _AutofillPageState extends State<AutofillPage> {
 
   Future<void> _start() async {
     _request = await _channel.invokeMapMethod<String, dynamic>('request') ?? {};
-    if (!await _store.init()) {
+    if (await _store.init() != VaultState.open) {
       setState(() {
         _message = t.openKeyholdFirst;
         _loading = false;

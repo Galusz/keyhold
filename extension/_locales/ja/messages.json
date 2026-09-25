@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "Google Drive に接続できません"
   },
-  "setPasswordInApp": {
-    "message": "先に Keyhold アプリでマスターパスワードを設定してください"
-  },
   "signInWindowOpen": {
     "message": "Google のログイン画面がまだ開いています。閉じてから、もう一度お試しください。"
   },
   "wrongMasterPassword": {
     "message": "マスターパスワードが違います"
+  },
+  "noVaultMatches": {
+    "message": "このパスワードで開ける保管庫は Google Drive にありません"
   }
 }

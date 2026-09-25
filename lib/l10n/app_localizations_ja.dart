@@ -37,9 +37,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get change => '変更';
 
   @override
-  String get connect => '接続';
-
-  @override
   String get disconnect => '接続を解除';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get masterPassword => 'マスターパスワード';
 
   @override
-  String get setMasterPassword => 'マスターパスワードを設定';
-
-  @override
   String copied(String what) {
     return '$whatをコピーしました';
   }
@@ -93,12 +87,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String driveNotConnected(String error) {
     return 'Google Drive に接続できませんでした：$error';
   }
-
-  @override
-  String get masterPasswordOfVault => '保管庫のマスターパスワード';
-
-  @override
-  String get masterPasswordFromComputer => 'パソコンの Keyhold で設定したパスワード';
 
   @override
   String get scanQr => 'QR コードをスキャン';
@@ -170,14 +158,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      'パスワードと 2 段階認証コードを、パソコンと同じ保管庫で管理できます。ご自身の Google Drive を通じて常に同期されます。';
-
-  @override
   String get connectDrive => 'Google Drive に接続';
-
-  @override
-  String get startEmpty => '空の保管庫で始める';
 
   @override
   String codeSeconds(int seconds) {
@@ -201,9 +182,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncNow => '今すぐ同期';
 
   @override
-  String get fingerprintLock => '指紋ロック';
-
-  @override
   String get fingerprintSwitch => '指紋で Keyhold を開く';
 
   @override
@@ -222,12 +200,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => 'Keyhold でパスワードを自動入力';
-
-  @override
-  String get passwordSetPhone => '設定済みです。新しいデバイスでこの保管庫を開くときに使います。';
-
-  @override
-  String get passwordNotSetPhone => '未設定です。これがないと、新しいデバイスで保管庫を開けません。';
 
   @override
   String get deleteThisLogin => 'このログイン情報を削除しますか？';
@@ -302,15 +274,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get browserExtension => 'ブラウザ拡張機能';
-
-  @override
-  String get backup => 'バックアップ';
-
-  @override
-  String get importCsv => 'CSV からインポート';
-
-  @override
-  String get changeMasterPassword => 'マスターパスワードを変更';
 
   @override
   String get addFile => 'ファイルを追加';
@@ -426,10 +389,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword =>
-      'Google Drive：「バックアップ」を開いてマスターパスワードを入力してください';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive：$problem';
   }
@@ -466,14 +425,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get off => 'オフ';
-
-  @override
-  String onWith(String detail) {
-    return 'オン — $detail';
-  }
-
-  @override
-  String get join => '参加';
 
   @override
   String get synced => '同期しました';
@@ -514,17 +465,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get driveHoldsVault =>
-      'Google Drive にはすでに Keyhold の保管庫があります。参加するには、その保管庫のマスターパスワードが必要です。';
-
-  @override
-  String get masterPasswordOfDriveVault => 'Google Drive にある保管庫のマスターパスワード';
-
-  @override
-  String get driveHint =>
-      '暗号化された保管庫を、ご自身の Google Drive の「Keyhold」フォルダに保存します。ほかのデバイスとも同期され、パソコンをなくしても何も失われません。Google が中身を読むことはできません。';
-
-  @override
   String get driveNotInBuild => 'このビルドでは Google Drive が設定されていません。';
 
   @override
@@ -555,9 +495,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get yourServer => '自分のサーバー';
-
-  @override
-  String get foldersHint => '保存するたびに、日付入りのコピーを各フォルダに作成し、最新の 30 個を残します。';
 
   @override
   String get noFolders => 'フォルダなし — ローカルコピーはオフです';
@@ -835,20 +772,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get passwordDoesNotOpen => 'そのパスワードではこの保管庫を開けません';
 
   @override
-  String get currentPasswordWrong => '現在のマスターパスワードが違います';
-
-  @override
   String get unlockVault => '保管庫のロックを解除';
 
   @override
   String get unlockHint => 'この保管庫は別のパソコンから移されたものです。ここで開くには、マスターパスワードを入力してください。';
-
-  @override
-  String get masterPasswordHint =>
-      'この保管庫は Windows が自動で開きます。マスターパスワードは、再インストール後や新しいパソコン、スマートフォンで保管庫を開くときに使います。';
-
-  @override
-  String get currentMasterPassword => '現在のマスターパスワード';
 
   @override
   String get newMasterPassword => '新しいマスターパスワード';
@@ -973,60 +900,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => 'パスワードをインポート';
-
-  @override
-  String get importHint =>
-      'ブラウザからパスワードを CSV 形式でエクスポートし、そのファイルをここで読み込みます。Chrome、Edge、Firefox、Bitwarden、KeePassXC のエクスポートに対応しています。';
-
-  @override
-  String get chooseCsv => 'CSV ファイルを選択';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 件をインポートできます',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 件をインポートできます',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: '空の行 $skipped 件をスキップ',
-    );
-    return '$_temp0（$_temp1）';
-  }
-
-  @override
-  String andMore(int count) {
-    return 'ほか $count 件';
-  }
-
-  @override
-  String get deleteCsv => 'インポート後に CSV ファイルを削除';
-
-  @override
   String get deleteCsvHint => 'すべてのパスワードが暗号化されずに保存されています';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 件をインポート',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint =>
@@ -1046,13 +920,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String nextCode(String code) {
     return '次：$code';
   }
-
-  @override
-  String get noMasterPasswordBar =>
-      'マスターパスワードが未設定です。バックアップを別のパソコンで開けません。クリックして設定してください。';
-
-  @override
-  String get printRecoverySheet => 'リカバリーシートを印刷';
 
   @override
   String get recoverySheet => 'リカバリーシート';
@@ -1124,14 +991,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteVault => '保管庫を削除';
 
   @override
-  String get deleteVaultHint =>
-      'Keyhold がこのデバイスに保存しているすべてのもの（パスワード、2 段階認証コード、ファイル、設定）が消去されます。その後 Keyhold は終了し、空の状態で起動します。';
-
-  @override
-  String get deleteVaultDrive =>
-      'Google Drive からも削除する（ほかのデバイスでは、そこで削除するまでコピーが残ります）';
-
-  @override
   String get deleteVaultFolders => 'バックアップ先フォルダのコピーも削除する';
 
   @override
@@ -1141,17 +1000,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteVaultSureHint => 'この操作は元に戻せません。';
 
   @override
-  String get vaultDeleted => '保管庫を削除しました。Keyhold を終了します。';
-
-  @override
   String get recoveryGate => 'リカバリーキーを表示するには、マスターパスワードを入力してください。';
 
   @override
   String get showKey => 'キーを表示';
-
-  @override
-  String get recoveryNeedsPassword =>
-      '先にマスターパスワードを設定してください。リカバリーキーは設定後に表示されます。';
 
   @override
   String get recoveryCopyRow => 'この行を、印刷したシートに手書きで書き写してください';
@@ -1197,9 +1049,6 @@ class AppLocalizationsJa extends AppLocalizations {
       'コピーを開けませんでした。パスワードかリカバリーキーが違うか、Keyhold の保管庫ではありません。';
 
   @override
-  String get openCopy => 'バックアップのコピーを開く…';
-
-  @override
   String copyTitle(String name) {
     return 'コピー：$name';
   }
@@ -1208,10 +1057,264 @@ class AppLocalizationsJa extends AppLocalizations {
   String get copyReadOnly => '閲覧のみです。ここでの操作で保管庫は変わりません。個別の項目を保管庫に追加できます。';
 
   @override
-  String get addToVault => '自分の保管庫に追加';
+  String get myVault => 'マイ保管庫';
 
   @override
-  String addedToVault(String name) {
-    return '「$name」は保管庫にあります';
+  String get vaultTab => '保管庫';
+
+  @override
+  String get syncTab => '同期';
+
+  @override
+  String get copiesTab => 'バックアップ';
+
+  @override
+  String get startHint =>
+      'パスワードと 2 段階認証コードを 1 つの保管庫に。パソコンでも、スマートフォンでも、ブラウザでも使えます。';
+
+  @override
+  String get createVault => '新しい保管庫を作成';
+
+  @override
+  String get openMyVault => '自分の保管庫を開く';
+
+  @override
+  String get newVault => '新しい保管庫';
+
+  @override
+  String get vaultName => '保管庫の名前';
+
+  @override
+  String get newVaultHint =>
+      'マスターパスワードで、パソコン、スマートフォン、ブラウザのどの端末でもこの保管庫を開けます。Keyhold はこれを復元できませんが、次に受け取るリカバリーキーなら開けます。';
+
+  @override
+  String get sealHint =>
+      'この保管庫にはまだマスターパスワードがありません。今すぐ設定してください。ほかの端末やブラウザでこの保管庫を開くのに使います。';
+
+  @override
+  String get createVaultButton => '保管庫を作成';
+
+  @override
+  String get forgotPassword => 'パスワードをお忘れですか？';
+
+  @override
+  String get usePassword => 'マスターパスワードを使う';
+
+  @override
+  String get recoveryKey => 'リカバリーキー';
+
+  @override
+  String get recoveryKeyFieldHint => 'リカバリーシートの 36 文字です。スペースは関係ありません。';
+
+  @override
+  String get openVaultTitle => '保管庫を開く';
+
+  @override
+  String get openVaultHint => '保管庫はそのままの状態で開きます。ほかの保管庫と統合されることはありません。';
+
+  @override
+  String get fromDrive => 'Google Drive から';
+
+  @override
+  String get fromDriveHint => 'Google にログインしてから、保管庫のマスターパスワードを入力します。';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email：保管庫のマスターパスワードを入力してください。';
   }
+
+  @override
+  String get fromFile => 'ファイルから（.khd）';
+
+  @override
+  String get fromFileHint => 'バックアップ先フォルダ、USB メモリ、古いパソコンにあるコピーです。';
+
+  @override
+  String get closedHere => 'この端末で以前開いた保管庫';
+
+  @override
+  String closedOn(String date) {
+    return '$date に閉じました';
+  }
+
+  @override
+  String get closedVaultGone => 'その保管庫のファイルはもうこの端末にありません。';
+
+  @override
+  String get typeVaultPassword =>
+      '開きたい保管庫のマスターパスワードを入力してください。Keyhold が Google Drive にある各保管庫で試します。';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return '保管庫を探しています：$of 件中 $at 件目';
+  }
+
+  @override
+  String get noVaultInDrive => 'この Google Drive にはまだ Keyhold の保管庫がありません。';
+
+  @override
+  String get noVaultMatches => 'このパスワードで開ける保管庫は Google Drive にありません。';
+
+  @override
+  String get sameVaultFile =>
+      'このファイルは、いま開いている保管庫のコピーです。項目を取り出すには「バックアップ」から「コピーを確認」を使ってください。';
+
+  @override
+  String fileVaultPassword(String name) {
+    return '$name のマスターパスワードを入力してください。';
+  }
+
+  @override
+  String get driveFileUnreadable =>
+      'Google Drive にあるこの保管庫のファイルを読み取れません。Keyhold はそのままにします。';
+
+  @override
+  String get vaultInfoHint =>
+      'この保管庫は、どの端末でも自分のマスターパスワードで開きます。パスワードを忘れても、リカバリーキーで保管庫を開いて新しいパスワードを設定できます。';
+
+  @override
+  String get recoveryKeyHint => 'マスターパスワードの入力後に表示・印刷できます';
+
+  @override
+  String get otherVaults => 'ほかの保管庫';
+
+  @override
+  String get openOtherVault => '別の保管庫を開く';
+
+  @override
+  String get openOtherVaultHint => 'Google Drive、ファイル、またはこの端末から';
+
+  @override
+  String get createNewVaultHint => '空の保管庫。専用のマスターパスワード付き';
+
+  @override
+  String closeVaultTitle(String name) {
+    return 'この端末で「$name」を閉じますか？';
+  }
+
+  @override
+  String get closeVaultHint =>
+      '何も削除されません。Google Drive、バックアップのコピー、この端末の保管庫リストに残り、マスターパスワードでまた開けます。';
+
+  @override
+  String get continueLabel => '続ける';
+
+  @override
+  String get renameVault => '保管庫の名前を変更';
+
+  @override
+  String get reviewCopy => 'コピーを確認';
+
+  @override
+  String get driveVaultHint =>
+      'この保管庫を、Google Drive の「Keyhold」フォルダに専用の暗号化ファイルとして保存します。ほかの端末はこの保管庫のマスターパスワードで開きます。1 つの Google Drive に複数の保管庫を置いても混ざることはありません。Google には読めません。';
+
+  @override
+  String get foldersSlotsHint =>
+      '保存のたびに、各フォルダで保管庫のコピーを最大 7 つ更新します。最新のものと、約 1 時間前、1 日前、1 週間前、1 か月前、3 か月前、1 年前のものです。';
+
+  @override
+  String get deleteVaultHereHint =>
+      'この端末から保管庫を消去します。パスワード、2 段階認証コード、ファイルが対象です。以前ここで開いたほかの保管庫は残ります。その後、Keyhold はスタート画面を表示します。';
+
+  @override
+  String get deleteVaultDriveMine => 'Google Drive からも削除する（そこにあるほかの保管庫は残ります）';
+
+  @override
+  String get vaultDeletedHere => '保管庫を削除しました。';
+
+  @override
+  String get menu => 'メニュー';
+
+  @override
+  String get importTitle => 'インポート';
+
+  @override
+  String get importMenuHint => 'ほかのアプリや別の保管庫からパスワードとコードを取り込みます';
+
+  @override
+  String get importAnyHint =>
+      'ほかのパスワード管理アプリや認証アプリのエクスポート、KeePass データベース、別の Keyhold 保管庫を選んでください。Keyhold がファイルの種類を自動で判別し、取り込む項目はあなたが選びます。';
+
+  @override
+  String get importReading => 'ファイルを読み込んでいます…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return 'この $format ファイルのパスワード';
+  }
+
+  @override
+  String get importWrongPassword => 'このパスワードではファイルを開けません。';
+
+  @override
+  String get importUnknown =>
+      'Keyhold はこのファイルを認識できません。元のアプリから CSV か JSON でもう一度エクスポートしてください。';
+
+  @override
+  String importNothing(String format) {
+    return '$format：このファイルには Keyhold が保存できるものがありません。';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      'この KeePass データベースには Keyhold が開けないもの（キーファイルまたは Twofish 暗号）が使われています。KeePass から CSV でエクスポートしてください。';
+
+  @override
+  String get bitwardenAccountLocked =>
+      'この Bitwarden のエクスポートは Bitwarden アカウントでしか開けません。パスワード保護付きか暗号化なしの JSON でもう一度エクスポートしてください。';
+
+  @override
+  String get otpLinks => 'otpauth リンク';
+
+  @override
+  String get importPickHint => '保管庫に入れる項目にチェックを入れてください。すでにある項目はチェックが外れています。';
+
+  @override
+  String codesLeftOut(int count) {
+    return '除外したコード：$count 件。Keyhold が作れるのは 30 秒ごとの 6 桁コードだけで、8 桁、60 秒、カウンター方式、Steam は使えません。';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return '除外した項目：$count 件（空の項目、カード、個人情報）。';
+  }
+
+  @override
+  String get selectAll => 'すべて選択';
+
+  @override
+  String get alreadyInVault => '保管庫にあります';
+
+  @override
+  String addSelected(int count) {
+    return '追加（$count）';
+  }
+
+  @override
+  String addedCount(int count) {
+    return '保管庫に追加しました：$count 件';
+  }
+
+  @override
+  String get deletePlainFile => '取り込み後にこのファイルを削除';
+
+  @override
+  String get importPasswordsFrom => 'パスワード';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome、Edge、Firefox、Safari（CSV）、Bitwarden（CSV または JSON）、1Password（.1pux または CSV）、KeePass と KeePassXC（.kdbx または CSV）、LastPass、Proton Pass、NordPass、Dashlane（CSV）、別の Keyhold 保管庫（.khd）。';
+
+  @override
+  String get importCodesFrom => '2 段階認証コード';
+
+  @override
+  String get importCodesList =>
+      'Aegis（.json）、2FAS（.2fas）、Ente Auth、FreeOTP+、andOTP、otpauth:// リンクを含むファイル。Google Authenticator：エクスポート用 QR コードを表示し、Keyhold の QR コードボタンを使います。';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator と Authy はコードをエクスポートできません。各サービスで 2 段階認証をもう一度有効にし、新しい QR コードをスキャンしてください。';
 }

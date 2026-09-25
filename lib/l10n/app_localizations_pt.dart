@@ -37,9 +37,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get change => 'Alterar';
 
   @override
-  String get connect => 'Conectar';
-
-  @override
   String get disconnect => 'Desconectar';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get masterPassword => 'Senha mestra';
 
   @override
-  String get setMasterPassword => 'Definir senha mestra';
-
-  @override
   String copied(String what) {
     return 'Copiado: $what';
   }
@@ -94,13 +88,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String driveNotConnected(String error) {
     return 'O Google Drive não foi conectado: $error';
   }
-
-  @override
-  String get masterPasswordOfVault => 'Senha mestra do seu cofre';
-
-  @override
-  String get masterPasswordFromComputer =>
-      'A que você definiu no Keyhold do seu computador';
 
   @override
   String get scanQr => 'Ler um código QR';
@@ -175,14 +162,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      'Suas senhas e códigos de dois fatores — o mesmo cofre do seu computador, sempre em sincronia pelo seu próprio Google Drive.';
-
-  @override
   String get connectDrive => 'Conectar o Google Drive';
-
-  @override
-  String get startEmpty => 'Começar com um cofre vazio';
 
   @override
   String codeSeconds(int seconds) {
@@ -207,9 +187,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncNow => 'Sincronizar agora';
 
   @override
-  String get fingerprintLock => 'Bloqueio por impressão digital';
-
-  @override
   String get fingerprintSwitch => 'Abrir o Keyhold com a impressão digital';
 
   @override
@@ -229,14 +206,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => 'Preencher senhas com o Keyhold';
-
-  @override
-  String get passwordSetPhone =>
-      'Definida. Ela abre este cofre em um novo dispositivo.';
-
-  @override
-  String get passwordNotSetPhone =>
-      'Não definida. Sem ela, um novo dispositivo não consegue abrir o cofre.';
 
   @override
   String get deleteThisLogin => 'Excluir este login?';
@@ -319,15 +288,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get browserExtension => 'Extensão do navegador';
-
-  @override
-  String get backup => 'Backup';
-
-  @override
-  String get importCsv => 'Importar de CSV';
-
-  @override
-  String get changeMasterPassword => 'Alterar senha mestra';
 
   @override
   String get addFile => 'Adicionar arquivo';
@@ -465,10 +425,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword =>
-      'Google Drive: abra Backup e digite a senha mestra';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive: $problem';
   }
@@ -506,14 +462,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get off => 'Desativado';
-
-  @override
-  String onWith(String detail) {
-    return 'Ativado — $detail';
-  }
-
-  @override
-  String get join => 'Entrar';
 
   @override
   String get synced => 'Sincronizado';
@@ -555,18 +503,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get driveHoldsVault =>
-      'O Google Drive já tem um cofre do Keyhold. Para entrar nele, é preciso a senha mestra dele.';
-
-  @override
-  String get masterPasswordOfDriveVault =>
-      'Senha mestra do cofre no Google Drive';
-
-  @override
-  String get driveHint =>
-      'Guarda o cofre criptografado em uma pasta \"Keyhold\" no seu próprio Google Drive, para que seus outros dispositivos fiquem sincronizados e um computador perdido não perca nada. O Google não consegue lê-lo.';
-
-  @override
   String get driveNotInBuild =>
       'O Google Drive não está configurado nesta versão.';
 
@@ -601,10 +537,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get yourServer => 'Seu servidor';
-
-  @override
-  String get foldersHint =>
-      'A cada salvamento, uma cópia com data vai para cada pasta e as últimas 30 são mantidas.';
 
   @override
   String get noFolders => 'Nenhuma pasta — cópias locais desativadas';
@@ -898,21 +830,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get passwordDoesNotOpen => 'Essa senha não abre este cofre';
 
   @override
-  String get currentPasswordWrong => 'A senha mestra atual está incorreta';
-
-  @override
   String get unlockVault => 'Desbloquear cofre';
 
   @override
   String get unlockHint =>
       'Este cofre veio de outro computador. Digite a senha mestra para abri-lo aqui.';
-
-  @override
-  String get masterPasswordHint =>
-      'O Windows abre este cofre para você automaticamente. A senha mestra é o caminho de volta depois de uma reinstalação, em um computador novo ou no seu telefone.';
-
-  @override
-  String get currentMasterPassword => 'Senha mestra atual';
 
   @override
   String get newMasterPassword => 'Nova senha mestra';
@@ -1041,64 +963,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => 'Importar senhas';
-
-  @override
-  String get importHint =>
-      'Exporte suas senhas do navegador como CSV e depois carregue o arquivo aqui. Exportações do Chrome, Edge, Firefox, Bitwarden e KeePassXC funcionam.';
-
-  @override
-  String get chooseCsv => 'Escolher arquivo CSV';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count itens prontos',
-      one: '1 item pronto',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count itens prontos',
-      one: '1 item pronto',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: '$skipped linhas vazias ignoradas',
-      one: '1 linha vazia ignorada',
-    );
-    return '$_temp0, $_temp1';
-  }
-
-  @override
-  String andMore(int count) {
-    return 'e mais $count';
-  }
-
-  @override
-  String get deleteCsv => 'Excluir o arquivo CSV após importar';
-
-  @override
   String get deleteCsvHint => 'Ele contém todas as senhas em texto simples';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Importar $count itens',
-      one: 'Importar 1 item',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint =>
@@ -1118,13 +983,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String nextCode(String code) {
     return 'próximo $code';
   }
-
-  @override
-  String get noMasterPasswordBar =>
-      'Sem senha mestra: seus backups não podem ser abertos em outro computador. Clique para definir uma.';
-
-  @override
-  String get printRecoverySheet => 'Imprimir a folha de recuperação';
 
   @override
   String get recoverySheet => 'Folha de recuperação';
@@ -1197,14 +1055,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteVault => 'Excluir o cofre';
 
   @override
-  String get deleteVaultHint =>
-      'Tudo o que o Keyhold guarda neste dispositivo é apagado: senhas, códigos de dois fatores, arquivos e configurações. Depois o Keyhold fecha e começa vazio.';
-
-  @override
-  String get deleteVaultDrive =>
-      'Excluir também do Google Drive (os outros dispositivos mantêm a cópia deles até você excluí-la lá também)';
-
-  @override
   String get deleteVaultFolders =>
       'Excluir também as cópias nas pastas de backup';
 
@@ -1215,19 +1065,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteVaultSureHint => 'Isso não pode ser desfeito.';
 
   @override
-  String get vaultDeleted =>
-      'O cofre foi excluído. O Keyhold vai fechar agora.';
-
-  @override
   String get recoveryGate =>
       'Digite sua senha mestra para ver a chave de recuperação.';
 
   @override
   String get showKey => 'Mostrar a chave';
-
-  @override
-  String get recoveryNeedsPassword =>
-      'Defina primeiro uma senha mestra: a chave de recuperação só aparece depois disso.';
 
   @override
   String get recoveryCopyRow => 'Copie esta linha à mão na folha impressa';
@@ -1277,9 +1119,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não foi possível abrir a cópia: senha ou chave de recuperação erradas, ou não é um cofre do Keyhold.';
 
   @override
-  String get openCopy => 'Abrir uma cópia de backup…';
-
-  @override
   String copyTitle(String name) {
     return 'Cópia: $name';
   }
@@ -1289,10 +1128,275 @@ class AppLocalizationsPt extends AppLocalizations {
       'Somente para ver: nada aqui altera seu cofre. Você pode adicionar itens avulsos ao seu cofre.';
 
   @override
-  String get addToVault => 'Adicionar ao meu cofre';
+  String get myVault => 'Meu cofre';
 
   @override
-  String addedToVault(String name) {
-    return '\"$name\" está no seu cofre';
+  String get vaultTab => 'Cofre';
+
+  @override
+  String get syncTab => 'Sincronizar';
+
+  @override
+  String get copiesTab => 'Backups';
+
+  @override
+  String get startHint =>
+      'Suas senhas e códigos de dois fatores em um só cofre: no computador, no telefone e no navegador.';
+
+  @override
+  String get createVault => 'Criar um cofre novo';
+
+  @override
+  String get openMyVault => 'Abrir meu cofre';
+
+  @override
+  String get newVault => 'Cofre novo';
+
+  @override
+  String get vaultName => 'Nome do cofre';
+
+  @override
+  String get newVaultHint =>
+      'A senha mestra abre este cofre em todos os seus dispositivos: computador, telefone e navegador. O Keyhold não consegue recuperá-la; a chave de recuperação que você recebe em seguida consegue.';
+
+  @override
+  String get sealHint =>
+      'Seu cofre ainda não tem senha mestra. Defina agora: ela abre este cofre nos seus outros dispositivos e no navegador.';
+
+  @override
+  String get createVaultButton => 'Criar o cofre';
+
+  @override
+  String get forgotPassword => 'Esqueceu a senha?';
+
+  @override
+  String get usePassword => 'Usar a senha mestra';
+
+  @override
+  String get recoveryKey => 'Chave de recuperação';
+
+  @override
+  String get recoveryKeyFieldHint =>
+      'Os 36 caracteres da sua folha de recuperação; espaços não importam.';
+
+  @override
+  String get openVaultTitle => 'Abrir um cofre';
+
+  @override
+  String get openVaultHint =>
+      'O cofre abre como está. Ele nunca é misturado com outro cofre.';
+
+  @override
+  String get fromDrive => 'Do Google Drive';
+
+  @override
+  String get fromDriveHint =>
+      'Entre no Google e digite a senha mestra do cofre.';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email: digite a senha mestra do cofre.';
   }
+
+  @override
+  String get fromFile => 'De um arquivo (.khd)';
+
+  @override
+  String get fromFileHint =>
+      'Uma cópia de uma pasta de backup, de um pendrive ou de um computador antigo.';
+
+  @override
+  String get closedHere => 'Abertos antes neste dispositivo';
+
+  @override
+  String closedOn(String date) {
+    return 'fechado em $date';
+  }
+
+  @override
+  String get closedVaultGone =>
+      'O arquivo desse cofre não está mais neste dispositivo.';
+
+  @override
+  String get typeVaultPassword =>
+      'Digite a senha mestra do cofre que você quer abrir. O Keyhold testa a senha em cada cofre do seu Google Drive.';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return 'Procurando seu cofre: $at de $of';
+  }
+
+  @override
+  String get noVaultInDrive =>
+      'Ainda não há nenhum cofre Keyhold neste Google Drive.';
+
+  @override
+  String get noVaultMatches =>
+      'Nenhum cofre do seu Google Drive abre com esta senha.';
+
+  @override
+  String get sameVaultFile =>
+      'Este arquivo é uma cópia do cofre que está aberto. Para tirar itens dele, use Backups e depois Revisar uma cópia.';
+
+  @override
+  String fileVaultPassword(String name) {
+    return 'Digite a senha mestra de $name.';
+  }
+
+  @override
+  String get driveFileUnreadable =>
+      'Não dá para ler o arquivo deste cofre no Google Drive. O Keyhold o deixa como está.';
+
+  @override
+  String get vaultInfoHint =>
+      'Este cofre abre com a senha mestra dele em todos os dispositivos. Se você esquecer a senha, a chave de recuperação abre o cofre e você escolhe uma nova.';
+
+  @override
+  String get recoveryKeyHint => 'Mostrada e impressa depois da senha mestra';
+
+  @override
+  String get otherVaults => 'Outros cofres';
+
+  @override
+  String get openOtherVault => 'Abrir outro cofre';
+
+  @override
+  String get openOtherVaultHint =>
+      'Do Google Drive, de um arquivo ou deste dispositivo';
+
+  @override
+  String get createNewVaultHint => 'Vazio, com a própria senha mestra';
+
+  @override
+  String closeVaultTitle(String name) {
+    return 'Fechar \"$name\" neste dispositivo?';
+  }
+
+  @override
+  String get closeVaultHint =>
+      'Nada é apagado: ele continua no Google Drive, nas cópias de backup e na lista de cofres deste dispositivo. Ele abre de novo com a senha mestra dele.';
+
+  @override
+  String get continueLabel => 'Continuar';
+
+  @override
+  String get renameVault => 'Renomear o cofre';
+
+  @override
+  String get reviewCopy => 'Revisar uma cópia';
+
+  @override
+  String get driveVaultHint =>
+      'Guarda este cofre como um arquivo criptografado próprio, numa pasta \"Keyhold\" do seu Google Drive. Seus outros dispositivos o abrem com a senha mestra dele. Vários cofres podem dividir um Google Drive sem nunca se misturar. O Google não consegue lê-los.';
+
+  @override
+  String get foldersSlotsHint =>
+      'Cada salvamento atualiza até 7 cópias do cofre em cada pasta: a mais recente e outras de cerca de uma hora, um dia, uma semana, um mês, três meses e um ano atrás.';
+
+  @override
+  String get deleteVaultHereHint =>
+      'O cofre é apagado deste dispositivo: senhas, códigos de dois fatores e arquivos. Os cofres abertos antes aqui continuam. Depois o Keyhold mostra a tela inicial.';
+
+  @override
+  String get deleteVaultDriveMine =>
+      'Apagar também do Google Drive (os outros cofres continuam lá)';
+
+  @override
+  String get vaultDeletedHere => 'O cofre foi apagado.';
+
+  @override
+  String get menu => 'Menu';
+
+  @override
+  String get importTitle => 'Importar';
+
+  @override
+  String get importMenuHint =>
+      'Senhas e códigos de outros apps ou de outro cofre';
+
+  @override
+  String get importAnyHint =>
+      'Escolha uma exportação de outro gerenciador de senhas ou app autenticador, um banco de dados do KeePass ou outro cofre do Keyhold. O Keyhold reconhece o arquivo sozinho, e você marca o que entra.';
+
+  @override
+  String get importReading => 'Lendo o arquivo…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return 'Senha deste arquivo do $format';
+  }
+
+  @override
+  String get importWrongPassword => 'Essa senha não abre este arquivo.';
+
+  @override
+  String get importUnknown =>
+      'O Keyhold não reconhece este arquivo. Exporte de novo pelo outro app, como CSV ou JSON.';
+
+  @override
+  String importNothing(String format) {
+    return '$format: não há nada neste arquivo que o Keyhold possa guardar.';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      'Este banco do KeePass usa algo que o Keyhold não consegue abrir (um arquivo de chave ou a cifra Twofish). Exporte-o pelo KeePass como CSV.';
+
+  @override
+  String get bitwardenAccountLocked =>
+      'Esta exportação do Bitwarden só abre com a sua conta do Bitwarden. Exporte de novo como JSON, protegido por senha ou sem criptografia.';
+
+  @override
+  String get otpLinks => 'links otpauth';
+
+  @override
+  String get importPickHint =>
+      'Marque o que deve entrar no seu cofre. O que você já tem fica desmarcado.';
+
+  @override
+  String codesLeftOut(int count) {
+    return 'Códigos deixados de fora: $count. O Keyhold só gera códigos de 6 dígitos a cada 30 segundos, sem 8 dígitos, 60 segundos, contadores ou Steam.';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return 'Registros deixados de fora: $count (vazios, cartões e identidades).';
+  }
+
+  @override
+  String get selectAll => 'Selecionar tudo';
+
+  @override
+  String get alreadyInVault => 'já está no seu cofre';
+
+  @override
+  String addSelected(int count) {
+    return 'Adicionar ($count)';
+  }
+
+  @override
+  String addedCount(int count) {
+    return 'Adicionado ao cofre: $count';
+  }
+
+  @override
+  String get deletePlainFile => 'Apagar o arquivo depois';
+
+  @override
+  String get importPasswordsFrom => 'Senhas';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome, Edge, Firefox e Safari (CSV), Bitwarden (CSV ou JSON), 1Password (.1pux ou CSV), KeePass e KeePassXC (.kdbx ou CSV), LastPass, Proton Pass, NordPass e Dashlane (CSV), e outro cofre do Keyhold (.khd).';
+
+  @override
+  String get importCodesFrom => 'Códigos de dois fatores';
+
+  @override
+  String get importCodesList =>
+      'Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ e andOTP, e qualquer arquivo com links otpauth://. Google Authenticator: mostre o QR code de exportação dele e use o botão de QR code do Keyhold.';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator e Authy não deixam os códigos saírem: ative de novo a verificação em duas etapas em cada serviço e leia o novo QR code.';
 }

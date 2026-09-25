@@ -37,9 +37,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get change => 'Changer';
 
   @override
-  String get connect => 'Connecter';
-
-  @override
   String get disconnect => 'Déconnecter';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get masterPassword => 'Mot de passe principal';
 
   @override
-  String get setMasterPassword => 'Définir le mot de passe principal';
-
-  @override
   String copied(String what) {
     return '$what copié';
   }
@@ -95,14 +89,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String driveNotConnected(String error) {
     return 'Google Drive n’a pas été connecté : $error';
   }
-
-  @override
-  String get masterPasswordOfVault =>
-      'Mot de passe principal de votre coffre-fort';
-
-  @override
-  String get masterPasswordFromComputer =>
-      'Celui que vous avez défini dans Keyhold sur votre ordinateur';
 
   @override
   String get scanQr => 'Scanner un code QR';
@@ -178,14 +164,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      'Vos mots de passe et codes de double authentification — le même coffre-fort que sur votre ordinateur, synchronisé via votre propre Google Drive.';
-
-  @override
   String get connectDrive => 'Connecter Google Drive';
-
-  @override
-  String get startEmpty => 'Commencer avec un coffre-fort vide';
 
   @override
   String codeSeconds(int seconds) {
@@ -210,9 +189,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncNow => 'Synchroniser maintenant';
 
   @override
-  String get fingerprintLock => 'Verrouillage par empreinte';
-
-  @override
   String get fingerprintSwitch => 'Ouvrir Keyhold avec une empreinte digitale';
 
   @override
@@ -232,14 +208,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => 'Remplir les mots de passe avec Keyhold';
-
-  @override
-  String get passwordSetPhone =>
-      'Défini. Il ouvre ce coffre-fort sur un nouvel appareil.';
-
-  @override
-  String get passwordNotSetPhone =>
-      'Non défini. Sans lui, un nouvel appareil ne peut pas ouvrir le coffre-fort.';
 
   @override
   String get deleteThisLogin => 'Supprimer cet identifiant ?';
@@ -322,15 +290,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get browserExtension => 'Extension de navigateur';
-
-  @override
-  String get backup => 'Sauvegarde';
-
-  @override
-  String get importCsv => 'Importer depuis un CSV';
-
-  @override
-  String get changeMasterPassword => 'Changer le mot de passe principal';
 
   @override
   String get addFile => 'Ajouter un fichier';
@@ -468,10 +427,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword =>
-      'Google Drive : ouvrez Sauvegarde et saisissez le mot de passe principal';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive : $problem';
   }
@@ -509,14 +464,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get off => 'Désactivé';
-
-  @override
-  String onWith(String detail) {
-    return 'Activé — $detail';
-  }
-
-  @override
-  String get join => 'Rejoindre';
 
   @override
   String get synced => 'Synchronisé';
@@ -558,18 +505,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get driveHoldsVault =>
-      'Google Drive contient déjà un coffre-fort Keyhold. Son mot de passe principal est nécessaire pour le rejoindre.';
-
-  @override
-  String get masterPasswordOfDriveVault =>
-      'Mot de passe principal du coffre-fort dans Google Drive';
-
-  @override
-  String get driveHint =>
-      'Garde le coffre-fort chiffré dans un dossier « Keyhold » de votre propre Google Drive : vos autres appareils restent synchronisés et un ordinateur perdu ne vous fait rien perdre. Google ne peut pas le lire.';
-
-  @override
   String get driveNotInBuild =>
       'Google Drive n’est pas configuré dans cette version.';
 
@@ -604,10 +539,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get yourServer => 'Votre serveur';
-
-  @override
-  String get foldersHint =>
-      'Chaque enregistrement dépose une copie datée dans chaque dossier et garde les 30 dernières.';
 
   @override
   String get noFolders => 'Aucun dossier — les copies locales sont désactivées';
@@ -905,22 +836,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce mot de passe n’ouvre pas ce coffre-fort';
 
   @override
-  String get currentPasswordWrong =>
-      'Le mot de passe principal actuel est incorrect';
-
-  @override
   String get unlockVault => 'Déverrouiller le coffre-fort';
 
   @override
   String get unlockHint =>
       'Ce coffre-fort vient d’un autre appareil. Saisissez le mot de passe principal pour l’ouvrir ici.';
-
-  @override
-  String get masterPasswordHint =>
-      'Windows ouvre ce coffre-fort pour vous automatiquement. Le mot de passe principal vous permet d’y revenir après une réinstallation, sur un nouvel ordinateur ou sur votre téléphone.';
-
-  @override
-  String get currentMasterPassword => 'Mot de passe principal actuel';
 
   @override
   String get newMasterPassword => 'Nouveau mot de passe principal';
@@ -1050,64 +970,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => 'Importer des mots de passe';
-
-  @override
-  String get importHint =>
-      'Exportez vos mots de passe du navigateur au format CSV, puis chargez le fichier ici. Les exports de Chrome, Edge, Firefox, Bitwarden et KeePassXC fonctionnent tous.';
-
-  @override
-  String get chooseCsv => 'Choisir un fichier CSV';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entrées prêtes',
-      one: '$count entrée prête',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entrées prêtes',
-      one: '$count entrée prête',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: '$skipped lignes vides ignorées',
-      one: '$skipped ligne vide ignorée',
-    );
-    return '$_temp0, $_temp1';
-  }
-
-  @override
-  String andMore(int count) {
-    return 'et $count de plus';
-  }
-
-  @override
-  String get deleteCsv => 'Supprimer le fichier CSV après l’import';
-
-  @override
   String get deleteCsvHint => 'Il contient tous les mots de passe en clair';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Importer $count entrées',
-      one: 'Importer $count entrée',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint =>
@@ -1127,13 +990,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String nextCode(String code) {
     return 'puis $code';
   }
-
-  @override
-  String get noMasterPasswordBar =>
-      'Pas de mot de passe principal : vos sauvegardes ne peuvent pas être ouvertes sur un autre ordinateur. Cliquez pour en définir un.';
-
-  @override
-  String get printRecoverySheet => 'Imprimer la fiche de récupération';
 
   @override
   String get recoverySheet => 'Fiche de récupération';
@@ -1206,14 +1062,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteVault => 'Supprimer le coffre-fort';
 
   @override
-  String get deleteVaultHint =>
-      'Tout ce que Keyhold garde sur cet appareil est effacé : mots de passe, codes de double authentification, fichiers et réglages. Keyhold se ferme ensuite et redémarre vide.';
-
-  @override
-  String get deleteVaultDrive =>
-      'Le supprimer aussi de Google Drive (les autres appareils gardent leur copie tant que vous ne l’y supprimez pas)';
-
-  @override
   String get deleteVaultFolders =>
       'Supprimer aussi les copies dans les dossiers de sauvegarde';
 
@@ -1224,18 +1072,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteVaultSureHint => 'Cette action est irréversible.';
 
   @override
-  String get vaultDeleted => 'Le coffre-fort est supprimé. Keyhold se ferme.';
-
-  @override
   String get recoveryGate =>
       'Saisissez votre mot de passe principal pour voir la clé de récupération.';
 
   @override
   String get showKey => 'Afficher la clé';
-
-  @override
-  String get recoveryNeedsPassword =>
-      'Définissez d’abord un mot de passe principal : la clé de récupération n’apparaît qu’ensuite.';
 
   @override
   String get recoveryCopyRow =>
@@ -1286,9 +1127,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'La copie ne s’est pas ouverte : mauvais mot de passe ou mauvaise clé de récupération, ou ce n’est pas un coffre-fort Keyhold.';
 
   @override
-  String get openCopy => 'Ouvrir une copie de sauvegarde…';
-
-  @override
   String copyTitle(String name) {
     return 'Copie : $name';
   }
@@ -1298,10 +1136,277 @@ class AppLocalizationsFr extends AppLocalizations {
       'Consultation seulement : rien ici ne modifie votre coffre-fort. Vous pouvez y ajouter une entrée à la fois.';
 
   @override
-  String get addToVault => 'Ajouter à mon coffre-fort';
+  String get myVault => 'Mon coffre-fort';
 
   @override
-  String addedToVault(String name) {
-    return '« $name » est dans votre coffre-fort';
+  String get vaultTab => 'Coffre-fort';
+
+  @override
+  String get syncTab => 'Synchro';
+
+  @override
+  String get copiesTab => 'Sauvegardes';
+
+  @override
+  String get startHint =>
+      'Vos mots de passe et codes de double authentification dans un seul coffre-fort : sur votre ordinateur, votre téléphone et dans votre navigateur.';
+
+  @override
+  String get createVault => 'Créer un nouveau coffre-fort';
+
+  @override
+  String get openMyVault => 'Ouvrir mon coffre-fort';
+
+  @override
+  String get newVault => 'Nouveau coffre-fort';
+
+  @override
+  String get vaultName => 'Nom du coffre-fort';
+
+  @override
+  String get newVaultHint =>
+      'Le mot de passe principal ouvre ce coffre-fort sur chacun de vos appareils : ordinateur, téléphone et navigateur. Keyhold ne peut pas le récupérer ; la clé de récupération que vous recevrez ensuite, si.';
+
+  @override
+  String get sealHint =>
+      'Votre coffre-fort n’a pas encore de mot de passe principal. Définissez-le maintenant : il ouvre ce coffre-fort sur vos autres appareils et dans le navigateur.';
+
+  @override
+  String get createVaultButton => 'Créer le coffre-fort';
+
+  @override
+  String get forgotPassword => 'Mot de passe oublié ?';
+
+  @override
+  String get usePassword => 'Utiliser le mot de passe principal';
+
+  @override
+  String get recoveryKey => 'Clé de récupération';
+
+  @override
+  String get recoveryKeyFieldHint =>
+      'Les 36 caractères de votre fiche de récupération ; les espaces ne comptent pas.';
+
+  @override
+  String get openVaultTitle => 'Ouvrir un coffre-fort';
+
+  @override
+  String get openVaultHint =>
+      'Le coffre-fort s’ouvre tel qu’il est. Il n’est jamais fusionné avec un autre coffre-fort.';
+
+  @override
+  String get fromDrive => 'Depuis Google Drive';
+
+  @override
+  String get fromDriveHint =>
+      'Connectez-vous à Google, puis saisissez le mot de passe principal du coffre-fort.';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email : saisissez le mot de passe principal du coffre-fort.';
   }
+
+  @override
+  String get fromFile => 'Depuis un fichier (.khd)';
+
+  @override
+  String get fromFileHint =>
+      'Une copie d’un dossier de sauvegarde, d’une clé USB ou d’un ancien ordinateur.';
+
+  @override
+  String get closedHere => 'Ouverts auparavant sur cet appareil';
+
+  @override
+  String closedOn(String date) {
+    return 'fermé le $date';
+  }
+
+  @override
+  String get closedVaultGone =>
+      'Le fichier de ce coffre-fort n’est plus sur cet appareil.';
+
+  @override
+  String get typeVaultPassword =>
+      'Saisissez le mot de passe principal du coffre-fort à ouvrir. Keyhold l’essaie sur chaque coffre-fort de votre Google Drive.';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return 'Recherche de votre coffre-fort : $at sur $of';
+  }
+
+  @override
+  String get noVaultInDrive =>
+      'Il n’y a pas encore de coffre-fort Keyhold dans ce Google Drive.';
+
+  @override
+  String get noVaultMatches =>
+      'Aucun coffre-fort de votre Google Drive ne s’ouvre avec ce mot de passe.';
+
+  @override
+  String get sameVaultFile =>
+      'Ce fichier est une copie du coffre-fort déjà ouvert. Pour en reprendre des entrées, passez par Sauvegardes, puis Consulter une copie.';
+
+  @override
+  String fileVaultPassword(String name) {
+    return 'Saisissez le mot de passe principal de $name.';
+  }
+
+  @override
+  String get driveFileUnreadable =>
+      'Le fichier de ce coffre-fort dans Google Drive est illisible. Keyhold le laisse tel quel.';
+
+  @override
+  String get vaultInfoHint =>
+      'Ce coffre-fort s’ouvre avec son mot de passe principal sur chaque appareil. Si vous oubliez le mot de passe, la clé de récupération ouvre le coffre-fort et vous en choisissez un nouveau.';
+
+  @override
+  String get recoveryKeyHint =>
+      'Affichée et imprimée après le mot de passe principal';
+
+  @override
+  String get otherVaults => 'Autres coffres-forts';
+
+  @override
+  String get openOtherVault => 'Ouvrir un autre coffre-fort';
+
+  @override
+  String get openOtherVaultHint =>
+      'Depuis Google Drive, un fichier ou cet appareil';
+
+  @override
+  String get createNewVaultHint =>
+      'Vide, avec son propre mot de passe principal';
+
+  @override
+  String closeVaultTitle(String name) {
+    return 'Fermer « $name » sur cet appareil ?';
+  }
+
+  @override
+  String get closeVaultHint =>
+      'Rien n’est supprimé : il reste dans Google Drive, dans les sauvegardes et dans la liste des coffres-forts de cet appareil. Il s’ouvre à nouveau avec son mot de passe principal.';
+
+  @override
+  String get continueLabel => 'Continuer';
+
+  @override
+  String get renameVault => 'Renommer le coffre-fort';
+
+  @override
+  String get reviewCopy => 'Consulter une copie';
+
+  @override
+  String get driveVaultHint =>
+      'Garde ce coffre-fort dans son propre fichier chiffré, dans un dossier « Keyhold » de votre Google Drive. Vos autres appareils l’ouvrent avec son mot de passe principal. Plusieurs coffres-forts peuvent partager un même Google Drive sans jamais se mélanger. Google ne peut pas les lire.';
+
+  @override
+  String get foldersSlotsHint =>
+      'Chaque enregistrement met à jour jusqu’à 7 copies du coffre-fort dans chaque dossier : la plus récente, puis d’environ une heure, un jour, une semaine, un mois, trois mois et un an.';
+
+  @override
+  String get deleteVaultHereHint =>
+      'Le coffre-fort est effacé de cet appareil : mots de passe, codes de double authentification et fichiers. Les coffres-forts ouverts ici auparavant restent. Keyhold affiche ensuite son écran d’accueil.';
+
+  @override
+  String get deleteVaultDriveMine =>
+      'Le supprimer aussi de Google Drive (les autres coffres-forts restent)';
+
+  @override
+  String get vaultDeletedHere => 'Le coffre-fort est supprimé.';
+
+  @override
+  String get menu => 'Menu';
+
+  @override
+  String get importTitle => 'Importer';
+
+  @override
+  String get importMenuHint =>
+      'Mots de passe et codes d’autres apps ou d’un autre coffre-fort';
+
+  @override
+  String get importAnyHint =>
+      'Choisissez un export d’un autre gestionnaire de mots de passe ou d’une app d’authentification, une base KeePass ou un autre coffre-fort Keyhold. Keyhold reconnaît le fichier tout seul, et vous cochez ce qui entre.';
+
+  @override
+  String get importReading => 'Lecture du fichier…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return 'Mot de passe de ce fichier $format';
+  }
+
+  @override
+  String get importWrongPassword => 'Ce mot de passe n’ouvre pas ce fichier.';
+
+  @override
+  String get importUnknown =>
+      'Keyhold ne reconnaît pas ce fichier. Exportez-le de nouveau depuis l’autre app, en CSV ou en JSON.';
+
+  @override
+  String importNothing(String format) {
+    return '$format : ce fichier ne contient rien que Keyhold puisse garder.';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      'Cette base KeePass utilise quelque chose que Keyhold ne sait pas ouvrir (un fichier clé ou le chiffrement Twofish). Exportez-la depuis KeePass en CSV.';
+
+  @override
+  String get bitwardenAccountLocked =>
+      'Cet export Bitwarden ne s’ouvre qu’avec votre compte Bitwarden. Exportez de nouveau en JSON, protégé par mot de passe ou non chiffré.';
+
+  @override
+  String get otpLinks => 'liens otpauth';
+
+  @override
+  String get importPickHint =>
+      'Cochez ce qui doit entrer dans votre coffre-fort. Ce que vous avez déjà reste décoché.';
+
+  @override
+  String codesLeftOut(int count) {
+    return 'Codes laissés de côté : $count. Keyhold ne produit que des codes à 6 chiffres toutes les 30 secondes, pas 8 chiffres, 60 secondes, compteurs ni Steam.';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return 'Éléments laissés de côté : $count (vides, cartes et identités).';
+  }
+
+  @override
+  String get selectAll => 'Tout sélectionner';
+
+  @override
+  String get alreadyInVault => 'déjà dans votre coffre-fort';
+
+  @override
+  String addSelected(int count) {
+    return 'Ajouter ($count)';
+  }
+
+  @override
+  String addedCount(int count) {
+    return 'Ajouté au coffre-fort : $count';
+  }
+
+  @override
+  String get deletePlainFile => 'Supprimer le fichier ensuite';
+
+  @override
+  String get importPasswordsFrom => 'Mots de passe';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome, Edge, Firefox et Safari (CSV), Bitwarden (CSV ou JSON), 1Password (.1pux ou CSV), KeePass et KeePassXC (.kdbx ou CSV), LastPass, Proton Pass, NordPass et Dashlane (CSV), et un autre coffre-fort Keyhold (.khd).';
+
+  @override
+  String get importCodesFrom => 'Codes de double authentification';
+
+  @override
+  String get importCodesList =>
+      'Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ et andOTP, et tout fichier de liens otpauth://. Google Authenticator : affichez son QR code d’export et utilisez le bouton QR code de Keyhold.';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator et Authy ne laissent pas sortir les codes : réactivez la double authentification sur chaque service et scannez son nouveau QR code.';
 }

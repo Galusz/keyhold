@@ -12,6 +12,7 @@ import '../core/autotype.dart';
 import '../core/bridge.dart';
 import '../core/drive.dart';
 import '../core/favicons.dart';
+import '../core/importers.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../core/watch.dart';
@@ -23,6 +24,9 @@ import 'password_page.dart';
 import 'qr_page.dart';
 import 'backup_page.dart';
 import 'copy_page.dart';
+import 'start_page.dart';
+import 'sync_page.dart';
+import 'vault_info_page.dart';
 
 enum EntryFilter { all, twoFactor, plain, files, duplicates }
 
@@ -54,7 +58,6 @@ class _VaultPageState extends State<VaultPage> {
   Timer? _driveSoon;
   bool _driveBusy = false;
   bool _driveAgain = false;
-  bool _driveNeedsPassword = false;
   WatchResult? _lastScan;
   DateTime? _lastScanAt;
   bool _scanning = false;
@@ -78,29 +81,66 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Future<void> _boot() async {
-    final ready = await _store.init();
-    if (!ready && mounted) {
-      final unlocked = await Navigator.of(context).push(
+    final state = await _store.init();
+    if (state == VaultState.locked && mounted) {
+      await Navigator.of(context).push(
         MaterialPageRoute<bool>(
-          builder: (_) => PasswordPage(store: _store, unlockMode: true),
+          builder: (_) => PasswordPage(store: _store, mode: PasswordMode.unlock),
         ),
       );
-      if (unlocked != true) {
-        setState(() => _loading = false);
-        return;
-      }
     }
-    _vault = await _store.load();
-    final grouped = _autoGroup();
-    if (_vault.splitCodes() || grouped) await _store.save(_vault);
-    _store.icons.fetchAll(_vault.visible);
-    setState(() => _loading = false);
+    if (!await _ensureVault()) return;
+    await _loadVault();
     await _startBridge();
     await _startWatching();
     unawaited(_syncDrive());
     _driveTimer = Timer.periodic(const Duration(minutes: 5), (_) => _syncDrive());
     await _refreshCodes();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
+  }
+
+  /// A vault to work with: an empty device starts with a new vault or one it
+  /// already has somewhere, and a vault from before master passwords were
+  /// required gets one now.
+  Future<bool> _ensureVault() async {
+    if (!_store.isOpen && mounted) {
+      await Navigator.of(context).push(
+        MaterialPageRoute<bool>(builder: (_) => StartPage(store: _store, drive: _drive)),
+      );
+    }
+    if (_store.isOpen && !_store.hasPassword && mounted) {
+      await Navigator.of(context).push(
+        MaterialPageRoute<bool>(builder: (_) => PasswordPage(store: _store, mode: PasswordMode.seal)),
+      );
+    }
+    return mounted && _store.isOpen;
+  }
+
+  Future<void> _loadVault() async {
+    _vault = await _store.load();
+    final grouped = _autoGroup();
+    if (_vault.splitCodes() || grouped) await _store.save(_vault);
+    _store.icons.fetchAll(_vault.visible);
+    _codes.clear();
+    _codeWindow = -1;
+    _revision++;
+    _selected.clear();
+    _group = null;
+    setState(() => _loading = false);
+  }
+
+  /// Another vault took this one's place, or it was deleted.
+  Future<void> _reopen() async {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    // Nothing of the vault that left stays on show or reaches the browser.
+    setState(() {
+      _vault = Vault();
+      _loading = true;
+    });
+    if (!await _ensureVault()) return;
+    await _loadVault();
+    await _refreshCodes();
+    unawaited(_syncDrive());
   }
 
   /// How a login caught in the browser relates to what the vault holds.
@@ -224,15 +264,86 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Future<void> _import() async {
-    final imported = await Navigator.of(context).push(
-      MaterialPageRoute<List<VaultEntry>>(builder: (_) => const ImportPage()),
-    );
-    if (imported == null || imported.isEmpty) return;
-    for (final entry in imported) {
-      _vault.put(entry);
-    }
-    await _persist();
+    await _take(await Navigator.of(context).push(
+      MaterialPageRoute<List<VaultEntry>>(builder: (_) => ImportPage(store: _store, vault: _vault)),
+    ));
   }
+
+  /// Entries brought in from elsewhere, each a new entry of its own.
+  Future<void> _take(List<VaultEntry>? picked) async {
+    if (picked == null || picked.isEmpty) return;
+    for (final e in picked) {
+      _vault.put(e);
+    }
+    _vault.splitCodes();
+    await _persist();
+    if (mounted) {
+      setState(() {});
+      _toast(t.addedCount(picked.length));
+    }
+  }
+
+  /// What is not needed day to day: the vault itself, sync, backups, import
+  /// and the browser extension.
+  Widget _menu() {
+    final theme = Theme.of(context);
+    final syncedAt = _drive.syncedAt;
+    PopupMenuItem<VoidCallback> item(IconData icon, String title, String? state, VoidCallback action) =>
+        PopupMenuItem(
+          value: action,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(icon),
+            title: Text(title),
+            subtitle: state == null ? null : Text(state, maxLines: 1, overflow: TextOverflow.ellipsis),
+          ),
+        );
+    return PopupMenuButton<VoidCallback>(
+      tooltip: t.menu,
+      constraints: const BoxConstraints(minWidth: 340, maxWidth: 400),
+      onSelected: (action) => action(),
+      itemBuilder: (_) => [
+        item(Icons.key_outlined, t.vaultTab, _vault.name.isEmpty ? t.myVault : _vault.name, _openVaultInfo),
+        item(
+          _drive.lastError != null
+              ? Icons.sync_problem
+              : _drive.connected
+                  ? Icons.cloud_done_outlined
+                  : Icons.cloud_off_outlined,
+          t.syncTab,
+          !_drive.connected
+              ? t.off
+              : _drive.lastError ?? (syncedAt == null ? _drive.email : t.driveSynced(_ago(syncedAt))),
+          _openSync,
+        ),
+        item(Icons.history, t.copiesTab, null, _openBackup),
+        item(Icons.download_outlined, t.importTitle, t.importMenuHint, _import),
+        item(Icons.extension_outlined, t.browserExtension, null, _openExtension),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.menu, color: theme.colorScheme.primary),
+            const SizedBox(width: 8),
+            Text(t.menu, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
+            Icon(Icons.arrow_drop_down, color: theme.colorScheme.primary),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openExtension() => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ExtensionPage(
+            token: _store.ensureBridgeToken(),
+            running: _bridge?.running ?? false,
+            extensionPath: _extensionFolder(),
+          ),
+        ),
+      );
 
   Future<void> _scanQr() async {
     await Navigator.of(context).push(MaterialPageRoute<void>(
@@ -257,17 +368,6 @@ class _VaultPageState extends State<VaultPage> {
     if (mounted) setState(() {});
   }
 
-
-  Future<void> _setPassword() async {
-    final changed = await Navigator.of(context).push(
-      MaterialPageRoute<bool>(
-        builder: (_) => PasswordPage(store: _store, unlockMode: false),
-      ),
-    );
-    // Sends the new password to the other devices right away.
-    if (changed == true) await _persist();
-    if (mounted) setState(() {});
-  }
 
   int _codeWindow = -1;
 
@@ -297,16 +397,15 @@ class _VaultPageState extends State<VaultPage> {
 
   /// Pulls changes from other devices and pushes this one's. Edits made while
   /// a sync runs are kept: the result is merged into the vault as it is now.
-  Future<SyncResult?> _syncDrive({String? password}) async {
-    if (!_drive.connected) return null;
+  Future<SyncResult?> _syncDrive() async {
+    if (!_drive.connected || !_store.isOpen) return null;
     if (_driveBusy) {
       _driveAgain = true;
       return null;
     }
     _driveBusy = true;
     try {
-      final result = await _drive.sync(_vault, password: password);
-      _driveNeedsPassword = result.needsPassword;
+      final result = await _drive.sync(_vault);
       final theirs = result.vault;
       if (theirs != null) {
         _vault = Vault.merge(_vault, theirs);
@@ -627,7 +726,11 @@ class _VaultPageState extends State<VaultPage> {
                 onPressed: () => setState(_selected.clear),
               )
             : null,
-        title: Text(selecting ? t.selectedCount(_selected.length) : 'Keyhold'),
+        title: Text(selecting
+            ? t.selectedCount(_selected.length)
+            : _vault.name.isEmpty
+                ? 'Keyhold'
+                : _vault.name),
         actions: selecting
             ? [
                 FilledButton.icon(
@@ -643,39 +746,8 @@ class _VaultPageState extends State<VaultPage> {
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: _scanQr,
           ),
-          IconButton(
-            tooltip: t.browserExtension,
-            icon: const Icon(Icons.extension_outlined),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => ExtensionPage(
-                  token: _store.ensureBridgeToken(),
-                  running: _bridge?.running ?? false,
-                  extensionPath: _extensionFolder(),
-                ),
-              ),
-            ),
-          ),
-          IconButton(
-            tooltip: t.backup,
-            icon: const Icon(Icons.backup_outlined),
-            onPressed: _openBackup,
-          ),
-          IconButton(
-            tooltip: t.openCopy,
-            icon: const Icon(Icons.folder_open_outlined),
-            onPressed: _pickCopy,
-          ),
-          IconButton(
-            tooltip: t.importCsv,
-            icon: const Icon(Icons.download_outlined),
-            onPressed: _import,
-          ),
-          IconButton(
-            tooltip: _store.hasPassword ? t.changeMasterPassword : t.setMasterPassword,
-            icon: Icon(_store.hasPassword ? Icons.lock_outline : Icons.lock_open_outlined),
-            onPressed: _setPassword,
-          ),
+          const SizedBox(width: 4),
+          _menu(),
           const SizedBox(width: 8),
         ],
         bottom: PreferredSize(
@@ -1096,30 +1168,15 @@ class _VaultPageState extends State<VaultPage> {
       return;
     }
     if (!mounted) return;
-    await Navigator.of(context).push(MaterialPageRoute<void>(
+    await _take(await Navigator.of(context).push(MaterialPageRoute<List<VaultEntry>>(
       builder: (_) => CopyPage(
-        copy: copy!,
-        name: name,
-        onAdd: (e) async {
-          // A new entry of its own: whatever the vault holds now stays.
-          _vault.put(VaultEntry.fromJson({
-            ...e.toJson(),
-            'id': newId(),
-            'twoFactor': '',
-            'updatedAt': DateTime.now().millisecondsSinceEpoch,
-          }));
-          await _persist();
-        },
+        title: t.copyTitle(name),
+        hint: t.copyReadOnly,
+        entries: entriesOf(copy!),
+        vault: _vault,
+        ticked: false,
       ),
-    ));
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _pickCopy() async {
-    const type = XTypeGroup(label: 'Keyhold', extensions: ['khd']);
-    final file = await openFile(acceptedTypeGroups: const [type]);
-    if (file == null) return;
-    await _openCopy(await file.readAsBytes(), file.name);
+    )));
   }
 
   Future<String?> _askCopyPassword() {
@@ -1149,7 +1206,37 @@ class _VaultPageState extends State<VaultPage> {
   Future<void> _openBackup() async {
     await Navigator.of(context).push(
       MaterialPageRoute<bool>(
-        builder: (_) => BackupPage(store: _store, drive: _drive, onSync: _syncDrive, onOpenCopy: _openCopy),
+        builder: (_) => BackupPage(store: _store, onOpenCopy: _openCopy),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _openSync() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => SyncPage(drive: _drive, onSync: _syncDrive)),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _openVaultInfo() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => VaultInfoPage(
+          store: _store,
+          drive: _drive,
+          vault: _vault,
+          onRename: (name) async {
+            _vault.rename(name);
+            await _persist();
+            if (mounted) setState(() {});
+          },
+          beforeClose: () async {
+            _driveSoon?.cancel();
+            await _syncDrive();
+          },
+          onSwitched: _reopen,
+        ),
       ),
     );
     if (mounted) setState(() {});
@@ -1199,47 +1286,17 @@ class _VaultPageState extends State<VaultPage> {
         ),
     };
 
-    // Without a master password a copy opens only on this Windows account.
-    if (!_store.hasPassword) {
-      const ink = Colors.black87;
-      return Material(
-        color: const Color(0xFFFFE082),
-        child: InkWell(
-          onTap: _setPassword,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              children: [
-                const Icon(Icons.warning_amber_rounded, size: 18, color: ink),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    t.noMasterPasswordBar,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(color: ink, fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Text(t.itemCount(count), style: theme.textTheme.bodySmall?.copyWith(color: ink)),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     final drive = !_drive.connected || places.isEmpty
         ? null
-        : _driveNeedsPassword
-            ? t.driveNeedsPassword
-            : _drive.lastError != null
-                ? t.driveProblem(_drive.lastError!)
-                : syncedAt == null
-                    ? null
-                    : t.driveSynced(_ago(syncedAt));
+        : _drive.lastError != null
+            ? t.driveProblem(_drive.lastError!)
+            : syncedAt == null
+                ? null
+                : t.driveSynced(_ago(syncedAt));
 
     return InkWell(
-      onTap: _openBackup,
+      // With no folder or server the vault's safety is Google Drive.
+      onTap: places.isEmpty ? _openSync : _openBackup,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
@@ -1259,11 +1316,9 @@ class _VaultPageState extends State<VaultPage> {
             ),
             if (drive != null) ...[
               Icon(
-                _drive.lastError != null || _driveNeedsPassword
-                    ? Icons.sync_problem
-                    : Icons.add_to_drive,
+                _drive.lastError != null ? Icons.sync_problem : Icons.add_to_drive,
                 size: 18,
-                color: _drive.lastError != null || _driveNeedsPassword
+                color: _drive.lastError != null
                     ? theme.colorScheme.error
                     : theme.colorScheme.primary,
               ),

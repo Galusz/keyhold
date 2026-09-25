@@ -37,9 +37,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get change => '更改';
 
   @override
-  String get connect => '连接';
-
-  @override
   String get disconnect => '断开连接';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get masterPassword => '主密码';
 
   @override
-  String get setMasterPassword => '设置主密码';
-
-  @override
   String copied(String what) {
     return '已复制$what';
   }
@@ -93,12 +87,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String driveNotConnected(String error) {
     return '未能连接 Google Drive：$error';
   }
-
-  @override
-  String get masterPasswordOfVault => '密码库的主密码';
-
-  @override
-  String get masterPasswordFromComputer => '就是您在电脑上的 Keyhold 中设置的那个';
 
   @override
   String get scanQr => '扫描二维码';
@@ -170,14 +158,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      '您的密码和双重验证码——与电脑上是同一个密码库，通过您自己的 Google Drive 保持同步。';
-
-  @override
   String get connectDrive => '连接 Google Drive';
-
-  @override
-  String get startEmpty => '从空密码库开始';
 
   @override
   String codeSeconds(int seconds) {
@@ -201,9 +182,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncNow => '立即同步';
 
   @override
-  String get fingerprintLock => '指纹锁';
-
-  @override
   String get fingerprintSwitch => '用指纹打开 Keyhold';
 
   @override
@@ -221,12 +199,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => '用 Keyhold 填写密码';
-
-  @override
-  String get passwordSetPhone => '已设置。在新设备上用它打开这个密码库。';
-
-  @override
-  String get passwordNotSetPhone => '未设置。没有它，新设备就无法打开密码库。';
 
   @override
   String get deleteThisLogin => '删除此登录信息？';
@@ -301,15 +273,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get browserExtension => '浏览器扩展程序';
-
-  @override
-  String get backup => '备份';
-
-  @override
-  String get importCsv => '从 CSV 导入';
-
-  @override
-  String get changeMasterPassword => '更改主密码';
 
   @override
   String get addFile => '添加文件';
@@ -425,9 +388,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword => 'Google Drive：请打开“备份”并输入主密码';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive：$problem';
   }
@@ -464,14 +424,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get off => '已关闭';
-
-  @override
-  String onWith(String detail) {
-    return '已开启：$detail';
-  }
-
-  @override
-  String get join => '加入';
 
   @override
   String get synced => '已同步';
@@ -512,16 +464,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get driveHoldsVault => 'Google Drive 中已有一个 Keyhold 密码库。需要它的主密码才能加入。';
-
-  @override
-  String get masterPasswordOfDriveVault => 'Google Drive 中密码库的主密码';
-
-  @override
-  String get driveHint =>
-      '将加密的密码库保存在您自己 Google Drive 的“Keyhold”文件夹中，让您的其他设备保持同步，电脑丢了也不会丢失任何数据。Google 无法读取它。';
-
-  @override
   String get driveNotInBuild => '此版本未设置 Google Drive。';
 
   @override
@@ -552,9 +494,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get yourServer => '您的服务器';
-
-  @override
-  String get foldersHint => '每次保存都会在每个文件夹中放入一份带日期的副本，并保留最近 30 份。';
 
   @override
   String get noFolders => '没有文件夹，本地副本已关闭';
@@ -830,20 +769,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passwordDoesNotOpen => '该密码无法打开此密码库';
 
   @override
-  String get currentPasswordWrong => '当前主密码错误';
-
-  @override
   String get unlockVault => '解锁密码库';
 
   @override
   String get unlockHint => '此密码库来自另一台电脑。请输入主密码，在这里打开它。';
-
-  @override
-  String get masterPasswordHint =>
-      'Windows 会自动为您打开此密码库。重装系统后、在新电脑上或在手机上，都要靠主密码才能重新打开。';
-
-  @override
-  String get currentMasterPassword => '当前主密码';
 
   @override
   String get newMasterPassword => '新主密码';
@@ -965,60 +894,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => '导入密码';
-
-  @override
-  String get importHint =>
-      '先从浏览器中将密码导出为 CSV 文件，再在这里加载该文件。Chrome、Edge、Firefox、Bitwarden 和 KeePassXC 导出的文件都可以使用。';
-
-  @override
-  String get chooseCsv => '选择 CSV 文件';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已准备好 $count 个条目',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已准备好 $count 个条目',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: '已跳过 $skipped 个空行',
-    );
-    return '$_temp0，$_temp1';
-  }
-
-  @override
-  String andMore(int count) {
-    return '还有 $count 个';
-  }
-
-  @override
-  String get deleteCsv => '导入后删除 CSV 文件';
-
-  @override
   String get deleteCsvHint => '它以明文保存了所有密码';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '导入 $count 个条目',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint => '对准网站的双重验证二维码，或 Google Authenticator 导出的二维码。';
@@ -1036,12 +912,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String nextCode(String code) {
     return '下一个 $code';
   }
-
-  @override
-  String get noMasterPasswordBar => '未设置主密码：您的备份无法在其他电脑上打开。点击即可设置。';
-
-  @override
-  String get printRecoverySheet => '打印恢复单';
 
   @override
   String get recoverySheet => '恢复单';
@@ -1110,14 +980,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteVault => '删除密码库';
 
   @override
-  String get deleteVaultHint =>
-      'Keyhold 在此设备上保存的所有内容都将被清除：密码、双重验证码、文件和设置。之后 Keyhold 会关闭，并以空密码库重新开始。';
-
-  @override
-  String get deleteVaultDrive =>
-      '同时从 Google Drive 中删除（其他设备会保留各自的副本，直到您在那里也将其删除）';
-
-  @override
   String get deleteVaultFolders => '同时删除备份文件夹中的副本';
 
   @override
@@ -1127,16 +989,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteVaultSureHint => '此操作无法撤消。';
 
   @override
-  String get vaultDeleted => '密码库已删除。Keyhold 即将关闭。';
-
-  @override
   String get recoveryGate => '输入主密码即可查看恢复密钥。';
 
   @override
   String get showKey => '显示密钥';
-
-  @override
-  String get recoveryNeedsPassword => '请先设置主密码：设置之后才会显示恢复密钥。';
 
   @override
   String get recoveryCopyRow => '将这一行亲手抄到打印好的恢复单上';
@@ -1180,9 +1036,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get copyNotOpened => '无法打开副本：密码或恢复密钥错误，或者这不是 Keyhold 密码库。';
 
   @override
-  String get openCopy => '打开备份副本…';
-
-  @override
   String copyTitle(String name) {
     return '副本：$name';
   }
@@ -1191,10 +1044,259 @@ class AppLocalizationsZh extends AppLocalizations {
   String get copyReadOnly => '仅供查看：这里的操作不会改变您的密码库。可以将单个条目添加到您的密码库。';
 
   @override
-  String get addToVault => '添加到我的密码库';
+  String get myVault => '我的密码库';
 
   @override
-  String addedToVault(String name) {
-    return '“$name”已在您的密码库中';
+  String get vaultTab => '密码库';
+
+  @override
+  String get syncTab => '同步';
+
+  @override
+  String get copiesTab => '备份';
+
+  @override
+  String get startHint => '您的密码和双重验证码都在一个密码库里：电脑、手机和浏览器上都能用。';
+
+  @override
+  String get createVault => '创建新密码库';
+
+  @override
+  String get openMyVault => '打开我的密码库';
+
+  @override
+  String get newVault => '新密码库';
+
+  @override
+  String get vaultName => '密码库名称';
+
+  @override
+  String get newVaultHint =>
+      '主密码可在您的每台设备上打开此密码库：电脑、手机和浏览器。Keyhold 无法找回主密码；接下来得到的恢复密钥可以。';
+
+  @override
+  String get sealHint => '您的密码库还没有主密码。现在设置：它用于在其他设备和浏览器中打开此密码库。';
+
+  @override
+  String get createVaultButton => '创建密码库';
+
+  @override
+  String get forgotPassword => '忘记密码？';
+
+  @override
+  String get usePassword => '使用主密码';
+
+  @override
+  String get recoveryKey => '恢复密钥';
+
+  @override
+  String get recoveryKeyFieldHint => '恢复单上的 36 个字符；空格无关紧要。';
+
+  @override
+  String get openVaultTitle => '打开密码库';
+
+  @override
+  String get openVaultHint => '密码库按原样打开，绝不会与其他密码库合并。';
+
+  @override
+  String get fromDrive => '从 Google Drive';
+
+  @override
+  String get fromDriveHint => '登录 Google，然后输入密码库的主密码。';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email：请输入密码库的主密码。';
   }
+
+  @override
+  String get fromFile => '从文件（.khd）';
+
+  @override
+  String get fromFileHint => '备份文件夹、U 盘或旧电脑中的副本。';
+
+  @override
+  String get closedHere => '以前在此设备上打开过';
+
+  @override
+  String closedOn(String date) {
+    return '$date 关闭';
+  }
+
+  @override
+  String get closedVaultGone => '该密码库的文件已不在此设备上。';
+
+  @override
+  String get typeVaultPassword =>
+      '输入要打开的密码库的主密码。Keyhold 会在您 Google Drive 中的每个密码库上尝试。';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return '正在查找您的密码库：第 $at 个，共 $of 个';
+  }
+
+  @override
+  String get noVaultInDrive => '此 Google Drive 中还没有 Keyhold 密码库。';
+
+  @override
+  String get noVaultMatches => '您的 Google Drive 中没有能用此密码打开的密码库。';
+
+  @override
+  String get sameVaultFile => '此文件是当前已打开密码库的副本。要从中取出条目，请使用“备份”，然后“查看副本”。';
+
+  @override
+  String fileVaultPassword(String name) {
+    return '请输入 $name 的主密码。';
+  }
+
+  @override
+  String get driveFileUnreadable => 'Google Drive 中此密码库的文件无法读取。Keyhold 会保持原样。';
+
+  @override
+  String get vaultInfoHint =>
+      '此密码库在每台设备上都用它的主密码打开。如果忘记密码，恢复密钥可以打开密码库，然后您再设置新密码。';
+
+  @override
+  String get recoveryKeyHint => '输入主密码后显示并打印';
+
+  @override
+  String get otherVaults => '其他密码库';
+
+  @override
+  String get openOtherVault => '打开其他密码库';
+
+  @override
+  String get openOtherVaultHint => '从 Google Drive、文件或此设备';
+
+  @override
+  String get createNewVaultHint => '空的，有自己的主密码';
+
+  @override
+  String closeVaultTitle(String name) {
+    return '要在此设备上关闭“$name”吗？';
+  }
+
+  @override
+  String get closeVaultHint =>
+      '不会删除任何内容：它仍保留在 Google Drive、备份副本和此设备的密码库列表中，用它的主密码即可再次打开。';
+
+  @override
+  String get continueLabel => '继续';
+
+  @override
+  String get renameVault => '重命名密码库';
+
+  @override
+  String get reviewCopy => '查看副本';
+
+  @override
+  String get driveVaultHint =>
+      '将此密码库作为单独的加密文件保存在您 Google Drive 的“Keyhold”文件夹中。其他设备用它的主密码打开。多个密码库可以共用一个 Google Drive，彼此互不混合。Google 无法读取它们。';
+
+  @override
+  String get foldersSlotsHint =>
+      '每次保存都会在每个文件夹中更新最多 7 份密码库副本：最新的一份，以及大约一小时、一天、一周、一个月、三个月和一年前的副本。';
+
+  @override
+  String get deleteVaultHereHint =>
+      '密码库将从此设备中清除：密码、双重验证码和文件。以前在此打开过的密码库会保留。之后 Keyhold 会显示开始界面。';
+
+  @override
+  String get deleteVaultDriveMine => '同时从 Google Drive 删除（那里的其他密码库保留）';
+
+  @override
+  String get vaultDeletedHere => '密码库已删除。';
+
+  @override
+  String get menu => '菜单';
+
+  @override
+  String get importTitle => '导入';
+
+  @override
+  String get importMenuHint => '来自其他应用或其他密码库的密码和验证码';
+
+  @override
+  String get importAnyHint =>
+      '选择其他密码管理器或验证器应用的导出文件、KeePass 数据库或其他 Keyhold 密码库。Keyhold 会自动识别文件，由您勾选要导入的内容。';
+
+  @override
+  String get importReading => '正在读取文件…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return '此 $format 文件的密码';
+  }
+
+  @override
+  String get importWrongPassword => '此密码无法打开该文件。';
+
+  @override
+  String get importUnknown => 'Keyhold 无法识别此文件。请从原应用重新导出为 CSV 或 JSON。';
+
+  @override
+  String importNothing(String format) {
+    return '$format：此文件中没有 Keyhold 可以保存的内容。';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      '此 KeePass 数据库使用了 Keyhold 无法打开的内容（密钥文件或 Twofish 加密）。请在 KeePass 中导出为 CSV。';
+
+  @override
+  String get bitwardenAccountLocked =>
+      '此 Bitwarden 导出只能用您的 Bitwarden 账户打开。请重新导出为 JSON，选择密码保护或不加密。';
+
+  @override
+  String get otpLinks => 'otpauth 链接';
+
+  @override
+  String get importPickHint => '勾选要放入密码库的内容。已有的条目不会被勾选。';
+
+  @override
+  String codesLeftOut(int count) {
+    return '已跳过的验证码：$count。Keyhold 只生成每 30 秒更新的 6 位验证码，不支持 8 位、60 秒、计数器或 Steam。';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return '已跳过的记录：$count（空记录、卡片和身份信息）。';
+  }
+
+  @override
+  String get selectAll => '全选';
+
+  @override
+  String get alreadyInVault => '已在密码库中';
+
+  @override
+  String addSelected(int count) {
+    return '添加（$count）';
+  }
+
+  @override
+  String addedCount(int count) {
+    return '已添加到密码库：$count';
+  }
+
+  @override
+  String get deletePlainFile => '导入后删除此文件';
+
+  @override
+  String get importPasswordsFrom => '密码';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome、Edge、Firefox 和 Safari（CSV），Bitwarden（CSV 或 JSON），1Password（.1pux 或 CSV），KeePass 和 KeePassXC（.kdbx 或 CSV），LastPass、Proton Pass、NordPass 和 Dashlane（CSV），以及其他 Keyhold 密码库（.khd）。';
+
+  @override
+  String get importCodesFrom => '双重验证码';
+
+  @override
+  String get importCodesList =>
+      'Aegis（.json）、2FAS（.2fas）、Ente Auth、FreeOTP+ 和 andOTP，以及任何包含 otpauth:// 链接的文件。Google Authenticator：在其中显示导出二维码，然后使用 Keyhold 的二维码按钮。';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator 和 Authy 不允许导出验证码：请在每个服务中重新开启双重验证并扫描新的二维码。';
 }

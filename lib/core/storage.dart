@@ -12,19 +12,24 @@ import 'crypto.dart';
 import 'favicons.dart';
 import 'models.dart';
 
+/// What a device holds when Keyhold starts: an open vault, a vault that needs
+/// its master password here, or nothing yet.
+enum VaultState { open, locked, none }
+
 class VaultStore {
   late final Directory _dir;
+  late final Directory _closedDir;
   late final File _vaultFile;
   late final File _keyFile;
   Uint8List? _key;
   late final BackupService backup;
   late final Favicons icons;
 
-  /// Returns false when the vault is locked by a password this machine does not know yet.
-  Future<bool> init() async {
+  Future<VaultState> init() async {
     final base = await getApplicationSupportDirectory();
     _dir = Directory('${base.path}${Platform.pathSeparator}keyhold');
     if (!_dir.existsSync()) _dir.createSync(recursive: true);
+    _closedDir = Directory('${_dir.path}${Platform.pathSeparator}closed');
     _vaultFile = File('${_dir.path}${Platform.pathSeparator}vault.khd');
     _keyFile = File('${_dir.path}${Platform.pathSeparator}key.bin');
     icons = Favicons(Directory('${_dir.path}${Platform.pathSeparator}icons'));
@@ -32,10 +37,9 @@ class VaultStore {
       File('${_dir.path}${Platform.pathSeparator}settings.json'),
     )..loadSettings();
 
-    Uint8List? payload;
-    if (_vaultFile.existsSync()) {
-      payload = _split(await _vaultFile.readAsBytes()).payload;
-    }
+    if (!_vaultFile.existsSync()) return VaultState.none;
+    final payload = _split(await _vaultFile.readAsBytes()).payload;
+    if (payload.isEmpty) return VaultState.none;
 
     // A key this Windows account or phone can no longer open (a reset account,
     // an app restored onto a new phone) counts as none: the master password
@@ -48,23 +52,109 @@ class VaultStore {
     }
     if (stored != null && await _opens(stored, payload)) {
       _key = stored;
-      return true;
+      return VaultState.open;
     }
 
-    if (hasPassword || _headerRecovery != null) {
-      return false;
-    }
+    if (hasPassword || _headerRecovery != null) return VaultState.locked;
 
-    // Nothing here opens this vault: it is put aside, never overwritten, and a new one begins.
-    if (payload != null && payload.isNotEmpty) {
-      _vaultFile.renameSync(
-          '${_dir.path}${Platform.pathSeparator}vault-unreadable-${DateTime.now().millisecondsSinceEpoch}.khd');
-    }
+    // Nothing opens this vault any more: it is put aside, never overwritten.
+    _vaultFile.renameSync(
+        '${_dir.path}${Platform.pathSeparator}vault-unreadable-${DateTime.now().millisecondsSinceEpoch}.khd');
+    _resetHeader();
+    return VaultState.none;
+  }
 
-    final fresh = newKey();
-    await _storeKey(fresh);
-    _key = fresh;
-    return true;
+  bool get isOpen => _key != null;
+
+  /// A new, empty vault on this device, sealed by [password] from the start
+  /// and with its recovery key made. The vault open until now is closed first.
+  Future<void> createVault(String name, String password) async {
+    await _close();
+    final key = newKey();
+    final salt = randomBytes(16);
+    _wrapped = await wrapKey(key, password, salt);
+    _salt = salt;
+    _wrapChangedAt = DateTime.now().millisecondsSinceEpoch;
+    final code = await newRecoveryCode();
+    _recovery = RecoveryWrap(code: code, sealed: await sealForRecovery(key, code), changedAt: _wrapChangedAt);
+    _key = key;
+    await _storeKey(key);
+    await save(Vault()..rename(name));
+  }
+
+  /// The key of the vault in [bytes] when [typed] is its master password or
+  /// its recovery key, otherwise null.
+  Future<Uint8List?> keyFor(Uint8List bytes, String typed) async {
+    final parts = _parse(bytes);
+    if (parts.payload.isEmpty || typed.isEmpty) return null;
+    var key = await _keyFromCode(parts.recovery, typed);
+    if (key == null && parts.salt != null && parts.wrapped != null) {
+      try {
+        key = await unwrapKey(parts.wrapped!, typed, parts.salt!);
+      } catch (_) {
+        key = null;
+      }
+    }
+    return key != null && await _opens(key, parts.payload) ? key : null;
+  }
+
+  /// Makes the vault in [bytes], opened with [key], this device's vault. The
+  /// vault open until now is closed first. Nothing is merged.
+  Future<void> openVault(Uint8List bytes, Uint8List key) async {
+    final parts = _parse(bytes);
+    final vault = Vault.decode(await unseal(key, parts.payload));
+    await _close();
+    _key = key;
+    _salt = parts.salt;
+    _wrapped = parts.wrapped;
+    _headerRecovery = parts.recovery;
+    await _storeKey(key);
+    await save(vault);
+    final tag = await this.tag();
+    final left = closedFile(tag);
+    if (left.existsSync()) left.deleteSync();
+    backup
+      ..closed = backup.closed.where((c) => c.tag != tag).toList()
+      ..saveSettings();
+  }
+
+  /// Where a vault closed on this device keeps its file.
+  File closedFile(String tag) => File('${_closedDir.path}${Platform.pathSeparator}vault-$tag.khd');
+
+  /// Puts the open vault aside: its file moves among the closed ones and
+  /// opens again with its master password. Nothing is deleted.
+  Future<void> _close() async {
+    if (_key != null && _vaultFile.existsSync()) {
+      // A vault without a master password could never be opened again.
+      if (!hasPassword) throw StateError('closing a vault without a master password');
+      await _writing;
+      final vault = await load();
+      final tag = await this.tag();
+      _closedDir.createSync(recursive: true);
+      _vaultFile.renameSync(closedFile(tag).path);
+      backup.closed = [
+        ClosedVault(tag: tag, name: vault.name, count: vault.visible.length, at: DateTime.now()),
+        ...backup.closed.where((c) => c.tag != tag),
+      ];
+    }
+    _forgetKey();
+  }
+
+  void _forgetKey() {
+    if (_keyFile.existsSync()) _keyFile.deleteSync();
+    _key = null;
+    _resetHeader();
+    backup
+      ..driveSyncedAt = null
+      ..saveSettings();
+  }
+
+  void _resetHeader() {
+    _salt = null;
+    _wrapped = null;
+    _wrapChangedAt = 0;
+    _headerRecovery = null;
+    _recovery = null;
   }
 
   String ensureBridgeToken() {
@@ -83,33 +173,18 @@ class VaultStore {
   /// A vault file opened only to look inside: with this vault's key, or with
   /// the copy's recovery key or master password. Nothing here changes.
   Future<Vault?> openCopy(Uint8List bytes, [String typed = '']) async {
-    final parts = _parse(bytes);
-    if (parts.payload.isEmpty) return null;
-    Uint8List? byPassword;
-    if (typed.isNotEmpty && parts.salt != null && parts.wrapped != null) {
-      try {
-        byPassword = await unwrapKey(parts.wrapped!, typed, parts.salt!);
-      } catch (_) {
-        byPassword = null;
-      }
-    }
-    for (final key in [_key, await _keyFromCode(parts.recovery, typed), byPassword]) {
-      if (key == null) continue;
-      try {
-        return Vault.decode(await unseal(key, parts.payload));
-      } catch (_) {
-        // not this key
-      }
-    }
-    return null;
+    final payload = _parse(bytes).payload;
+    if (payload.isEmpty) return null;
+    final key = await opens(bytes) ? _key : await keyFor(bytes, typed);
+    return key == null ? null : Vault.decode(await unseal(key, payload));
   }
 
   /// Whether [bytes] is this very vault (a copy of it opens with its key).
   Future<bool> opens(Uint8List bytes) async => _key != null && await _opens(_key!, _parse(bytes).payload);
 
-  /// A short mark of this vault's key in the names of its backup copies:
-  /// tidying up old copies never touches another vault's.
-  Future<String> _tag() async {
+  /// A short mark of this vault's key in the names of its file in Google
+  /// Drive and of its backup copies: another vault's are never touched.
+  Future<String> tag() async {
     final hash = await Sha256().hash(_key!);
     return hash.bytes.take(4).map((b) => b.toRadixString(16).padLeft(2, '0')).join();
   }
@@ -130,12 +205,12 @@ class VaultStore {
 
   String get vaultPath => _vaultFile.path;
 
-  /// Erases this device's vault: the file, its key, the settings and the icons.
-  void deleteLocal() {
-    for (final entity in _dir.listSync()) {
-      entity.deleteSync(recursive: true);
-    }
-    _key = null;
+  /// Erases the open vault from this device, file and key; vaults closed
+  /// here earlier stay.
+  Future<void> deleteLocal() async {
+    await _writing;
+    if (_vaultFile.existsSync()) _vaultFile.deleteSync();
+    _forgetKey();
   }
 
   static const _magic = [0x4B, 0x48, 0x4C, 0x44, 0x31];
@@ -222,9 +297,10 @@ class VaultStore {
     }
   }
 
-  Future<void> setPassword(String password) async {
+  Future<void> setPassword(String password, {String? name}) async {
     // Read first: loading takes the header from disk.
     final vault = await load();
+    if (name != null) vault.rename(name);
     final salt = randomBytes(16);
     _wrapped = await wrapKey(_key!, password, salt);
     _salt = salt;
@@ -302,7 +378,7 @@ class VaultStore {
       final tmp = File('${_vaultFile.path}.$pid.tmp');
       await tmp.writeAsBytes(bytes, flush: true);
       tmp.renameSync(_vaultFile.path);
-      await backup.run(_vaultFile, await _tag());
+      await backup.run(_vaultFile, await tag());
     });
     _writing = done.catchError((_) {});
     return done;
@@ -333,37 +409,11 @@ class VaultStore {
     return Uint8List.fromList([..._buildHeader(), ...await seal(_key!, vault.encode())]);
   }
 
-  /// Opens a vault file from another device that shares this vault's key.
+  /// Opens a file of this very vault written by another device.
   Future<Vault> open(Uint8List bytes) async {
     final payload = _parse(bytes).payload;
     if (payload.isEmpty) return Vault();
     return Vault.decode(await unseal(_key!, payload));
-  }
-
-  /// Takes over the key of a vault created on another device, unlocked
-  /// with its master password. This device's entries are sealed with that key
-  /// before its own key is let go: whatever fails in between, the master
-  /// password still opens the file here.
-  Future<bool> adopt(Uint8List bytes, String password) async {
-    final parts = _parse(bytes);
-    // The recovery code opens it as well as the master password does.
-    var dek = await _keyFromCode(parts.recovery, password);
-    if (dek == null) {
-      if (parts.salt == null || parts.wrapped == null) return false;
-      try {
-        dek = await unwrapKey(parts.wrapped!, password, parts.salt!);
-      } catch (_) {
-        return false;
-      }
-    }
-    final mine = await load();
-    _key = dek;
-    _salt = parts.salt;
-    _wrapped = parts.wrapped;
-    _headerRecovery = parts.recovery;
-    await save(mine);
-    await _storeKey(dek);
-    return true;
   }
 
   static const _keystore = MethodChannel('keyhold/keystore');

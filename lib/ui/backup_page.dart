@@ -4,28 +4,20 @@ import 'dart:typed_data';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
-import '../core/drive.dart';
-import '../core/crypto.dart';
 import '../core/remote.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
-import 'delete_vault_page.dart';
-import 'password_page.dart';
 
+/// Copies of the vault in folders and on the user's own server; they are
+/// only copies, never another place the vault syncs with.
 class BackupPage extends StatefulWidget {
   const BackupPage({
     super.key,
     required this.store,
-    required this.drive,
-    required this.onSync,
     required this.onOpenCopy,
   });
 
   final VaultStore store;
-  final DriveSync drive;
-
-  /// Runs a sync through the vault screen, which owns the open vault.
-  final Future<SyncResult?> Function({String? password}) onSync;
 
   /// Opens a vault file (a backup copy) to look inside.
   final Future<void> Function(Uint8List bytes, String name) onOpenCopy;
@@ -45,8 +37,6 @@ class _BackupPageState extends State<BackupPage> {
   String? _message;
   bool _failed = false;
   bool _busy = false;
-  String? _driveMessage;
-  bool _driveBusy = false;
 
   @override
   void initState() {
@@ -179,68 +169,6 @@ class _BackupPageState extends State<BackupPage> {
     }
   }
 
-  Future<void> _drive(Future<void> Function() action) async {
-    setState(() {
-      _driveBusy = true;
-      _driveMessage = null;
-    });
-    try {
-      await action();
-    } on DriveError catch (e) {
-      _driveMessage = e.message;
-    } finally {
-      if (mounted) setState(() => _driveBusy = false);
-    }
-  }
-
-  Future<void> _syncDrive() async {
-    var result = await widget.onSync();
-    if (result != null && result.needsPassword) {
-      final password = await _askPassword();
-      if (password == null) {
-        _driveMessage = t.driveHoldsVault;
-        return;
-      }
-      result = await widget.onSync(password: password);
-      if (result != null && await readRecoveryCode(password) != null && mounted) {
-        await newPasswordAfterRecovery(context, widget.store);
-      }
-    }
-    _driveMessage =
-        widget.drive.lastError ??
-        (result == null
-            ? null
-            : result.changedHere || result.uploaded
-            ? t.synced
-            : t.alreadyInSync);
-  }
-
-  Future<String?> _askPassword() {
-    final field = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(t.masterPasswordOfDriveVault),
-        content: SizedBox(
-          width: 380,
-          child: TextField(
-            controller: field,
-            obscureText: true,
-            decoration: InputDecoration(labelText: t.masterPassword, helperText: t.orRecoveryCode, helperMaxLines: 2),
-            onSubmitted: (v) => Navigator.pop(context, v),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, field.text),
-            child: Text(t.join),
-          ),
-        ],
-      ),
-    ).whenComplete(field.dispose);
-  }
-
   String _when(DateTime t) {
     String two(int n) => n.toString().padLeft(2, '0');
     final now = DateTime.now();
@@ -248,73 +176,6 @@ class _BackupPageState extends State<BackupPage> {
     return t.year == now.year && t.month == now.month && t.day == now.day
         ? time
         : '${two(t.day)}.${two(t.month)} $time';
-  }
-
-  List<Widget> _driveSection(ThemeData theme) {
-    final drive = widget.drive;
-    final synced = drive.syncedAt;
-
-    return [
-      Text(
-        t.driveHint,
-        style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
-      ),
-      const SizedBox(height: 12),
-      if (!DriveSync.available)
-        Text(t.driveNotInBuild)
-      else if (!widget.store.hasPassword) ...[
-        Text(t.setPasswordFirst),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: OutlinedButton.icon(
-            onPressed: () async {
-              await Navigator.of(context).push(
-                MaterialPageRoute<bool>(
-                  builder: (_) => PasswordPage(store: widget.store, unlockMode: false),
-                ),
-              );
-              if (mounted) setState(() {});
-            },
-            icon: const Icon(Icons.lock_outline),
-            label: Text(t.setMasterPassword),
-          ),
-        ),
-      ] else if (!drive.connected)
-        Align(
-          alignment: Alignment.centerLeft,
-          child: FilledButton.icon(
-            onPressed: _driveBusy
-                ? null
-                : () => _drive(() async {
-                    await drive.connect();
-                    await _syncDrive();
-                  }),
-            icon: const Icon(Icons.add_to_drive),
-            label: Text(t.connectDrive),
-          ),
-        )
-      else
-        Wrap(
-          spacing: 12,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            Text(synced == null ? t.connectedAs(drive.email) : t.connectedAsSynced(drive.email, _when(synced))),
-            OutlinedButton.icon(
-              onPressed: _driveBusy ? null : () => _drive(_syncDrive),
-              icon: const Icon(Icons.sync),
-              label: Text(t.syncNow),
-            ),
-            TextButton(
-              onPressed: _driveBusy ? null : () => _drive(drive.disconnect),
-              child: Text(t.disconnect),
-            ),
-          ],
-        ),
-      if (_driveBusy) ...[const SizedBox(height: 12), const LinearProgressIndicator()],
-      if (_driveMessage != null) ...[const SizedBox(height: 8), Text(_driveMessage!)],
-    ];
   }
 
   /// One kind of backup: a card with its state in the header, open or folded.
@@ -356,7 +217,7 @@ class _BackupPageState extends State<BackupPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.backup),
+        title: Text(t.copiesTab),
         actions: [
           TextButton(onPressed: _save, child: Text(t.save)),
           const SizedBox(width: 8),
@@ -365,12 +226,6 @@ class _BackupPageState extends State<BackupPage> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          _section(
-            icon: Icons.add_to_drive,
-            title: 'Google Drive',
-            state: widget.drive.connected ? t.onWith(widget.drive.email) : t.off,
-            children: _driveSection(theme),
-          ),
           _section(
             icon: Icons.folder_copy_outlined,
             title: t.foldersOnComputer,
@@ -389,17 +244,6 @@ class _BackupPageState extends State<BackupPage> {
             open: _host.text.trim().isNotEmpty,
             children: _serverSection(theme),
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (_) => DeleteVaultPage(store: widget.store, drive: widget.drive),
-              )),
-              icon: const Icon(Icons.delete_forever_outlined),
-              label: Text(t.deleteVault),
-            ),
-          ),
         ],
       ),
     );
@@ -407,7 +251,7 @@ class _BackupPageState extends State<BackupPage> {
 
   List<Widget> _folderSection(ThemeData theme) => [
     Text(
-      t.foldersHint,
+      t.foldersSlotsHint,
       style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
     ),
     const SizedBox(height: 12),
@@ -432,8 +276,8 @@ class _BackupPageState extends State<BackupPage> {
         ),
         OutlinedButton.icon(
           onPressed: _openCopyFile,
-          icon: const Icon(Icons.folder_open_outlined),
-          label: Text(t.openCopy),
+          icon: const Icon(Icons.visibility_outlined),
+          label: Text(t.reviewCopy),
         ),
       ],
     ),

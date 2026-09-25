@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "无法连接 Google Drive"
   },
-  "setPasswordInApp": {
-    "message": "请先在 Keyhold 应用中设置主密码"
-  },
   "signInWindowOpen": {
     "message": "Google 登录窗口仍处于打开状态。请关闭它，然后重试。"
   },
   "wrongMasterPassword": {
     "message": "主密码错误"
+  },
+  "noVaultMatches": {
+    "message": "您的 Google Drive 中没有能用此密码打开的密码库"
   }
 }

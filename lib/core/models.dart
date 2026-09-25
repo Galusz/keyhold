@@ -195,9 +195,24 @@ class Vault {
   KeyWrap? keyWrap;
   RecoveryWrap? recovery;
 
-  Vault({Map<String, VaultEntry>? entries, Map<String, VaultFile>? files, this.keyWrap, this.recovery})
-      : entries = entries ?? {},
+  /// What the owner calls this vault ("My vault", "Work"), and when it was named.
+  String name;
+  int nameAt;
+
+  Vault({
+    Map<String, VaultEntry>? entries,
+    Map<String, VaultFile>? files,
+    this.keyWrap,
+    this.recovery,
+    this.name = '',
+    this.nameAt = 0,
+  })  : entries = entries ?? {},
         files = files ?? {};
+
+  void rename(String to) {
+    name = to.trim();
+    nameAt = DateTime.now().millisecondsSinceEpoch;
+  }
 
   List<VaultFile> get visibleFiles {
     final list = files.values.where((f) => !f.deleted).toList();
@@ -448,6 +463,8 @@ class Vault {
         'files': files.values.map((f) => f.toJson()).toList(),
         if (keyWrap != null) 'keyWrap': keyWrap!.toJson(),
         if (recovery != null) 'recovery': recovery!.toJson(),
+        if (name.isNotEmpty) 'name': name,
+        if (nameAt > 0) 'nameAt': nameAt,
       });
 
   factory Vault.decode(String source) {
@@ -472,6 +489,8 @@ class Vault {
       files: fileMap,
       keyWrap: wrap == null ? null : KeyWrap.fromJson(wrap),
       recovery: recovery == null ? null : RecoveryWrap.fromJson(recovery),
+      name: (root['name'] ?? '') as String,
+      nameAt: (root['nameAt'] ?? 0) as int,
     );
   }
 
@@ -498,6 +517,15 @@ class Vault {
         ? remote.recovery
         : local.recovery;
 
-    return Vault(entries: entryMap, files: fileMap, keyWrap: wrap, recovery: kept);
+    final named = remote.nameAt > local.nameAt ? remote : local;
+
+    return Vault(
+      entries: entryMap,
+      files: fileMap,
+      keyWrap: wrap,
+      recovery: kept,
+      name: named.name,
+      nameAt: named.nameAt,
+    );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 
@@ -7,13 +6,16 @@ import '../core/drive.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
 
-/// Erases the vault on this device, and on request its copy in Google Drive
-/// and in the backup folders. Keyhold closes afterwards and starts empty.
+/// Erases the open vault on this device, and on request its file in Google
+/// Drive and its copies in the backup folders. Other vaults stay.
 class DeleteVaultPage extends StatefulWidget {
-  const DeleteVaultPage({super.key, required this.store, required this.drive});
+  const DeleteVaultPage({super.key, required this.store, required this.drive, required this.onDeleted});
 
   final VaultStore store;
   final DriveSync drive;
+
+  /// Keyhold goes back to its start screen.
+  final Future<void> Function() onDeleted;
 
   @override
   State<DeleteVaultPage> createState() => _DeleteVaultPageState();
@@ -49,14 +51,9 @@ class _DeleteVaultPageState extends State<DeleteVaultPage> {
     });
     try {
       // Google Drive first: if it cannot be reached, nothing is gone yet.
-      if (_drive && widget.drive.connected) await widget.drive.deleteRemote();
-      if (_folders) widget.store.backup.deleteCopies();
-      try {
-        await widget.drive.disconnect();
-      } catch (_) {
-        // the vault goes regardless; Google forgets the link on its own
-      }
-      widget.store.deleteLocal();
+      if (_drive && widget.drive.connected) await widget.drive.deleteMine();
+      if (_folders) widget.store.backup.deleteCopies(await widget.store.tag());
+      await widget.store.deleteLocal();
     } catch (e) {
       setState(() {
         _busy = false;
@@ -65,7 +62,7 @@ class _DeleteVaultPageState extends State<DeleteVaultPage> {
       return;
     }
     setState(() => _done = true);
-    Timer(const Duration(seconds: 2), () => exit(0));
+    Timer(const Duration(seconds: 2), widget.onDeleted);
   }
 
   @override
@@ -77,13 +74,13 @@ class _DeleteVaultPageState extends State<DeleteVaultPage> {
       child: Scaffold(
         appBar: AppBar(title: Text(t.deleteVault)),
         body: _done
-            ? Center(child: Text(t.vaultDeleted, style: theme.textTheme.titleMedium))
+            ? Center(child: Text(t.vaultDeletedHere, style: theme.textTheme.titleMedium))
             : ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
                   Icon(Icons.delete_forever_outlined, size: 48, color: theme.colorScheme.error),
                   const SizedBox(height: 16),
-                  Text(t.deleteVaultHint, style: theme.textTheme.bodyMedium),
+                  Text(t.deleteVaultHereHint, style: theme.textTheme.bodyMedium),
                   const SizedBox(height: 16),
                   if (widget.drive.connected)
                     CheckboxListTile(
@@ -91,7 +88,7 @@ class _DeleteVaultPageState extends State<DeleteVaultPage> {
                       controlAffinity: ListTileControlAffinity.leading,
                       value: _drive,
                       onChanged: _busy ? null : (v) => setState(() => _drive = v ?? false),
-                      title: Text(t.deleteVaultDrive),
+                      title: Text(t.deleteVaultDriveMine),
                     ),
                   if (backup.targets.isNotEmpty)
                     CheckboxListTile(

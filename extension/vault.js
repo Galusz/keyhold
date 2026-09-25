@@ -10,7 +10,9 @@ const Standalone = (() => {
   // "Web application" client of the Keyhold Google project; not a secret.
   const GOOGLE_CLIENT_ID = '95881372863-ajkuag5vst7l6re7c7cvj000j4dq4gcn.apps.googleusercontent.com';
   const SCOPE = 'https://www.googleapis.com/auth/drive.file';
-  const FILE = 'vault.khd';
+  // Every vault has a file of its own in the "Keyhold" folder; the master
+  // password says which one is the user's.
+  const VAULT_NAME = /^vault(-[0-9a-f]{8})?\.khd$/;
   const MAGIC = [0x4b, 0x48, 0x4c, 0x44, 0x31];
   const OFFER_TIME = 2 * 60 * 1000;
   const FAILED_TIME = 30 * 1000;
@@ -124,31 +126,33 @@ const Standalone = (() => {
     return response;
   }
 
-  async function fileId(interactive) {
-    const { driveFile } = await local.get('driveFile');
-    if (driveFile) return driveFile;
+  async function vaultFiles(interactive) {
     const query = new URLSearchParams({
-      q: `name = '${FILE}' and trashed = false`,
+      q: "name contains 'vault' and trashed = false and mimeType != 'application/vnd.google-apps.folder'",
       orderBy: 'modifiedTime desc',
-      fields: 'files(id)',
+      fields: 'files(id,name)',
+      pageSize: '200',
     });
     const { files } = await (await drive(`https://www.googleapis.com/drive/v3/files?${query}`, {}, interactive)).json();
-    if (!files || files.length === 0) return null;
-    await local.set({ driveFile: files[0].id });
-    return files[0].id;
+    return (files || []).filter((f) => VAULT_NAME.test(f.name));
   }
 
-  async function download(interactive = false) {
-    const id = await fileId(interactive);
-    if (!id) throw new Error(t('noVaultInDrive'));
-    const response = await drive(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, {}, interactive);
-    const bytes = new Uint8Array(await response.arrayBuffer());
+  async function fetchFile(id) {
+    const response = await drive(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`);
+    return new Uint8Array(await response.arrayBuffer());
+  }
+
+  // The file of the vault opened here.
+  async function download() {
+    const { driveFile } = await local.get('driveFile');
+    if (!driveFile) throw new Error(t('noVaultInDrive'));
+    const bytes = await fetchFile(driveFile);
     await local.set({ vaultFile: toB64(bytes), pulledAt: Date.now() });
     return bytes;
   }
 
   async function upload(bytes) {
-    const id = await fileId(false);
+    const { driveFile: id } = await local.get('driveFile');
     await drive(`https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=media`, {
       method: 'PATCH',
       headers: { 'content-type': 'application/octet-stream' },
@@ -742,22 +746,19 @@ const Standalone = (() => {
 
     /// "none" (never connected here), "locked" or "open".
     async state() {
-      const { vaultFile } = await local.get('vaultFile');
-      if (!vaultFile) return { state: 'none' };
+      const { vaultFile, driveConnected } = await local.get(['vaultFile', 'driveConnected']);
+      if (!vaultFile && !driveConnected) return { state: 'none' };
       const { dek } = await session.get('dek');
       return { state: dek ? 'open' : 'locked' };
     },
 
-    /// Signs in to Google and fetches the vault; the master password comes next.
+    /// Signs in to Google; the master password then picks the vault.
     async connect() {
       try {
         await session.remove('driveToken');
         await local.remove(['driveFile', 'vaultFile']);
-        const bytes = await download(true);
-        if (!parse(bytes).salt) {
-          await local.remove('vaultFile');
-          return { error: t('setPasswordInApp') };
-        }
+        if ((await vaultFiles(true)).length === 0) return { error: t('noVaultInDrive') };
+        await local.set({ driveConnected: true });
         return { ok: true };
       } catch (e) {
         const text = e.message || '';
@@ -768,28 +769,46 @@ const Standalone = (() => {
       }
     },
 
+    /// The vault opened here before is tried first, then every vault in Drive:
+    /// the one this password opens is the user's.
     async unlock(password) {
-      let bytes;
-      try {
-        bytes = await download();
-      } catch (e) {
-        const { vaultFile } = await local.get('vaultFile');
-        if (!vaultFile) return { error: e.message };
-        bytes = fromB64(vaultFile);
-      }
-      const parts = parse(bytes);
-      if (!parts.salt) return { error: t('setPasswordInApp') };
-      try {
-        const dek = await unwrap(password, parts.salt, parts.wrapped);
+      const keyIn = async (bytes) => {
+        const parts = parse(bytes);
+        if (!parts.salt) return null;
+        try {
+          return await unwrap(password, parts.salt, parts.wrapped);
+        } catch {
+          return null;
+        }
+      };
+      const opened = async (dek) => {
         await session.set({ dek: toB64(dek), usedAt: Date.now() });
         loaded = null;
         // Every missing icon, so the list under the fields has them too.
         const map = await iconMap();
         for (const e of visible(await vault())) iconFrom(map, e.url);
         return { ok: true };
+      };
+
+      const { driveFile, vaultFile } = await local.get(['driveFile', 'vaultFile']);
+      let ids;
+      try {
+        ids = (await vaultFiles(false)).map((f) => f.id);
       } catch (e) {
-        return { error: t('wrongMasterPassword') };
+        // Offline: only the copy kept here can open.
+        if (!vaultFile) return { error: e.message };
+        const dek = await keyIn(fromB64(vaultFile));
+        return dek ? opened(dek) : { error: t('wrongMasterPassword') };
       }
+      if (driveFile && ids.includes(driveFile)) ids = [driveFile, ...ids.filter((id) => id !== driveFile)];
+      for (const id of ids) {
+        const bytes = await fetchFile(id);
+        const dek = await keyIn(bytes);
+        if (!dek) continue;
+        await local.set({ driveFile: id, vaultFile: toB64(bytes), pulledAt: Date.now() });
+        return opened(dek);
+      }
+      return { error: t(ids.length ? 'noVaultMatches' : 'noVaultInDrive') };
     },
 
     async lock() {
@@ -802,7 +821,7 @@ const Standalone = (() => {
       loaded = null;
       icons = null;
       await session.remove(['dek', 'aloneOffers', 'driveToken', 'usedAt']);
-      await local.remove(['driveFile', 'vaultFile', 'pulledAt', 'driveEmail', 'icons']);
+      await local.remove(['driveFile', 'vaultFile', 'pulledAt', 'driveEmail', 'icons', 'driveConnected']);
       return { ok: true };
     },
   };

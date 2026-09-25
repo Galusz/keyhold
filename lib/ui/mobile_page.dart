@@ -3,17 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../core/crypto.dart';
 import '../core/drive.dart';
 import '../core/favicons.dart';
 import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../l10n/l10n.dart';
-import 'delete_vault_page.dart';
 import 'entry_page.dart';
+import 'import_page.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
+import 'start_page.dart';
+import 'sync_page.dart';
+import 'vault_info_page.dart';
 import 'vault_page.dart' show SiteAvatar;
 
 /// A fingerprint, or the phone's own PIN or pattern when that fails.
@@ -47,7 +49,6 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   Vault _vault = Vault();
   bool _loading = true;
-  bool _welcome = false;
   bool _codesOnly = true;
   int _codeWindow = -1;
   int _left = 30;
@@ -111,7 +112,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   Future<void> _resume() async {
     // The autofill screen may have saved a login to the vault file meanwhile.
-    if (!_loading) {
+    if (!_loading && _store.isOpen) {
       _vault = Vault.merge(_vault, await _store.load());
       _codeWindow = -1;
       await _refreshCodes();
@@ -120,21 +121,58 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   }
 
   Future<void> _boot() async {
-    final ready = await _store.init();
-    if (!ready && mounted) {
+    final state = await _store.init();
+    if (state == VaultState.locked && mounted) {
       await Navigator.of(context).push(MaterialPageRoute<bool>(
-        builder: (_) => PasswordPage(store: _store, unlockMode: true),
+        builder: (_) => PasswordPage(store: _store, mode: PasswordMode.unlock),
       ));
     }
-    _vault = await _store.load();
-    if (_vault.splitCodes()) await _store.save(_vault);
+    if (!await _ensureVault()) return;
     // The fingerprint panel comes up only from the Unlock button.
     _locked = _store.backup.fingerprintLock;
-    _store.icons.fetchAll(_vault.visible);
-    _welcome = _vault.visible.isEmpty && !_drive.connected;
-    setState(() => _loading = false);
+    await _loadVault();
     await _refreshCodes();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
+    unawaited(_sync());
+  }
+
+  /// Like on the computer: a new or an existing vault on an empty phone, and
+  /// a master password for a vault from before one was required.
+  Future<bool> _ensureVault() async {
+    if (!_store.isOpen && mounted) {
+      await Navigator.of(context).push(MaterialPageRoute<bool>(
+        builder: (_) => StartPage(store: _store, drive: _drive),
+      ));
+    }
+    if (_store.isOpen && !_store.hasPassword && mounted) {
+      await Navigator.of(context).push(MaterialPageRoute<bool>(
+        builder: (_) => PasswordPage(store: _store, mode: PasswordMode.seal),
+      ));
+    }
+    return mounted && _store.isOpen;
+  }
+
+  Future<void> _loadVault() async {
+    _vault = await _store.load();
+    if (_vault.splitCodes()) await _store.save(_vault);
+    _store.icons.fetchAll(_vault.visible);
+    _codes.clear();
+    _next.clear();
+    _codeWindow = -1;
+    setState(() => _loading = false);
+  }
+
+  /// Another vault took this one's place, or it was deleted.
+  Future<void> _reopen() async {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    // Nothing of the vault that left stays on show or reaches the browser.
+    setState(() {
+      _vault = Vault();
+      _loading = true;
+    });
+    if (!await _ensureVault()) return;
+    await _loadVault();
+    await _refreshCodes();
     unawaited(_sync());
   }
 
@@ -162,15 +200,15 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   }
 
   /// Same merge as on the computer: edits made while it runs are kept.
-  Future<SyncResult?> _sync({String? password}) async {
-    if (!_drive.connected) return null;
+  Future<SyncResult?> _sync() async {
+    if (!_drive.connected || !_store.isOpen) return null;
     if (_syncing) {
       _syncAgain = true;
       return null;
     }
     setState(() => _syncing = true);
     try {
-      final result = await _drive.sync(_vault, password: password);
+      final result = await _drive.sync(_vault);
       final theirs = result.vault;
       if (theirs != null) {
         _vault = Vault.merge(_vault, theirs);
@@ -190,55 +228,6 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
         unawaited(_sync());
       }
     }
-  }
-
-  // ---------- Google Drive ----------
-
-  Future<void> _connect() async {
-    try {
-      await _drive.connect();
-    } catch (e) {
-      _toast(t.driveNotConnected('$e'));
-      return;
-    }
-    var result = await _sync();
-    if (result != null && result.needsPassword) {
-      final password = await _askPassword();
-      if (password == null) return;
-      result = await _sync(password: password);
-      if (result != null && await readRecoveryCode(password) != null && mounted) {
-        await newPasswordAfterRecovery(context, _store);
-      }
-    }
-    if (_drive.lastError != null) {
-      _toast(_drive.lastError!);
-      return;
-    }
-    setState(() => _welcome = false);
-  }
-
-  Future<String?> _askPassword() {
-    final field = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(t.masterPassword),
-        content: TextField(
-          controller: field,
-          obscureText: true,
-          decoration: InputDecoration(
-            labelText: t.masterPasswordOfVault,
-            helperText: '${t.masterPasswordFromComputer}\n${t.orRecoveryCode}',
-            helperMaxLines: 4,
-          ),
-          onSubmitted: (v) => Navigator.pop(context, v),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(context, field.text), child: Text(t.open)),
-        ],
-      ),
-    ).whenComplete(field.dispose);
   }
 
   // ---------- actions ----------
@@ -359,7 +348,25 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
   Future<void> _settings() async {
     await Navigator.of(context).push(MaterialPageRoute<void>(
-      builder: (_) => _Settings(store: _store, drive: _drive, onConnect: _connect, onSync: _sync),
+      builder: (_) => _Settings(
+        store: _store,
+        drive: _drive,
+        vault: _vault,
+        onSync: _sync,
+        onRename: (name) async {
+          _vault.rename(name);
+          await _persist();
+        },
+        onImport: (picked) async {
+          for (final e in picked) {
+            _vault.put(e);
+          }
+          _vault.splitCodes();
+          await _persist();
+          _toast(t.addedCount(picked.length));
+        },
+        onSwitched: _reopen,
+      ),
     ));
     setState(() {});
   }
@@ -391,7 +398,6 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    if (_welcome) return _welcomeScreen();
 
     final q = _search.text.trim().toLowerCase();
     final items = _vault.visible.where((e) {
@@ -405,7 +411,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Keyhold'),
+        title: Text(_vault.name.isEmpty ? 'Keyhold' : _vault.name),
         actions: [
           if (_syncing)
             const Padding(
@@ -584,42 +590,6 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _welcomeScreen() {
-    final theme = Theme.of(context);
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Spacer(),
-              Icon(Icons.lock_outline, size: 64, color: theme.colorScheme.primary),
-              const SizedBox(height: 20),
-              Text('Keyhold', textAlign: TextAlign.center, style: theme.textTheme.headlineMedium),
-              const SizedBox(height: 12),
-              Text(
-                t.phoneWelcome,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
-              ),
-              const Spacer(),
-              FilledButton.icon(
-                onPressed: _connect,
-                icon: const Icon(Icons.add_to_drive),
-                label: Text(t.connectDrive),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => setState(() => _welcome = false),
-                child: Text(t.startEmpty),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _Details extends StatefulWidget {
@@ -726,14 +696,20 @@ class _Settings extends StatefulWidget {
   const _Settings({
     required this.store,
     required this.drive,
-    required this.onConnect,
+    required this.vault,
     required this.onSync,
+    required this.onRename,
+    required this.onImport,
+    required this.onSwitched,
   });
 
   final VaultStore store;
   final DriveSync drive;
-  final Future<void> Function() onConnect;
+  final Vault vault;
   final Future<SyncResult?> Function() onSync;
+  final Future<void> Function(String name) onRename;
+  final Future<void> Function(List<VaultEntry> picked) onImport;
+  final Future<void> Function() onSwitched;
 
   @override
   State<_Settings> createState() => _SettingsState();
@@ -741,8 +717,6 @@ class _Settings extends StatefulWidget {
 
 class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
   static const _autofill = MethodChannel('keyhold/autofill-settings');
-
-  bool _busy = false;
 
   /// "on", "off" or "unsupported" — whether Keyhold is the phone's password filler.
   String _filler = 'unsupported';
@@ -771,15 +745,6 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
     if (mounted) setState(() => _filler = state);
   }
 
-  Future<void> _run(Future<void> Function() action) async {
-    setState(() => _busy = true);
-    try {
-      await action();
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -791,47 +756,41 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Text('Google Drive', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(
-            !drive.connected
-                ? t.driveOnlyPhone
-                : synced == null
-                    ? t.connectedAs(drive.email)
-                    : t.connectedAsSynced(drive.email, TimeOfDay.fromDateTime(synced).format(context)),
-            style: theme.textTheme.bodyMedium,
-          ),
-          if (drive.lastError != null) ...[
-            const SizedBox(height: 4),
-            Text(drive.lastError!, style: TextStyle(color: theme.colorScheme.error)),
-          ],
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            children: [
-              if (!drive.connected)
-                FilledButton.icon(
-                  onPressed: _busy ? null : () => _run(widget.onConnect),
-                  icon: const Icon(Icons.add_to_drive),
-                  label: Text(t.connect),
-                )
-              else ...[
-                OutlinedButton.icon(
-                  onPressed: _busy ? null : () => _run(() async => widget.onSync()),
-                  icon: const Icon(Icons.sync),
-                  label: Text(t.syncNow),
+          Text(t.vaultTab, style: theme.textTheme.titleMedium),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.key_outlined),
+            title: Text(widget.vault.name.isEmpty ? t.myVault : widget.vault.name),
+            subtitle: Text(t.itemCount(widget.vault.visible.length)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => VaultInfoPage(
+                  store: widget.store,
+                  drive: drive,
+                  vault: widget.vault,
+                  onRename: widget.onRename,
+                  beforeClose: () async => widget.onSync(),
+                  onSwitched: widget.onSwitched,
                 ),
-                TextButton(
-                  onPressed: _busy ? null : () => _run(drive.disconnect),
-                  child: Text(t.disconnect),
-                ),
-              ],
-            ],
+              ));
+              if (mounted) setState(() {});
+            },
           ),
-          if (_busy) const Padding(padding: EdgeInsets.only(top: 12), child: LinearProgressIndicator()),
-          const Divider(height: 40),
-          Text(t.fingerprintLock, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.download_outlined),
+            title: Text(t.importTitle),
+            subtitle: Text(t.importMenuHint),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              final picked = await Navigator.of(context).push(MaterialPageRoute<List<VaultEntry>>(
+                builder: (_) => ImportPage(store: widget.store, vault: widget.vault),
+              ));
+              if (picked != null && picked.isNotEmpty) await widget.onImport(picked);
+              if (mounted) setState(() {});
+            },
+          ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             value: widget.store.backup.fingerprintLock,
@@ -843,6 +802,28 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
               widget.store.backup
                 ..fingerprintLock = on
                 ..saveSettings();
+              if (mounted) setState(() {});
+            },
+          ),
+          const Divider(height: 40),
+          Text(t.syncTab, style: theme.textTheme.titleMedium),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(drive.lastError != null ? Icons.sync_problem : Icons.add_to_drive),
+            title: const Text('Google Drive'),
+            subtitle: Text(
+              drive.lastError ??
+                  (!drive.connected
+                      ? t.driveOnlyPhone
+                      : synced == null
+                          ? t.connectedAs(drive.email)
+                          : t.connectedAsSynced(drive.email, TimeOfDay.fromDateTime(synced).format(context))),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => SyncPage(drive: drive, onSync: widget.onSync),
+              ));
               if (mounted) setState(() {});
             },
           ),
@@ -866,41 +847,6 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
               ),
             ],
           ],
-          const Divider(height: 40),
-          Text(t.masterPassword, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(
-            widget.store.hasPassword ? t.passwordSetPhone : t.passwordNotSetPhone,
-            style: theme.textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
-              onPressed: () async {
-                final changed = await Navigator.of(context).push(MaterialPageRoute<bool>(
-                  builder: (_) => PasswordPage(store: widget.store, unlockMode: false),
-                ));
-                // Sends the new password to the other devices right away.
-                if (changed == true) await widget.onSync();
-                if (mounted) setState(() {});
-              },
-              icon: const Icon(Icons.lock_outline),
-              label: Text(widget.store.hasPassword ? t.change : t.setMasterPassword),
-            ),
-          ),
-          const Divider(height: 40),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (_) => DeleteVaultPage(store: widget.store, drive: widget.drive),
-              )),
-              icon: const Icon(Icons.delete_forever_outlined),
-              label: Text(t.deleteVault),
-            ),
-          ),
         ],
       ),
     );

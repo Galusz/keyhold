@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "Google Drive est injoignable"
   },
-  "setPasswordInApp": {
-    "message": "Définissez d’abord un mot de passe principal dans l’appli Keyhold"
-  },
   "signInWindowOpen": {
     "message": "Une fenêtre de connexion Google est encore ouverte. Fermez-la et réessayez."
   },
   "wrongMasterPassword": {
     "message": "Mot de passe principal incorrect"
+  },
+  "noVaultMatches": {
+    "message": "Aucun coffre-fort de votre Google Drive ne s’ouvre avec ce mot de passe"
   }
 }

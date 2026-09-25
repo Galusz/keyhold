@@ -37,9 +37,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get change => 'Zmień';
 
   @override
-  String get connect => 'Połącz';
-
-  @override
   String get disconnect => 'Rozłącz';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get masterPassword => 'Hasło główne';
 
   @override
-  String get setMasterPassword => 'Ustaw hasło główne';
-
-  @override
   String copied(String what) {
     return 'Skopiowano: $what';
   }
@@ -93,13 +87,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String driveNotConnected(String error) {
     return 'Nie połączono z Google Drive: $error';
   }
-
-  @override
-  String get masterPasswordOfVault => 'Hasło główne sejfu';
-
-  @override
-  String get masterPasswordFromComputer =>
-      'To, które ustawiono w Keyhold na komputerze';
 
   @override
   String get scanQr => 'Zeskanuj kod QR';
@@ -177,14 +164,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      'Twoje hasła i kody weryfikacyjne — ten sam sejf co na komputerze, synchronizowany przez Twój Google Drive.';
-
-  @override
   String get connectDrive => 'Połącz z Google Drive';
-
-  @override
-  String get startEmpty => 'Zacznij od pustego sejfu';
 
   @override
   String codeSeconds(int seconds) {
@@ -209,9 +189,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get syncNow => 'Synchronizuj teraz';
 
   @override
-  String get fingerprintLock => 'Blokada odciskiem palca';
-
-  @override
   String get fingerprintSwitch => 'Otwieraj Keyhold odciskiem palca';
 
   @override
@@ -231,14 +208,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => 'Uzupełniaj hasła przez Keyhold';
-
-  @override
-  String get passwordSetPhone =>
-      'Ustawione. Otwiera ten sejf na nowym urządzeniu.';
-
-  @override
-  String get passwordNotSetPhone =>
-      'Nieustawione. Bez niego nowe urządzenie nie otworzy sejfu.';
 
   @override
   String get deleteThisLogin => 'Usunąć te dane logowania?';
@@ -316,15 +285,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get browserExtension => 'Rozszerzenie przeglądarki';
-
-  @override
-  String get backup => 'Kopia zapasowa';
-
-  @override
-  String get importCsv => 'Importuj z CSV';
-
-  @override
-  String get changeMasterPassword => 'Zmień hasło główne';
 
   @override
   String get addFile => 'Dodaj plik';
@@ -444,10 +404,6 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword =>
-      'Google Drive: otwórz „Kopia zapasowa” i wpisz hasło główne';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive: $problem';
   }
@@ -489,14 +445,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get off => 'Wyłączone';
 
   @override
-  String onWith(String detail) {
-    return 'Włączone — $detail';
-  }
-
-  @override
-  String get join => 'Dołącz';
-
-  @override
   String get synced => 'Zsynchronizowano';
 
   @override
@@ -534,17 +482,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String cannotWriteFolder(String folder) {
     return 'Zalogowano, ale nie można zapisać w „$folder”. Wybierz inny folder.';
   }
-
-  @override
-  String get driveHoldsVault =>
-      'W Google Drive jest już sejf Keyhold. Aby do niego dołączyć, potrzebne jest jego hasło główne.';
-
-  @override
-  String get masterPasswordOfDriveVault => 'Hasło główne sejfu w Google Drive';
-
-  @override
-  String get driveHint =>
-      'Przechowuje zaszyfrowany sejf w folderze „Keyhold” na Twoim Google Drive, więc inne urządzenia są zsynchronizowane, a zgubiony komputer niczego nie zabiera. Google nie może go odczytać.';
 
   @override
   String get driveNotInBuild =>
@@ -585,10 +522,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get yourServer => 'Twój serwer';
-
-  @override
-  String get foldersHint =>
-      'Każdy zapis zostawia w każdym folderze kopię z datą i zachowuje 30 ostatnich.';
 
   @override
   String get noFolders => 'Brak folderów — kopie lokalne są wyłączone';
@@ -877,21 +810,11 @@ class AppLocalizationsPl extends AppLocalizations {
   String get passwordDoesNotOpen => 'To hasło nie otwiera tego sejfu';
 
   @override
-  String get currentPasswordWrong => 'Obecne hasło główne jest nieprawidłowe';
-
-  @override
   String get unlockVault => 'Odblokuj sejf';
 
   @override
   String get unlockHint =>
       'Ten sejf pochodzi z innego komputera. Wpisz hasło główne, aby go tu otworzyć.';
-
-  @override
-  String get masterPasswordHint =>
-      'Windows otwiera ten sejf automatycznie. Hasło główne pozwala do niego wrócić po ponownej instalacji, na nowym komputerze albo na telefonie.';
-
-  @override
-  String get currentMasterPassword => 'Obecne hasło główne';
 
   @override
   String get newMasterPassword => 'Nowe hasło główne';
@@ -1020,72 +943,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => 'Importuj hasła';
-
-  @override
-  String get importHint =>
-      'Wyeksportuj hasła z przeglądarki do pliku CSV, a potem wczytaj go tutaj. Działają eksporty z Chrome, Edge, Firefox, Bitwarden i KeePassXC.';
-
-  @override
-  String get chooseCsv => 'Wybierz plik CSV';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count wpisu gotowego',
-      many: '$count wpisów gotowych',
-      few: '$count wpisy gotowe',
-      one: '1 wpis gotowy',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count wpisu gotowego',
-      many: '$count wpisów gotowych',
-      few: '$count wpisy gotowe',
-      one: '1 wpis gotowy',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: 'pominięto $skipped pustego wiersza',
-      many: 'pominięto $skipped pustych wierszy',
-      few: 'pominięto $skipped puste wiersze',
-      one: 'pominięto 1 pusty wiersz',
-    );
-    return '$_temp0, $_temp1';
-  }
-
-  @override
-  String andMore(int count) {
-    return 'i jeszcze $count';
-  }
-
-  @override
-  String get deleteCsv => 'Usuń plik CSV po imporcie';
-
-  @override
   String get deleteCsvHint => 'Wszystkie hasła są w nim niezaszyfrowane';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Importuj $count wpisu',
-      many: 'Importuj $count wpisów',
-      few: 'Importuj $count wpisy',
-      one: 'Importuj 1 wpis',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint =>
@@ -1105,13 +963,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String nextCode(String code) {
     return 'następny $code';
   }
-
-  @override
-  String get noMasterPasswordBar =>
-      'Brak hasła głównego: kopii zapasowych nie da się otworzyć na innym komputerze. Kliknij, aby je ustawić.';
-
-  @override
-  String get printRecoverySheet => 'Wydrukuj zestaw ratunkowy';
 
   @override
   String get recoverySheet => 'Zestaw ratunkowy';
@@ -1184,14 +1035,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get deleteVault => 'Usuń sejf';
 
   @override
-  String get deleteVaultHint =>
-      'Wszystko, co Keyhold trzyma na tym urządzeniu, zostanie wymazane: hasła, kody weryfikacyjne, pliki i ustawienia. Potem Keyhold zamknie się i zacznie od pustego sejfu.';
-
-  @override
-  String get deleteVaultDrive =>
-      'Usuń go też z Google Drive (inne urządzenia zachowają swoją kopię, dopóki nie usuniesz jej także tam)';
-
-  @override
   String get deleteVaultFolders =>
       'Usuń też kopie w folderach kopii zapasowych';
 
@@ -1202,18 +1045,11 @@ class AppLocalizationsPl extends AppLocalizations {
   String get deleteVaultSureHint => 'Tego nie da się cofnąć.';
 
   @override
-  String get vaultDeleted => 'Sejf został usunięty. Keyhold zaraz się zamknie.';
-
-  @override
   String get recoveryGate =>
       'Wpisz hasło główne, aby zobaczyć klucz ratunkowy.';
 
   @override
   String get showKey => 'Pokaż klucz';
-
-  @override
-  String get recoveryNeedsPassword =>
-      'Najpierw ustaw hasło główne: klucz ratunkowy pojawi się dopiero potem.';
 
   @override
   String get recoveryCopyRow =>
@@ -1265,9 +1101,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Nie udało się otworzyć kopii: złe hasło lub klucz ratunkowy albo to nie jest sejf Keyhold.';
 
   @override
-  String get openCopy => 'Otwórz plik kopii…';
-
-  @override
   String copyTitle(String name) {
     return 'Kopia: $name';
   }
@@ -1277,10 +1110,276 @@ class AppLocalizationsPl extends AppLocalizations {
       'Tylko do podglądu: nic tu nie zmienia Twojego sejfu. Pojedynczy wpis możesz dodać do swojego sejfu.';
 
   @override
-  String get addToVault => 'Dodaj do mojego sejfu';
+  String get myVault => 'Mój sejf';
 
   @override
-  String addedToVault(String name) {
-    return '„$name” jest w Twoim sejfie';
+  String get vaultTab => 'Sejf';
+
+  @override
+  String get syncTab => 'Synchronizacja';
+
+  @override
+  String get copiesTab => 'Kopie';
+
+  @override
+  String get startHint =>
+      'Twoje hasła i kody weryfikacyjne w jednym sejfie: na komputerze, w telefonie i w przeglądarce.';
+
+  @override
+  String get createVault => 'Załóż nowy sejf';
+
+  @override
+  String get openMyVault => 'Otwórz mój sejf';
+
+  @override
+  String get newVault => 'Nowy sejf';
+
+  @override
+  String get vaultName => 'Nazwa sejfu';
+
+  @override
+  String get newVaultHint =>
+      'Hasło główne otwiera ten sejf na każdym Twoim urządzeniu: komputerze, telefonie i w przeglądarce. Keyhold go nie odzyska; zrobi to klucz ratunkowy, który dostaniesz za chwilę.';
+
+  @override
+  String get sealHint =>
+      'Twój sejf nie ma jeszcze hasła głównego. Ustaw je teraz: otwiera ten sejf na innych urządzeniach i w przeglądarce.';
+
+  @override
+  String get createVaultButton => 'Załóż sejf';
+
+  @override
+  String get forgotPassword => 'Nie pamiętasz hasła?';
+
+  @override
+  String get usePassword => 'Użyj hasła głównego';
+
+  @override
+  String get recoveryKey => 'Klucz ratunkowy';
+
+  @override
+  String get recoveryKeyFieldHint =>
+      '36 znaków z zestawu ratunkowego; spacje nie mają znaczenia.';
+
+  @override
+  String get openVaultTitle => 'Otwórz sejf';
+
+  @override
+  String get openVaultHint =>
+      'Sejf otwiera się taki, jaki jest. Nigdy nie łączy się z innym sejfem.';
+
+  @override
+  String get fromDrive => 'Z Google Drive';
+
+  @override
+  String get fromDriveHint =>
+      'Zaloguj się do Google, potem wpisz hasło główne sejfu.';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email: wpisz hasło główne sejfu.';
   }
+
+  @override
+  String get fromFile => 'Z pliku (.khd)';
+
+  @override
+  String get fromFileHint =>
+      'Kopia z folderu kopii, z pendrive’a albo ze starego komputera.';
+
+  @override
+  String get closedHere => 'Otwierane wcześniej na tym urządzeniu';
+
+  @override
+  String closedOn(String date) {
+    return 'zamknięty $date';
+  }
+
+  @override
+  String get closedVaultGone =>
+      'Pliku tego sejfu nie ma już na tym urządzeniu.';
+
+  @override
+  String get typeVaultPassword =>
+      'Wpisz hasło główne sejfu, który chcesz otworzyć. Keyhold sprawdzi je na każdym sejfie na Twoim Google Drive.';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return 'Szukam Twojego sejfu: $at z $of';
+  }
+
+  @override
+  String get noVaultInDrive =>
+      'Na tym Google Drive nie ma jeszcze sejfu Keyhold.';
+
+  @override
+  String get noVaultMatches =>
+      'Żaden sejf na Twoim Google Drive nie otwiera się tym hasłem.';
+
+  @override
+  String get sameVaultFile =>
+      'Ten plik to kopia sejfu, który masz otwarty. Wpisy wyjmiesz z niego przez Kopie, a potem Przejrzyj kopię.';
+
+  @override
+  String fileVaultPassword(String name) {
+    return 'Wpisz hasło główne do: $name.';
+  }
+
+  @override
+  String get driveFileUnreadable =>
+      'Pliku tego sejfu na Google Drive nie da się odczytać. Keyhold zostawia go bez zmian.';
+
+  @override
+  String get vaultInfoHint =>
+      'Ten sejf otwiera się swoim hasłem głównym na każdym urządzeniu. Jeśli zapomnisz hasła, klucz ratunkowy otworzy sejf i ustawisz nowe.';
+
+  @override
+  String get recoveryKeyHint =>
+      'Pokazywany i drukowany po wpisaniu hasła głównego';
+
+  @override
+  String get otherVaults => 'Inne sejfy';
+
+  @override
+  String get openOtherVault => 'Otwórz inny sejf';
+
+  @override
+  String get openOtherVaultHint =>
+      'Z Google Drive, z pliku albo z tego urządzenia';
+
+  @override
+  String get createNewVaultHint => 'Pusty, z własnym hasłem głównym';
+
+  @override
+  String closeVaultTitle(String name) {
+    return 'Zamknąć „$name” na tym urządzeniu?';
+  }
+
+  @override
+  String get closeVaultHint =>
+      'Nic nie jest kasowane: sejf zostaje na Google Drive, w kopiach i na liście sejfów tego urządzenia. Otworzysz go znowu jego hasłem głównym.';
+
+  @override
+  String get continueLabel => 'Dalej';
+
+  @override
+  String get renameVault => 'Zmień nazwę sejfu';
+
+  @override
+  String get reviewCopy => 'Przejrzyj kopię';
+
+  @override
+  String get driveVaultHint =>
+      'Trzyma ten sejf jako osobny zaszyfrowany plik w folderze „Keyhold” na Twoim Google Drive. Inne urządzenia otwierają go jego hasłem głównym. Na jednym Google Drive może być kilka sejfów i nigdy się nie mieszają. Google nie może ich odczytać.';
+
+  @override
+  String get foldersSlotsHint =>
+      'Każdy zapis odświeża w każdym folderze do 7 kopii sejfu: najnowszą oraz sprzed około godziny, dnia, tygodnia, miesiąca, trzech miesięcy i roku.';
+
+  @override
+  String get deleteVaultHereHint =>
+      'Sejf zostanie usunięty z tego urządzenia: hasła, kody weryfikacyjne i pliki. Sejfy otwierane tu wcześniej zostają. Potem Keyhold pokaże ekran startowy.';
+
+  @override
+  String get deleteVaultDriveMine =>
+      'Usuń go też z Google Drive (inne sejfy tam zostają)';
+
+  @override
+  String get vaultDeletedHere => 'Sejf jest usunięty.';
+
+  @override
+  String get menu => 'Menu';
+
+  @override
+  String get importTitle => 'Importuj';
+
+  @override
+  String get importMenuHint =>
+      'Hasła i kody z innych aplikacji albo z innego sejfu';
+
+  @override
+  String get importAnyHint =>
+      'Wybierz eksport z innego menedżera haseł albo aplikacji do kodów, bazę KeePass albo inny sejf Keyhold. Keyhold sam rozpozna, co to za plik, a Ty zaznaczysz, co ma wejść do sejfu.';
+
+  @override
+  String get importReading => 'Czytam plik…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return 'Hasło do pliku $format';
+  }
+
+  @override
+  String get importWrongPassword => 'To hasło nie otwiera tego pliku.';
+
+  @override
+  String get importUnknown =>
+      'Keyhold nie rozpoznaje tego pliku. Wyeksportuj go jeszcze raz z tamtej aplikacji, jako CSV albo JSON.';
+
+  @override
+  String importNothing(String format) {
+    return '$format: w tym pliku nie ma nic, co Keyhold może zachować.';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      'Ta baza KeePass używa czegoś, czego Keyhold nie otworzy (pliku klucza albo szyfru Twofish). Wyeksportuj ją z KeePassa jako CSV.';
+
+  @override
+  String get bitwardenAccountLocked =>
+      'Ten eksport Bitwarden otwiera się tylko Twoim kontem Bitwarden. Wyeksportuj jeszcze raz jako JSON, chroniony hasłem albo bez szyfrowania.';
+
+  @override
+  String get otpLinks => 'linki otpauth';
+
+  @override
+  String get importPickHint =>
+      'Zaznacz, co ma trafić do sejfu. Wpisy, które już masz, są odznaczone.';
+
+  @override
+  String codesLeftOut(int count) {
+    return 'Pominięte kody: $count. Keyhold robi tylko kody 6-cyfrowe co 30 sekund, bez 8 cyfr, 60 sekund, liczników i Steam.';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return 'Pominięte rekordy: $count (puste, karty i dane osobowe).';
+  }
+
+  @override
+  String get selectAll => 'Zaznacz wszystko';
+
+  @override
+  String get alreadyInVault => 'już jest w sejfie';
+
+  @override
+  String addSelected(int count) {
+    return 'Dodaj ($count)';
+  }
+
+  @override
+  String addedCount(int count) {
+    return 'Dodano do sejfu: $count';
+  }
+
+  @override
+  String get deletePlainFile => 'Usuń potem ten plik';
+
+  @override
+  String get importPasswordsFrom => 'Hasła';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome, Edge, Firefox i Safari (CSV), Bitwarden (CSV albo JSON), 1Password (.1pux albo CSV), KeePass i KeePassXC (.kdbx albo CSV), LastPass, Proton Pass, NordPass i Dashlane (CSV) oraz inny sejf Keyhold (.khd).';
+
+  @override
+  String get importCodesFrom => 'Kody weryfikacyjne';
+
+  @override
+  String get importCodesList =>
+      'Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ i andOTP oraz każdy plik z linkami otpauth://. Google Authenticator: pokaż w nim kod QR eksportu i użyj przycisku kodu QR w Keyhold.';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator i Authy nie wypuszczają kodów: włącz weryfikację dwuetapową w każdym serwisie jeszcze raz i zeskanuj nowy kod QR.';
 }

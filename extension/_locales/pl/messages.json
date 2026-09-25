@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "Brak połączenia z Google Drive"
   },
-  "setPasswordInApp": {
-    "message": "Najpierw ustaw hasło główne w aplikacji Keyhold"
-  },
   "signInWindowOpen": {
     "message": "Okno logowania Google jest nadal otwarte. Zamknij je i spróbuj ponownie."
   },
   "wrongMasterPassword": {
     "message": "Nieprawidłowe hasło główne"
+  },
+  "noVaultMatches": {
+    "message": "Żaden sejf na Twoim Dysku Google nie otwiera się tym hasłem"
   }
 }

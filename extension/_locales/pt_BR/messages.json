@@ -260,13 +260,13 @@
   "driveNotReachable": {
     "message": "O Google Drive está inacessível"
   },
-  "setPasswordInApp": {
-    "message": "Defina primeiro uma senha mestra no app Keyhold"
-  },
   "signInWindowOpen": {
     "message": "Uma janela de login do Google ainda está aberta. Feche-a e tente novamente."
   },
   "wrongMasterPassword": {
     "message": "Senha mestra incorreta"
+  },
+  "noVaultMatches": {
+    "message": "Nenhum cofre do seu Google Drive abre com esta senha"
   }
 }

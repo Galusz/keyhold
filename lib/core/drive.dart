@@ -18,7 +18,12 @@ const _clientId = String.fromEnvironment('KEYHOLD_GOOGLE_CLIENT_ID');
 const _clientSecret = String.fromEnvironment('KEYHOLD_GOOGLE_CLIENT_SECRET');
 const _scope = 'https://www.googleapis.com/auth/drive.file';
 const _folderName = 'Keyhold';
-const _fileName = 'vault.khd';
+
+/// Every vault has a file of its own, named by its key's short mark; the
+/// one name from before vaults had marks is taken over by its vault.
+final _vaultName = RegExp(r'^vault(-[0-9a-f]{8})?\.khd$');
+// EXPIRES: once no "vault.khd" is left in the author's Google Drive.
+const _unmarkedName = 'vault.khd';
 
 class DriveError implements Exception {
   DriveError(this.message, {this.status});
@@ -29,24 +34,25 @@ class DriveError implements Exception {
 }
 
 class SyncResult {
-  SyncResult({
-    this.vault,
-    this.changedHere = false,
-    this.uploaded = false,
-    this.needsPassword = false,
-  });
+  SyncResult({this.vault, this.changedHere = false, this.uploaded = false});
 
   /// The merged vault when this device got something new.
   final Vault? vault;
   final bool changedHere;
   final bool uploaded;
-
-  /// Drive holds a vault from another device; its master password unlocks it.
-  final bool needsPassword;
 }
 
-/// Keeps the encrypted vault file in a "Keyhold" folder in the user's own
-/// Google Drive and merges it with the local vault.
+/// A vault found in Google Drive by its master password or recovery key.
+class FoundVault {
+  FoundVault(this.bytes, this.key);
+
+  final Uint8List bytes;
+  final Uint8List key;
+}
+
+/// Keeps the encrypted vault in a "Keyhold" folder in the user's own Google
+/// Drive, one file per vault, and merges it with this device's copy. Other
+/// vaults in the same folder are never opened or touched.
 class DriveSync {
   DriveSync(this.store);
 
@@ -182,13 +188,12 @@ class DriveSync {
 
   // ---------- sync ----------
 
-  /// Merges the vault in Drive with [local]: newest change of every entry
-  /// wins, on both sides. [password] is only needed the first time this
-  /// device meets a vault made elsewhere. The caller saves [SyncResult.vault].
-  Future<SyncResult> sync(Vault local, {String? password}) async {
+  /// Merges this vault's file in Drive with [local]: newest change of every
+  /// entry wins, on both sides. The caller saves [SyncResult.vault].
+  Future<SyncResult> sync(Vault local) async {
     if (!connected) return SyncResult();
     try {
-      final result = await _sync(local, password);
+      final result = await _sync(local);
       lastError = null;
       store.backup
         ..driveSyncedAt = DateTime.now()
@@ -203,33 +208,27 @@ class DriveSync {
     }
   }
 
-  Future<SyncResult> _sync(Vault local, String? password) async {
+  Future<SyncResult> _sync(Vault local) async {
     store.syncKeyWrap(local);
     final folder = await _folder();
-    final remote = await _findFile(folder);
+    final remote = await _mine(folder);
 
+    // The first time: the vault gets its own file, whatever else is there.
     if (remote == null) {
-      if (!store.hasPassword) {
-        throw DriveError(t.setPasswordFirst);
-      }
-      await _upload(folder, null, await store.fileFor(local));
+      if (!store.hasPassword) throw DriveError(t.setPasswordFirst);
+      await _upload(folder, null, await store.fileFor(local), name: 'vault-${await store.tag()}.khd');
       return SyncResult(uploaded: true);
     }
 
-    final bytes = await _download(remote);
-    Vault theirs;
-    var adopted = false;
+    final Vault theirs;
     try {
-      theirs = await store.open(bytes);
+      theirs = await store.open(await _download(remote));
     } catch (_) {
-      if (password == null) return SyncResult(needsPassword: true);
-      if (!await store.adopt(bytes, password)) throw DriveError(t.wrongMasterPassword);
-      theirs = await store.open(bytes);
-      adopted = true;
+      throw DriveError(t.driveFileUnreadable);
     }
 
     final merged = Vault.merge(local, theirs);
-    final changedHere = adopted || _hasNewer(theirs, local);
+    final changedHere = _hasNewer(theirs, local);
     final changedThere = _hasNewer(local, theirs);
 
     if (changedThere) await _upload(folder, remote, await store.fileFor(merged));
@@ -244,6 +243,7 @@ class DriveSync {
   /// Whether [a] holds an entry, a file or a password change that [b] lacks or has older.
   bool _hasNewer(Vault a, Vault b) {
     if ((a.keyWrap?.changedAt ?? 0) > (b.keyWrap?.changedAt ?? 0)) return true;
+    if (a.nameAt > b.nameAt) return true;
     for (final e in a.entries.values) {
       final other = b.entries[e.id];
       if (other == null || e.updatedAt > other.updatedAt) return true;
@@ -257,17 +257,30 @@ class DriveSync {
 
   // ---------- Drive files ----------
 
-  /// Removes the "Keyhold" folder, with the vault in it, from the user's Google Drive.
-  Future<void> deleteRemote() async {
-    final found = await _json('GET', _api('/drive/v3/files', {
-      'q': "name = '$_folderName' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
-      'fields': 'files(id)',
-      'spaces': 'drive',
-    }));
-    for (final folder in found['files'] as List<dynamic>) {
-      final (status, _) = await _authorized('DELETE', _api('/drive/v3/files/${folder['id']}', {}));
-      if (status != 204 && status != 200 && status != 404) throw DriveError(t.driveAnswered('$status'));
+  /// Tries [typed] on every vault in the "Keyhold" folder and brings back the
+  /// one it opens. [onTry] tells which of how many is being tried. [files] is
+  /// how many vaults the folder holds.
+  Future<({FoundVault? found, int files})> find(String typed, {void Function(int at, int of)? onTry}) async {
+    try {
+      final all = (await _list(await _folder())).where((f) => _vaultName.hasMatch(f.name)).toList();
+      for (final (i, f) in all.indexed) {
+        onTry?.call(i + 1, all.length);
+        final bytes = await _download(f.id);
+        final key = await store.keyFor(bytes, typed);
+        if (key != null) return (found: FoundVault(bytes, key), files: all.length);
+      }
+      return (found: null, files: all.length);
+    } on SocketException {
+      throw DriveError(t.noInternet);
     }
+  }
+
+  /// Removes this vault's file from the user's Google Drive; other vaults stay.
+  Future<void> deleteMine() async {
+    final id = await _mine(await _folder());
+    if (id == null) return;
+    final (status, _) = await _authorized('DELETE', _api('/drive/v3/files/$id', {}));
+    if (status != 204 && status != 200 && status != 404) throw DriveError(t.driveAnswered('$status'));
   }
 
   Future<String> _folder() async {
@@ -284,15 +297,33 @@ class DriveSync {
     return created['id'] as String;
   }
 
-  Future<String?> _findFile(String folder) async {
+  Future<List<({String id, String name})>> _list(String folder) async {
     final found = await _json('GET', _api('/drive/v3/files', {
-      'q': "name = '$_fileName' and '$folder' in parents and trashed = false",
-      'fields': 'files(id)',
+      'q': "'$folder' in parents and trashed = false",
+      'fields': 'files(id,name)',
       'orderBy': 'modifiedTime desc',
+      'pageSize': '200',
       'spaces': 'drive',
     }));
-    final files = found['files'] as List<dynamic>;
-    return files.isEmpty ? null : files.first['id'] as String;
+    return [
+      for (final f in found['files'] as List<dynamic>) (id: f['id'] as String, name: f['name'] as String),
+    ];
+  }
+
+  /// This vault's file: named by its mark, or the unmarked file of before,
+  /// which takes the mark once this vault's key is seen to open it.
+  Future<String?> _mine(String folder) async {
+    final name = 'vault-${await store.tag()}.khd';
+    final files = await _list(folder);
+    for (final f in files) {
+      if (f.name == name) return f.id;
+    }
+    for (final f in files.where((f) => f.name == _unmarkedName)) {
+      if (!await store.opens(await _download(f.id))) continue;
+      await _json('PATCH', _api('/drive/v3/files/${f.id}', {'fields': 'id'}), body: {'name': name});
+      return f.id;
+    }
+    return null;
   }
 
   Future<Uint8List> _download(String id) async {
@@ -301,7 +332,7 @@ class DriveSync {
     return body;
   }
 
-  Future<void> _upload(String folder, String? id, Uint8List bytes) async {
+  Future<void> _upload(String folder, String? id, Uint8List bytes, {String name = ''}) async {
     if (id != null) {
       final (status, _) = await _authorized(
         'PATCH',
@@ -314,7 +345,7 @@ class DriveSync {
     }
 
     const boundary = 'keyhold-boundary-7f3a';
-    final meta = jsonEncode({'name': _fileName, 'parents': [folder]});
+    final meta = jsonEncode({'name': name, 'parents': [folder]});
     final body = BytesBuilder()
       ..add(utf8.encode('--$boundary\r\ncontent-type: application/json; charset=UTF-8\r\n\r\n$meta\r\n'))
       ..add(utf8.encode('--$boundary\r\ncontent-type: application/octet-stream\r\n\r\n'))

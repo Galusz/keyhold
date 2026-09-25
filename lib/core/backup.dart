@@ -19,6 +19,26 @@ class BackupStatus {
       BackupStatus(at: null, targets: const [], errors: const []);
 }
 
+/// A vault this device had open before another one was opened or made; its
+/// file stays here and opens again with its own master password.
+class ClosedVault {
+  ClosedVault({required this.tag, required this.name, required this.count, required this.at});
+
+  final String tag;
+  final String name;
+  final int count;
+  final DateTime at;
+
+  Map<String, dynamic> toJson() => {'tag': tag, 'name': name, 'count': count, 'at': at.toIso8601String()};
+
+  factory ClosedVault.fromJson(Map<String, dynamic> j) => ClosedVault(
+        tag: j['tag'] as String,
+        name: (j['name'] ?? '') as String,
+        count: (j['count'] ?? 0) as int,
+        at: DateTime.tryParse((j['at'] ?? '') as String) ?? DateTime(2000),
+      );
+}
+
 class BackupService {
   BackupService(this._settingsFile);
 
@@ -72,6 +92,9 @@ class BackupService {
   DateTime? driveSyncedAt;
   BackupStatus status = BackupStatus.empty();
 
+  /// Vaults closed on this device, newest first.
+  List<ClosedVault> closed = [];
+
   void loadSettings() {
     if (!_settingsFile.existsSync()) return;
     try {
@@ -93,6 +116,9 @@ class BackupService {
       driveToken = (raw['driveToken'] ?? '') as String;
       driveEmail = (raw['driveEmail'] ?? '') as String;
       driveSyncedAt = DateTime.tryParse((raw['driveSyncedAt'] ?? '') as String);
+      closed = [
+        for (final c in (raw['closed'] as List<dynamic>? ?? const [])) ClosedVault.fromJson(c as Map<String, dynamic>),
+      ];
 
       final at = raw['lastBackupAt'] as String?;
       status = BackupStatus(
@@ -118,6 +144,7 @@ class BackupService {
       if (driveToken.isNotEmpty) 'driveToken': driveToken,
       if (driveEmail.isNotEmpty) 'driveEmail': driveEmail,
       if (driveSyncedAt != null) 'driveSyncedAt': driveSyncedAt!.toIso8601String(),
+      if (closed.isNotEmpty) 'closed': [for (final c in closed) c.toJson()],
       'lastBackupAt': status.at?.toIso8601String(),
       'lastBackupTargets': status.targets,
     }));
@@ -157,13 +184,14 @@ class BackupService {
     return status;
   }
 
-  /// Removes the vault copies Keyhold left in the backup folders.
-  void deleteCopies() {
+  /// Removes the copies of one vault from the backup folders; other vaults' copies stay.
+  void deleteCopies(String tag) {
     for (final target in targets) {
       final dir = Directory(target);
       if (!dir.existsSync()) continue;
       for (final f in dir.listSync().whereType<File>()) {
-        if (f.path.contains('vault-') && f.path.endsWith('.khd')) f.deleteSync();
+        final name = f.uri.pathSegments.last;
+        if (name.startsWith('vault-$tag-') && name.endsWith('.khd')) f.deleteSync();
       }
     }
   }

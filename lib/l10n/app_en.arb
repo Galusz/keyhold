@@ -9,7 +9,6 @@
   "search": "Search",
   "settings": "Settings",
   "change": "Change",
-  "connect": "Connect",
   "disconnect": "Disconnect",
   "unlock": "Unlock",
   "noTitle": "(no title)",
@@ -21,7 +20,6 @@
   "notes": "Notes",
   "duplicates": "Duplicates",
   "masterPassword": "Master password",
-  "setMasterPassword": "Set master password",
   "copied": "{what} copied",
   "@copied": {
     "placeholders": {
@@ -41,8 +39,6 @@
       }
     }
   },
-  "masterPasswordOfVault": "Master password of your vault",
-  "masterPasswordFromComputer": "The one you set in Keyhold on your computer",
   "scanQr": "Scan a QR code",
   "scanQrHint": "Two-factor code of a website or a Google Authenticator export",
   "newCode": "New two-factor code",
@@ -96,9 +92,7 @@
       }
     }
   },
-  "phoneWelcome": "Your passwords and two-factor codes — the same vault as on your computer, kept in step through your own Google Drive.",
   "connectDrive": "Connect Google Drive",
-  "startEmpty": "Start with an empty vault",
   "codeSeconds": "Code ({seconds} s)",
   "@codeSeconds": {
     "placeholders": {
@@ -128,15 +122,12 @@
     }
   },
   "syncNow": "Sync now",
-  "fingerprintLock": "Fingerprint lock",
   "fingerprintSwitch": "Open Keyhold with a fingerprint",
   "fingerprintSwitchHint": "Locks when the screen goes dark or after a minute away. Suggestions under login fields keep working.",
   "fillingPasswords": "Filling passwords",
   "fillerOn": "Keyhold fills logins in apps and browsers: tap \"Keyhold\" under a login field. In Chrome also switch on Settings → Autofill services → Autofill using another service.",
   "fillerOff": "Let Keyhold fill logins and two-factor codes in apps and browsers.",
   "fillWithKeyhold": "Fill passwords with Keyhold",
-  "passwordSetPhone": "Set. It opens this vault on a new device.",
-  "passwordNotSetPhone": "Not set. Without it a new device cannot open the vault.",
   "deleteThisLogin": "Delete this login?",
   "deleteNamed": "Delete {name}?",
   "@deleteNamed": {
@@ -179,9 +170,6 @@
   "moveToGroup": "Move to group",
   "addCodesFromQr": "Add two-factor codes from a QR code",
   "browserExtension": "Browser extension",
-  "backup": "Backup",
-  "importCsv": "Import from CSV",
-  "changeMasterPassword": "Change master password",
   "addFile": "Add file",
   "newEntry": "New",
   "checking": "Checking…",
@@ -311,7 +299,6 @@
       }
     }
   },
-  "driveNeedsPassword": "Google Drive: open Backup and enter the master password",
   "driveProblem": "Google Drive: {problem}",
   "@driveProblem": {
     "placeholders": {
@@ -342,15 +329,6 @@
   "copyPassword": "Copy password",
   "save": "Save",
   "off": "Off",
-  "onWith": "On — {detail}",
-  "@onWith": {
-    "placeholders": {
-      "detail": {
-        "type": "String"
-      }
-    }
-  },
-  "join": "Join",
   "synced": "Synced",
   "alreadyInSync": "Already in sync",
   "fillHostFirst": "Fill in the host first",
@@ -392,9 +370,6 @@
       }
     }
   },
-  "driveHoldsVault": "Google Drive already holds a Keyhold vault. Its master password is needed to join it.",
-  "masterPasswordOfDriveVault": "Master password of the vault in Google Drive",
-  "driveHint": "Keeps the encrypted vault in a \"Keyhold\" folder in your own Google Drive, so your other devices stay in sync and a lost computer loses nothing. Google cannot read it.",
   "driveNotInBuild": "Google Drive is not set up in this build.",
   "setPasswordFirst": "Set a master password first — a new device needs it to open the vault.",
   "foldersOnComputer": "Folders on this computer",
@@ -418,7 +393,6 @@
     }
   },
   "yourServer": "Your server",
-  "foldersHint": "Every save drops a dated copy into each folder and keeps the last 30.",
   "noFolders": "No folders — local copies are off",
   "addFolder": "Add folder",
   "serverHint": "The same copy goes over SFTP to a machine you own. The file stays encrypted, so the server sees bytes and nothing else. Leave the host empty to skip this.",
@@ -581,11 +555,8 @@
   "atLeast8": "Use at least 8 characters",
   "passwordsDiffer": "The two passwords differ",
   "passwordDoesNotOpen": "That password does not open this vault",
-  "currentPasswordWrong": "The current master password is wrong",
   "unlockVault": "Unlock vault",
   "unlockHint": "This vault came from another machine. Type the master password to open it here.",
-  "masterPasswordHint": "Windows opens this vault for you automatically. The master password is the way back in after a reinstall, on a new machine, or on your phone.",
-  "currentMasterPassword": "Current master password",
   "newMasterPassword": "New master password",
   "repeatIt": "Repeat it",
   "openVault": "Open vault",
@@ -653,46 +624,7 @@
       }
     }
   },
-  "importPasswords": "Import passwords",
-  "importHint": "Export your passwords from the browser as CSV, then load the file here. Chrome, Edge, Firefox, Bitwarden and KeePassXC exports all work.",
-  "chooseCsv": "Choose CSV file",
-  "entriesReady": "{count, plural, =1{1 entry ready} other{{count} entries ready}}",
-  "@entriesReady": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "entriesReadySkipped": "{count, plural, =1{1 entry ready} other{{count} entries ready}}, {skipped, plural, =1{1 empty row skipped} other{{skipped} empty rows skipped}}",
-  "@entriesReadySkipped": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "skipped": {
-        "type": "int"
-      }
-    }
-  },
-  "andMore": "and {count} more",
-  "@andMore": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "deleteCsv": "Delete the CSV file after importing",
   "deleteCsvHint": "It holds every password in plain text",
-  "importEntries": "{count, plural, =1{Import 1 entry} other{Import {count} entries}}",
-  "@importEntries": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "cameraHint": "Point at the two-factor QR code of a website, or at the export from Google Authenticator.",
   "deleteThisCode": "Delete this two-factor code?",
   "deleteCodeWarning": "It disappears from all your devices. Without it you cannot sign in where it is used.",
@@ -705,8 +637,6 @@
       }
     }
   },
-  "noMasterPasswordBar": "No master password: your backups cannot be opened on another computer. Click to set one.",
-  "printRecoverySheet": "Print the recovery sheet",
   "recoverySheet": "Recovery sheet",
   "recoveryIntro": "This key opens your vault if you ever forget the master password. Print the sheet, copy the last row onto it by hand, and keep it at home.",
   "print": "Print",
@@ -754,15 +684,11 @@
   "sheetDriveNoEmail": "Google Drive, folder \"Keyhold\"",
   "noBackupPlaces": "No backup folder, server or Google Drive: the vault is only on this computer. Click to set one up.",
   "deleteVault": "Delete the vault",
-  "deleteVaultHint": "Everything Keyhold keeps on this device is erased: passwords, two-factor codes, files and settings. Keyhold then closes and starts empty.",
-  "deleteVaultDrive": "Also delete it from Google Drive (other devices keep their own copy until you delete it there too)",
   "deleteVaultFolders": "Also delete the copies in the backup folders",
   "deleteVaultSure": "Delete the vault for good?",
   "deleteVaultSureHint": "This cannot be undone.",
-  "vaultDeleted": "The vault is deleted. Keyhold closes now.",
   "recoveryGate": "Type your master password to see the recovery key.",
   "showKey": "Show the key",
-  "recoveryNeedsPassword": "Set a master password first: the recovery key is shown only after it.",
   "recoveryCopyRow": "Copy this row by hand onto the printed sheet",
   "checkRow": "Then type the last row as you wrote it on the sheet",
   "check": "Check",
@@ -783,7 +709,6 @@
   },
   "copyPasswordTitle": "Master password of this copy",
   "copyNotOpened": "This copy did not open: wrong password or recovery key, or not a Keyhold vault.",
-  "openCopy": "Open a backup copy…",
   "copyTitle": "Copy: {name}",
   "@copyTitle": {
     "placeholders": {
@@ -793,13 +718,158 @@
     }
   },
   "copyReadOnly": "Only for looking: nothing here changes your vault. Any single entry can be added to your vault.",
-  "addToVault": "Add to my vault",
-  "addedToVault": "\"{name}\" is in your vault",
-  "@addedToVault": {
+  "myVault": "My vault",
+  "vaultTab": "Vault",
+  "syncTab": "Sync",
+  "copiesTab": "Backups",
+  "startHint": "Your passwords and two-factor codes in one vault: on your computer, on your phone and in your browser.",
+  "createVault": "Create a new vault",
+  "openMyVault": "Open my vault",
+  "newVault": "New vault",
+  "vaultName": "Vault name",
+  "newVaultHint": "The master password opens this vault on each of your devices: computer, phone and browser. Keyhold can't recover it; the recovery key you get next can.",
+  "sealHint": "Your vault has no master password yet. Set it now: it opens this vault on your other devices and in the browser.",
+  "createVaultButton": "Create the vault",
+  "forgotPassword": "Forgot the password?",
+  "usePassword": "Use the master password",
+  "recoveryKey": "Recovery key",
+  "recoveryKeyFieldHint": "The 36 characters from your recovery sheet; spaces don't matter.",
+  "openVaultTitle": "Open a vault",
+  "openVaultHint": "The vault opens as it is. It is never merged with another vault.",
+  "fromDrive": "From Google Drive",
+  "fromDriveHint": "Sign in to Google, then type the vault's master password.",
+  "fromDriveAs": "{email}: type the vault's master password.",
+  "@fromDriveAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "fromFile": "From a file (.khd)",
+  "fromFileHint": "A copy from a backup folder, a USB stick or an old computer.",
+  "closedHere": "Opened on this device before",
+  "closedOn": "closed {date}",
+  "@closedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "closedVaultGone": "That vault's file is no longer on this device.",
+  "typeVaultPassword": "Type the master password of the vault you want to open. Keyhold tries it on every vault in your Google Drive.",
+  "lookingForVault": "Looking for your vault: {at} of {of}",
+  "@lookingForVault": {
+    "placeholders": {
+      "at": {
+        "type": "int"
+      },
+      "of": {
+        "type": "int"
+      }
+    }
+  },
+  "noVaultInDrive": "There is no Keyhold vault in this Google Drive yet.",
+  "noVaultMatches": "No vault in your Google Drive opens with this password.",
+  "sameVaultFile": "This file is a copy of the vault you have open. To take entries out of it, use Backups, then Review a copy.",
+  "fileVaultPassword": "Type the master password of {name}.",
+  "@fileVaultPassword": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
-  }
+  },
+  "driveFileUnreadable": "This vault's file in Google Drive can't be read. Keyhold leaves it as it is.",
+  "vaultInfoHint": "This vault opens with its master password on every device. If you forget the password, the recovery key opens the vault and you choose a new one.",
+  "recoveryKeyHint": "Shown and printed after the master password",
+  "otherVaults": "Other vaults",
+  "openOtherVault": "Open another vault",
+  "openOtherVaultHint": "From Google Drive, from a file or from this device",
+  "createNewVaultHint": "Empty, with its own master password",
+  "closeVaultTitle": "Close \"{name}\" on this device?",
+  "@closeVaultTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeVaultHint": "Nothing is deleted: it stays in Google Drive, in the backup copies and on this device's list of vaults. It opens again with its master password.",
+  "continueLabel": "Continue",
+  "renameVault": "Rename the vault",
+  "reviewCopy": "Review a copy",
+  "driveVaultHint": "Keeps this vault as its own encrypted file in a \"Keyhold\" folder in your Google Drive. Your other devices open it with its master password. Several vaults can share one Google Drive; they never mix. Google cannot read them.",
+  "foldersSlotsHint": "Every save updates up to 7 copies of the vault in each folder: the latest one, and ones about an hour, a day, a week, a month, three months and a year old.",
+  "deleteVaultHereHint": "The vault is erased from this device: passwords, two-factor codes and files. Vaults opened here before stay. Keyhold then shows its start screen.",
+  "deleteVaultDriveMine": "Also delete it from Google Drive (other vaults there stay)",
+  "vaultDeletedHere": "The vault is deleted.",
+  "menu": "Menu",
+  "importTitle": "Import",
+  "importMenuHint": "Passwords and codes from other apps or another vault",
+  "importAnyHint": "Choose an export from another password manager or authenticator app, a KeePass database or another Keyhold vault. Keyhold tells from the file what it is, and you tick what comes in.",
+  "importReading": "Reading the file…",
+  "importPasswordTitle": "Password of this {format} file",
+  "@importPasswordTitle": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "importWrongPassword": "That password doesn't open this file.",
+  "importUnknown": "Keyhold doesn't recognise this file. Export again from the other app, as CSV or JSON.",
+  "importNothing": "{format}: nothing in this file that Keyhold can keep.",
+  "@importNothing": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "keePassUnsupported": "This KeePass database uses something Keyhold can't open (a key file or the Twofish cipher). Export it from KeePass as CSV instead.",
+  "bitwardenAccountLocked": "This Bitwarden export only opens with your Bitwarden account. Export again as JSON, password protected or without encryption.",
+  "otpLinks": "otpauth links",
+  "importPickHint": "Tick what should go into your vault. Entries you already have are left unticked.",
+  "codesLeftOut": "Codes left out: {count}. Keyhold makes 6-digit codes every 30 seconds only, not 8 digits, 60 seconds, counters or Steam.",
+  "@codesLeftOut": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recordsLeftOut": "Records left out: {count} (empty ones, cards and identities).",
+  "@recordsLeftOut": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectAll": "Select all",
+  "alreadyInVault": "already in your vault",
+  "addSelected": "Add ({count})",
+  "@addSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addedCount": "Added to your vault: {count}",
+  "@addedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deletePlainFile": "Delete the file afterwards",
+  "importPasswordsFrom": "Passwords",
+  "importPasswordsList": "Chrome, Edge, Firefox and Safari (CSV), Bitwarden (CSV or JSON), 1Password (.1pux or CSV), KeePass and KeePassXC (.kdbx or CSV), LastPass, Proton Pass, NordPass and Dashlane (CSV), and another Keyhold vault (.khd).",
+  "importCodesFrom": "Two-factor codes",
+  "importCodesList": "Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ and andOTP, and any file of otpauth:// links. Google Authenticator: show its export QR code and use Keyhold's QR code button.",
+  "importNoExport": "Microsoft Authenticator and Authy don't let codes out: turn two-factor on again at each service and scan its new QR code."
 }

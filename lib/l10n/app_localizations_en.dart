@@ -37,9 +37,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get change => 'Change';
 
   @override
-  String get connect => 'Connect';
-
-  @override
   String get disconnect => 'Disconnect';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get masterPassword => 'Master password';
 
   @override
-  String get setMasterPassword => 'Set master password';
-
-  @override
   String copied(String what) {
     return '$what copied';
   }
@@ -93,13 +87,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String driveNotConnected(String error) {
     return 'Google Drive was not connected: $error';
   }
-
-  @override
-  String get masterPasswordOfVault => 'Master password of your vault';
-
-  @override
-  String get masterPasswordFromComputer =>
-      'The one you set in Keyhold on your computer';
 
   @override
   String get scanQr => 'Scan a QR code';
@@ -173,14 +160,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      'Your passwords and two-factor codes — the same vault as on your computer, kept in step through your own Google Drive.';
-
-  @override
   String get connectDrive => 'Connect Google Drive';
-
-  @override
-  String get startEmpty => 'Start with an empty vault';
 
   @override
   String codeSeconds(int seconds) {
@@ -205,9 +185,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncNow => 'Sync now';
 
   @override
-  String get fingerprintLock => 'Fingerprint lock';
-
-  @override
   String get fingerprintSwitch => 'Open Keyhold with a fingerprint';
 
   @override
@@ -227,13 +204,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => 'Fill passwords with Keyhold';
-
-  @override
-  String get passwordSetPhone => 'Set. It opens this vault on a new device.';
-
-  @override
-  String get passwordNotSetPhone =>
-      'Not set. Without it a new device cannot open the vault.';
 
   @override
   String get deleteThisLogin => 'Delete this login?';
@@ -309,15 +279,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get browserExtension => 'Browser extension';
-
-  @override
-  String get backup => 'Backup';
-
-  @override
-  String get importCsv => 'Import from CSV';
-
-  @override
-  String get changeMasterPassword => 'Change master password';
 
   @override
   String get addFile => 'Add file';
@@ -435,10 +396,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword =>
-      'Google Drive: open Backup and enter the master password';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive: $problem';
   }
@@ -476,14 +433,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get off => 'Off';
-
-  @override
-  String onWith(String detail) {
-    return 'On — $detail';
-  }
-
-  @override
-  String get join => 'Join';
 
   @override
   String get synced => 'Synced';
@@ -524,18 +473,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get driveHoldsVault =>
-      'Google Drive already holds a Keyhold vault. Its master password is needed to join it.';
-
-  @override
-  String get masterPasswordOfDriveVault =>
-      'Master password of the vault in Google Drive';
-
-  @override
-  String get driveHint =>
-      'Keeps the encrypted vault in a \"Keyhold\" folder in your own Google Drive, so your other devices stay in sync and a lost computer loses nothing. Google cannot read it.';
-
-  @override
   String get driveNotInBuild => 'Google Drive is not set up in this build.';
 
   @override
@@ -569,10 +506,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourServer => 'Your server';
-
-  @override
-  String get foldersHint =>
-      'Every save drops a dated copy into each folder and keeps the last 30.';
 
   @override
   String get noFolders => 'No folders — local copies are off';
@@ -854,21 +787,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordDoesNotOpen => 'That password does not open this vault';
 
   @override
-  String get currentPasswordWrong => 'The current master password is wrong';
-
-  @override
   String get unlockVault => 'Unlock vault';
 
   @override
   String get unlockHint =>
       'This vault came from another machine. Type the master password to open it here.';
-
-  @override
-  String get masterPasswordHint =>
-      'Windows opens this vault for you automatically. The master password is the way back in after a reinstall, on a new machine, or on your phone.';
-
-  @override
-  String get currentMasterPassword => 'Current master password';
 
   @override
   String get newMasterPassword => 'New master password';
@@ -998,64 +921,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => 'Import passwords';
-
-  @override
-  String get importHint =>
-      'Export your passwords from the browser as CSV, then load the file here. Chrome, Edge, Firefox, Bitwarden and KeePassXC exports all work.';
-
-  @override
-  String get chooseCsv => 'Choose CSV file';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entries ready',
-      one: '1 entry ready',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count entries ready',
-      one: '1 entry ready',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: '$skipped empty rows skipped',
-      one: '1 empty row skipped',
-    );
-    return '$_temp0, $_temp1';
-  }
-
-  @override
-  String andMore(int count) {
-    return 'and $count more';
-  }
-
-  @override
-  String get deleteCsv => 'Delete the CSV file after importing';
-
-  @override
   String get deleteCsvHint => 'It holds every password in plain text';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Import $count entries',
-      one: 'Import 1 entry',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint =>
@@ -1075,13 +941,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String nextCode(String code) {
     return 'next $code';
   }
-
-  @override
-  String get noMasterPasswordBar =>
-      'No master password: your backups cannot be opened on another computer. Click to set one.';
-
-  @override
-  String get printRecoverySheet => 'Print the recovery sheet';
 
   @override
   String get recoverySheet => 'Recovery sheet';
@@ -1154,14 +1013,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteVault => 'Delete the vault';
 
   @override
-  String get deleteVaultHint =>
-      'Everything Keyhold keeps on this device is erased: passwords, two-factor codes, files and settings. Keyhold then closes and starts empty.';
-
-  @override
-  String get deleteVaultDrive =>
-      'Also delete it from Google Drive (other devices keep their own copy until you delete it there too)';
-
-  @override
   String get deleteVaultFolders =>
       'Also delete the copies in the backup folders';
 
@@ -1172,18 +1023,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteVaultSureHint => 'This cannot be undone.';
 
   @override
-  String get vaultDeleted => 'The vault is deleted. Keyhold closes now.';
-
-  @override
   String get recoveryGate =>
       'Type your master password to see the recovery key.';
 
   @override
   String get showKey => 'Show the key';
-
-  @override
-  String get recoveryNeedsPassword =>
-      'Set a master password first: the recovery key is shown only after it.';
 
   @override
   String get recoveryCopyRow => 'Copy this row by hand onto the printed sheet';
@@ -1232,9 +1076,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'This copy did not open: wrong password or recovery key, or not a Keyhold vault.';
 
   @override
-  String get openCopy => 'Open a backup copy…';
-
-  @override
   String copyTitle(String name) {
     return 'Copy: $name';
   }
@@ -1244,10 +1085,275 @@ class AppLocalizationsEn extends AppLocalizations {
       'Only for looking: nothing here changes your vault. Any single entry can be added to your vault.';
 
   @override
-  String get addToVault => 'Add to my vault';
+  String get myVault => 'My vault';
 
   @override
-  String addedToVault(String name) {
-    return '\"$name\" is in your vault';
+  String get vaultTab => 'Vault';
+
+  @override
+  String get syncTab => 'Sync';
+
+  @override
+  String get copiesTab => 'Backups';
+
+  @override
+  String get startHint =>
+      'Your passwords and two-factor codes in one vault: on your computer, on your phone and in your browser.';
+
+  @override
+  String get createVault => 'Create a new vault';
+
+  @override
+  String get openMyVault => 'Open my vault';
+
+  @override
+  String get newVault => 'New vault';
+
+  @override
+  String get vaultName => 'Vault name';
+
+  @override
+  String get newVaultHint =>
+      'The master password opens this vault on each of your devices: computer, phone and browser. Keyhold can\'t recover it; the recovery key you get next can.';
+
+  @override
+  String get sealHint =>
+      'Your vault has no master password yet. Set it now: it opens this vault on your other devices and in the browser.';
+
+  @override
+  String get createVaultButton => 'Create the vault';
+
+  @override
+  String get forgotPassword => 'Forgot the password?';
+
+  @override
+  String get usePassword => 'Use the master password';
+
+  @override
+  String get recoveryKey => 'Recovery key';
+
+  @override
+  String get recoveryKeyFieldHint =>
+      'The 36 characters from your recovery sheet; spaces don\'t matter.';
+
+  @override
+  String get openVaultTitle => 'Open a vault';
+
+  @override
+  String get openVaultHint =>
+      'The vault opens as it is. It is never merged with another vault.';
+
+  @override
+  String get fromDrive => 'From Google Drive';
+
+  @override
+  String get fromDriveHint =>
+      'Sign in to Google, then type the vault\'s master password.';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email: type the vault\'s master password.';
   }
+
+  @override
+  String get fromFile => 'From a file (.khd)';
+
+  @override
+  String get fromFileHint =>
+      'A copy from a backup folder, a USB stick or an old computer.';
+
+  @override
+  String get closedHere => 'Opened on this device before';
+
+  @override
+  String closedOn(String date) {
+    return 'closed $date';
+  }
+
+  @override
+  String get closedVaultGone =>
+      'That vault\'s file is no longer on this device.';
+
+  @override
+  String get typeVaultPassword =>
+      'Type the master password of the vault you want to open. Keyhold tries it on every vault in your Google Drive.';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return 'Looking for your vault: $at of $of';
+  }
+
+  @override
+  String get noVaultInDrive =>
+      'There is no Keyhold vault in this Google Drive yet.';
+
+  @override
+  String get noVaultMatches =>
+      'No vault in your Google Drive opens with this password.';
+
+  @override
+  String get sameVaultFile =>
+      'This file is a copy of the vault you have open. To take entries out of it, use Backups, then Review a copy.';
+
+  @override
+  String fileVaultPassword(String name) {
+    return 'Type the master password of $name.';
+  }
+
+  @override
+  String get driveFileUnreadable =>
+      'This vault\'s file in Google Drive can\'t be read. Keyhold leaves it as it is.';
+
+  @override
+  String get vaultInfoHint =>
+      'This vault opens with its master password on every device. If you forget the password, the recovery key opens the vault and you choose a new one.';
+
+  @override
+  String get recoveryKeyHint => 'Shown and printed after the master password';
+
+  @override
+  String get otherVaults => 'Other vaults';
+
+  @override
+  String get openOtherVault => 'Open another vault';
+
+  @override
+  String get openOtherVaultHint =>
+      'From Google Drive, from a file or from this device';
+
+  @override
+  String get createNewVaultHint => 'Empty, with its own master password';
+
+  @override
+  String closeVaultTitle(String name) {
+    return 'Close \"$name\" on this device?';
+  }
+
+  @override
+  String get closeVaultHint =>
+      'Nothing is deleted: it stays in Google Drive, in the backup copies and on this device\'s list of vaults. It opens again with its master password.';
+
+  @override
+  String get continueLabel => 'Continue';
+
+  @override
+  String get renameVault => 'Rename the vault';
+
+  @override
+  String get reviewCopy => 'Review a copy';
+
+  @override
+  String get driveVaultHint =>
+      'Keeps this vault as its own encrypted file in a \"Keyhold\" folder in your Google Drive. Your other devices open it with its master password. Several vaults can share one Google Drive; they never mix. Google cannot read them.';
+
+  @override
+  String get foldersSlotsHint =>
+      'Every save updates up to 7 copies of the vault in each folder: the latest one, and ones about an hour, a day, a week, a month, three months and a year old.';
+
+  @override
+  String get deleteVaultHereHint =>
+      'The vault is erased from this device: passwords, two-factor codes and files. Vaults opened here before stay. Keyhold then shows its start screen.';
+
+  @override
+  String get deleteVaultDriveMine =>
+      'Also delete it from Google Drive (other vaults there stay)';
+
+  @override
+  String get vaultDeletedHere => 'The vault is deleted.';
+
+  @override
+  String get menu => 'Menu';
+
+  @override
+  String get importTitle => 'Import';
+
+  @override
+  String get importMenuHint =>
+      'Passwords and codes from other apps or another vault';
+
+  @override
+  String get importAnyHint =>
+      'Choose an export from another password manager or authenticator app, a KeePass database or another Keyhold vault. Keyhold tells from the file what it is, and you tick what comes in.';
+
+  @override
+  String get importReading => 'Reading the file…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return 'Password of this $format file';
+  }
+
+  @override
+  String get importWrongPassword => 'That password doesn\'t open this file.';
+
+  @override
+  String get importUnknown =>
+      'Keyhold doesn\'t recognise this file. Export again from the other app, as CSV or JSON.';
+
+  @override
+  String importNothing(String format) {
+    return '$format: nothing in this file that Keyhold can keep.';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      'This KeePass database uses something Keyhold can\'t open (a key file or the Twofish cipher). Export it from KeePass as CSV instead.';
+
+  @override
+  String get bitwardenAccountLocked =>
+      'This Bitwarden export only opens with your Bitwarden account. Export again as JSON, password protected or without encryption.';
+
+  @override
+  String get otpLinks => 'otpauth links';
+
+  @override
+  String get importPickHint =>
+      'Tick what should go into your vault. Entries you already have are left unticked.';
+
+  @override
+  String codesLeftOut(int count) {
+    return 'Codes left out: $count. Keyhold makes 6-digit codes every 30 seconds only, not 8 digits, 60 seconds, counters or Steam.';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return 'Records left out: $count (empty ones, cards and identities).';
+  }
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
+  String get alreadyInVault => 'already in your vault';
+
+  @override
+  String addSelected(int count) {
+    return 'Add ($count)';
+  }
+
+  @override
+  String addedCount(int count) {
+    return 'Added to your vault: $count';
+  }
+
+  @override
+  String get deletePlainFile => 'Delete the file afterwards';
+
+  @override
+  String get importPasswordsFrom => 'Passwords';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome, Edge, Firefox and Safari (CSV), Bitwarden (CSV or JSON), 1Password (.1pux or CSV), KeePass and KeePassXC (.kdbx or CSV), LastPass, Proton Pass, NordPass and Dashlane (CSV), and another Keyhold vault (.khd).';
+
+  @override
+  String get importCodesFrom => 'Two-factor codes';
+
+  @override
+  String get importCodesList =>
+      'Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ and andOTP, and any file of otpauth:// links. Google Authenticator: show its export QR code and use Keyhold\'s QR code button.';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator and Authy don\'t let codes out: turn two-factor on again at each service and scan its new QR code.';
 }

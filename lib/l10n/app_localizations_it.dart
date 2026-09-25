@@ -37,9 +37,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get change => 'Cambia';
 
   @override
-  String get connect => 'Connetti';
-
-  @override
   String get disconnect => 'Disconnetti';
 
   @override
@@ -73,9 +70,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get masterPassword => 'Password principale';
 
   @override
-  String get setMasterPassword => 'Imposta password principale';
-
-  @override
   String copied(String what) {
     return 'Copiato: $what';
   }
@@ -94,14 +88,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String driveNotConnected(String error) {
     return 'Google Drive non è stato connesso: $error';
   }
-
-  @override
-  String get masterPasswordOfVault =>
-      'Password principale della tua cassaforte';
-
-  @override
-  String get masterPasswordFromComputer =>
-      'Quella che hai impostato in Keyhold sul computer';
 
   @override
   String get scanQr => 'Scansiona un codice QR';
@@ -176,14 +162,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get phoneWelcome =>
-      'Le tue password e i codici a due fattori — la stessa cassaforte del computer, sempre allineata tramite il tuo Google Drive.';
-
-  @override
   String get connectDrive => 'Connetti Google Drive';
-
-  @override
-  String get startEmpty => 'Inizia con una cassaforte vuota';
 
   @override
   String codeSeconds(int seconds) {
@@ -208,9 +187,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncNow => 'Sincronizza ora';
 
   @override
-  String get fingerprintLock => 'Blocco con impronta';
-
-  @override
   String get fingerprintSwitch => 'Apri Keyhold con l\'impronta';
 
   @override
@@ -230,14 +206,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get fillWithKeyhold => 'Compila le password con Keyhold';
-
-  @override
-  String get passwordSetPhone =>
-      'Impostata. Apre questa cassaforte su un nuovo dispositivo.';
-
-  @override
-  String get passwordNotSetPhone =>
-      'Non impostata. Senza di essa un nuovo dispositivo non può aprire la cassaforte.';
 
   @override
   String get deleteThisLogin => 'Eliminare queste credenziali?';
@@ -319,15 +287,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get browserExtension => 'Estensione del browser';
-
-  @override
-  String get backup => 'Backup';
-
-  @override
-  String get importCsv => 'Importa da CSV';
-
-  @override
-  String get changeMasterPassword => 'Cambia password principale';
 
   @override
   String get addFile => 'Aggiungi file';
@@ -464,10 +423,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get driveNeedsPassword =>
-      'Google Drive: apri Backup e inserisci la password principale';
-
-  @override
   String driveProblem(String problem) {
     return 'Google Drive: $problem';
   }
@@ -505,14 +460,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get off => 'Disattivato';
-
-  @override
-  String onWith(String detail) {
-    return 'Attivo — $detail';
-  }
-
-  @override
-  String get join => 'Unisciti';
 
   @override
   String get synced => 'Sincronizzato';
@@ -554,18 +501,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get driveHoldsVault =>
-      'Google Drive contiene già una cassaforte Keyhold. Serve la sua password principale per unirti.';
-
-  @override
-  String get masterPasswordOfDriveVault =>
-      'Password principale della cassaforte su Google Drive';
-
-  @override
-  String get driveHint =>
-      'Tiene la cassaforte crittografata in una cartella \"Keyhold\" nel tuo Google Drive, così gli altri tuoi dispositivi restano sincronizzati e se perdi il computer non perdi nulla. Google non può leggerla.';
-
-  @override
   String get driveNotInBuild =>
       'Google Drive non è configurato in questa versione.';
 
@@ -600,10 +535,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get yourServer => 'Il tuo server';
-
-  @override
-  String get foldersHint =>
-      'Ogni salvataggio mette una copia datata in ogni cartella e conserva le ultime 30.';
 
   @override
   String get noFolders => 'Nessuna cartella — le copie locali sono disattivate';
@@ -890,21 +821,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get passwordDoesNotOpen => 'Questa password non apre la cassaforte';
 
   @override
-  String get currentPasswordWrong => 'La password principale attuale è errata';
-
-  @override
   String get unlockVault => 'Sblocca cassaforte';
 
   @override
   String get unlockHint =>
       'Questa cassaforte viene da un altro computer. Digita la password principale per aprirla qui.';
-
-  @override
-  String get masterPasswordHint =>
-      'Windows apre questa cassaforte per te in automatico. La password principale ti fa rientrare dopo una reinstallazione, su un nuovo computer o sul telefono.';
-
-  @override
-  String get currentMasterPassword => 'Password principale attuale';
 
   @override
   String get newMasterPassword => 'Nuova password principale';
@@ -1033,70 +954,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get importPasswords => 'Importa password';
-
-  @override
-  String get importHint =>
-      'Esporta le password dal browser in formato CSV, poi carica qui il file. Vanno bene le esportazioni di Chrome, Edge, Firefox, Bitwarden e KeePassXC.';
-
-  @override
-  String get chooseCsv => 'Scegli file CSV';
-
-  @override
-  String entriesReady(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count voci pronte',
-      one: '1 voce pronta',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String entriesReadySkipped(int count, int skipped) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count voci pronte',
-      one: '1 voce pronta',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      skipped,
-      locale: localeName,
-      other: '$skipped righe vuote saltate',
-      one: '1 riga vuota saltata',
-    );
-    return '$_temp0, $_temp1';
-  }
-
-  @override
-  String andMore(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'e altre $count',
-      one: 'e un\'altra',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get deleteCsv => 'Elimina il file CSV dopo l\'importazione';
-
-  @override
   String get deleteCsvHint => 'Contiene tutte le password in chiaro';
-
-  @override
-  String importEntries(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Importa $count voci',
-      one: 'Importa 1 voce',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get cameraHint =>
@@ -1116,13 +974,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String nextCode(String code) {
     return 'prossimo $code';
   }
-
-  @override
-  String get noMasterPasswordBar =>
-      'Nessuna password principale: i tuoi backup non si possono aprire su un altro computer. Fai clic per impostarla.';
-
-  @override
-  String get printRecoverySheet => 'Stampa il foglio di recupero';
 
   @override
   String get recoverySheet => 'Foglio di recupero';
@@ -1195,14 +1046,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteVault => 'Elimina la cassaforte';
 
   @override
-  String get deleteVaultHint =>
-      'Tutto ciò che Keyhold conserva su questo dispositivo viene cancellato: password, codici a due fattori, file e impostazioni. Poi Keyhold si chiude e riparte vuoto.';
-
-  @override
-  String get deleteVaultDrive =>
-      'Eliminala anche da Google Drive (gli altri dispositivi tengono la loro copia finché non la elimini anche lì)';
-
-  @override
   String get deleteVaultFolders =>
       'Elimina anche le copie nelle cartelle di backup';
 
@@ -1213,19 +1056,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteVaultSureHint => 'L’operazione non si può annullare.';
 
   @override
-  String get vaultDeleted =>
-      'La cassaforte è stata eliminata. Keyhold ora si chiude.';
-
-  @override
   String get recoveryGate =>
       'Digita la tua password principale per vedere la chiave di recupero.';
 
   @override
   String get showKey => 'Mostra la chiave';
-
-  @override
-  String get recoveryNeedsPassword =>
-      'Prima imposta una password principale: la chiave di recupero appare solo dopo.';
 
   @override
   String get recoveryCopyRow => 'Copia a mano questa riga sul foglio stampato';
@@ -1276,9 +1111,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile aprire la copia: password o chiave di recupero errata, oppure non è una cassaforte Keyhold.';
 
   @override
-  String get openCopy => 'Apri una copia di backup…';
-
-  @override
   String copyTitle(String name) {
     return 'Copia: $name';
   }
@@ -1288,10 +1120,276 @@ class AppLocalizationsIt extends AppLocalizations {
       'Solo da consultare: qui nulla cambia la tua cassaforte. Puoi aggiungere singole voci alla tua cassaforte.';
 
   @override
-  String get addToVault => 'Aggiungi alla mia cassaforte';
+  String get myVault => 'La mia cassaforte';
 
   @override
-  String addedToVault(String name) {
-    return '\"$name\" è nella tua cassaforte';
+  String get vaultTab => 'Cassaforte';
+
+  @override
+  String get syncTab => 'Sincronizza';
+
+  @override
+  String get copiesTab => 'Backup';
+
+  @override
+  String get startHint =>
+      'Le tue password e i codici a due fattori in una sola cassaforte: sul computer, sul telefono e nel browser.';
+
+  @override
+  String get createVault => 'Crea una nuova cassaforte';
+
+  @override
+  String get openMyVault => 'Apri la mia cassaforte';
+
+  @override
+  String get newVault => 'Nuova cassaforte';
+
+  @override
+  String get vaultName => 'Nome della cassaforte';
+
+  @override
+  String get newVaultHint =>
+      'La password principale apre questa cassaforte su ogni tuo dispositivo: computer, telefono e browser. Keyhold non può recuperarla; la chiave di recupero che ricevi subito dopo sì.';
+
+  @override
+  String get sealHint =>
+      'La tua cassaforte non ha ancora una password principale. Impostala ora: apre questa cassaforte sugli altri dispositivi e nel browser.';
+
+  @override
+  String get createVaultButton => 'Crea la cassaforte';
+
+  @override
+  String get forgotPassword => 'Password dimenticata?';
+
+  @override
+  String get usePassword => 'Usa la password principale';
+
+  @override
+  String get recoveryKey => 'Chiave di recupero';
+
+  @override
+  String get recoveryKeyFieldHint =>
+      'I 36 caratteri del tuo foglio di recupero; gli spazi non contano.';
+
+  @override
+  String get openVaultTitle => 'Apri una cassaforte';
+
+  @override
+  String get openVaultHint =>
+      'La cassaforte si apre così com’è. Non viene mai unita a un’altra cassaforte.';
+
+  @override
+  String get fromDrive => 'Da Google Drive';
+
+  @override
+  String get fromDriveHint =>
+      'Accedi a Google, poi digita la password principale della cassaforte.';
+
+  @override
+  String fromDriveAs(String email) {
+    return '$email: digita la password principale della cassaforte.';
   }
+
+  @override
+  String get fromFile => 'Da un file (.khd)';
+
+  @override
+  String get fromFileHint =>
+      'Una copia da una cartella di backup, da una chiavetta USB o da un vecchio computer.';
+
+  @override
+  String get closedHere => 'Aperte prima su questo dispositivo';
+
+  @override
+  String closedOn(String date) {
+    return 'chiusa il $date';
+  }
+
+  @override
+  String get closedVaultGone =>
+      'Il file di quella cassaforte non è più su questo dispositivo.';
+
+  @override
+  String get typeVaultPassword =>
+      'Digita la password principale della cassaforte che vuoi aprire. Keyhold la prova su ogni cassaforte del tuo Google Drive.';
+
+  @override
+  String lookingForVault(int at, int of) {
+    return 'Cerco la tua cassaforte: $at di $of';
+  }
+
+  @override
+  String get noVaultInDrive =>
+      'In questo Google Drive non c\'è ancora una cassaforte Keyhold.';
+
+  @override
+  String get noVaultMatches =>
+      'Nessuna cassaforte nel tuo Google Drive si apre con questa password.';
+
+  @override
+  String get sameVaultFile =>
+      'Questo file è una copia della cassaforte già aperta. Per riprenderne delle voci, usa Backup e poi Esamina una copia.';
+
+  @override
+  String fileVaultPassword(String name) {
+    return 'Digita la password principale di $name.';
+  }
+
+  @override
+  String get driveFileUnreadable =>
+      'Il file di questa cassaforte in Google Drive non si può leggere. Keyhold lo lascia com’è.';
+
+  @override
+  String get vaultInfoHint =>
+      'Questa cassaforte si apre con la sua password principale su ogni dispositivo. Se dimentichi la password, la chiave di recupero apre la cassaforte e ne scegli una nuova.';
+
+  @override
+  String get recoveryKeyHint =>
+      'Mostrata e stampata dopo la password principale';
+
+  @override
+  String get otherVaults => 'Altre casseforti';
+
+  @override
+  String get openOtherVault => 'Apri un’altra cassaforte';
+
+  @override
+  String get openOtherVaultHint =>
+      'Da Google Drive, da un file o da questo dispositivo';
+
+  @override
+  String get createNewVaultHint => 'Vuota, con una propria password principale';
+
+  @override
+  String closeVaultTitle(String name) {
+    return 'Chiudere \"$name\" su questo dispositivo?';
+  }
+
+  @override
+  String get closeVaultHint =>
+      'Non si cancella nulla: resta in Google Drive, nelle copie di backup e nell’elenco delle casseforti di questo dispositivo. Si riapre con la sua password principale.';
+
+  @override
+  String get continueLabel => 'Continua';
+
+  @override
+  String get renameVault => 'Rinomina la cassaforte';
+
+  @override
+  String get reviewCopy => 'Esamina una copia';
+
+  @override
+  String get driveVaultHint =>
+      'Tiene questa cassaforte come file cifrato a sé in una cartella \"Keyhold\" del tuo Google Drive. Gli altri dispositivi la aprono con la sua password principale. Più casseforti possono stare nello stesso Google Drive senza mai mescolarsi. Google non può leggerle.';
+
+  @override
+  String get foldersSlotsHint =>
+      'Ogni salvataggio aggiorna fino a 7 copie della cassaforte in ogni cartella: la più recente e altre di circa un’ora, un giorno, una settimana, un mese, tre mesi e un anno fa.';
+
+  @override
+  String get deleteVaultHereHint =>
+      'La cassaforte viene cancellata da questo dispositivo: password, codici a due fattori e file. Le casseforti aperte qui in precedenza restano. Poi Keyhold mostra la schermata iniziale.';
+
+  @override
+  String get deleteVaultDriveMine =>
+      'Cancellala anche da Google Drive (le altre casseforti restano)';
+
+  @override
+  String get vaultDeletedHere => 'La cassaforte è cancellata.';
+
+  @override
+  String get menu => 'Menu';
+
+  @override
+  String get importTitle => 'Importa';
+
+  @override
+  String get importMenuHint =>
+      'Password e codici da altre app o da un’altra cassaforte';
+
+  @override
+  String get importAnyHint =>
+      'Scegli un’esportazione da un altro gestore di password o app di autenticazione, un database KeePass o un’altra cassaforte Keyhold. Keyhold riconosce il file da solo e tu spunti cosa entra.';
+
+  @override
+  String get importReading => 'Lettura del file…';
+
+  @override
+  String importPasswordTitle(String format) {
+    return 'Password di questo file $format';
+  }
+
+  @override
+  String get importWrongPassword => 'Questa password non apre il file.';
+
+  @override
+  String get importUnknown =>
+      'Keyhold non riconosce questo file. Esportalo di nuovo dall’altra app, come CSV o JSON.';
+
+  @override
+  String importNothing(String format) {
+    return '$format: in questo file non c’è nulla che Keyhold possa tenere.';
+  }
+
+  @override
+  String get keePassUnsupported =>
+      'Questo database KeePass usa qualcosa che Keyhold non sa aprire (un file chiave o il cifrario Twofish). Esportalo da KeePass come CSV.';
+
+  @override
+  String get bitwardenAccountLocked =>
+      'Questa esportazione di Bitwarden si apre solo con il tuo account Bitwarden. Esporta di nuovo come JSON, protetto da password o senza cifratura.';
+
+  @override
+  String get otpLinks => 'link otpauth';
+
+  @override
+  String get importPickHint =>
+      'Spunta cosa deve entrare nella tua cassaforte. Quello che hai già resta senza spunta.';
+
+  @override
+  String codesLeftOut(int count) {
+    return 'Codici esclusi: $count. Keyhold genera solo codici a 6 cifre ogni 30 secondi, non a 8 cifre, 60 secondi, contatori o Steam.';
+  }
+
+  @override
+  String recordsLeftOut(int count) {
+    return 'Elementi esclusi: $count (vuoti, carte e identità).';
+  }
+
+  @override
+  String get selectAll => 'Seleziona tutto';
+
+  @override
+  String get alreadyInVault => 'già nella cassaforte';
+
+  @override
+  String addSelected(int count) {
+    return 'Aggiungi ($count)';
+  }
+
+  @override
+  String addedCount(int count) {
+    return 'Aggiunti alla cassaforte: $count';
+  }
+
+  @override
+  String get deletePlainFile => 'Elimina il file dopo';
+
+  @override
+  String get importPasswordsFrom => 'Password';
+
+  @override
+  String get importPasswordsList =>
+      'Chrome, Edge, Firefox e Safari (CSV), Bitwarden (CSV o JSON), 1Password (.1pux o CSV), KeePass e KeePassXC (.kdbx o CSV), LastPass, Proton Pass, NordPass e Dashlane (CSV), e un’altra cassaforte Keyhold (.khd).';
+
+  @override
+  String get importCodesFrom => 'Codici a due fattori';
+
+  @override
+  String get importCodesList =>
+      'Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ e andOTP, e qualsiasi file di link otpauth://. Google Authenticator: mostra il suo QR code di esportazione e usa il pulsante QR code di Keyhold.';
+
+  @override
+  String get importNoExport =>
+      'Microsoft Authenticator e Authy non fanno uscire i codici: riattiva la verifica in due passaggi su ogni servizio e scansiona il nuovo QR code.';
 }

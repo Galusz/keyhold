@@ -178,7 +178,6 @@ font:600 22px/38px ui-monospace,Consolas,monospace;text-align:center}
 
   List<Widget> _gate(BuildContext context) {
     final theme = Theme.of(context);
-    if (!_store.hasPassword) return [Text(t.recoveryNeedsPassword, style: theme.textTheme.bodyMedium)];
     return [
       Icon(Icons.key_outlined, size: 48, color: theme.colorScheme.primary),
       const SizedBox(height: 16),
