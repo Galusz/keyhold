@@ -207,17 +207,42 @@ const Standalone = (() => {
 
   let loaded = null;
 
-  // The vault opened here closes by itself after half an hour without use.
+  // The vault opened here closes by itself after half an hour without the
+  // user: pages that look for logins in the background do not keep it open,
+  // and an alarm shuts it even when nothing asks at all.
   const IDLE_LOCK = 30 * 60 * 1000;
+  const IDLE_ALARM = 'keyhold-idle';
+  // What the user does, as opposed to what pages ask by themselves.
+  const BY_USER = new Set(['/fill', '/code', '/review', '/entry', '/put', '/delete', '/pair', '/never', '/autosave']);
 
-  async function vault() {
+  async function shut() {
+    loaded = null;
+    await session.remove(['dek', 'aloneOffers', 'usedAt']);
+  }
+
+  async function idle() {
     const { dek, usedAt } = await session.get(['dek', 'usedAt']);
-    if (dek && usedAt && Date.now() - usedAt > IDLE_LOCK) {
-      loaded = null;
-      await session.remove(['dek', 'aloneOffers', 'usedAt']);
+    return !!dek && !!usedAt && Date.now() - usedAt > IDLE_LOCK;
+  }
+
+  async function touch() {
+    await session.set({ usedAt: Date.now() });
+    if (ext.alarms) ext.alarms.create(IDLE_ALARM, { delayInMinutes: IDLE_LOCK / 60000 + 1 });
+  }
+
+  if (ext.alarms) {
+    ext.alarms.onAlarm.addListener(async (alarm) => {
+      if (alarm.name === IDLE_ALARM && (await idle())) await shut();
+    });
+  }
+
+  async function vault(byUser = false) {
+    if (await idle()) {
+      await shut();
       return null;
     }
-    if (dek && (!usedAt || Date.now() - usedAt > 60 * 1000)) await session.set({ usedAt: Date.now() });
+    const { dek, usedAt } = await session.get(['dek', 'usedAt']);
+    if (dek && byUser && (!usedAt || Date.now() - usedAt > 60 * 1000)) await touch();
     if (loaded) return loaded;
     const { vaultFile } = await local.get('vaultFile');
     if (!dek || !vaultFile) return null;
@@ -306,6 +331,8 @@ const Standalone = (() => {
     }
   }
 
+  const isPlain = (url) => (url || '').trim().toLowerCase().startsWith('http://');
+
   const visible = (data) =>
     (data.entries || [])
       .filter((e) => !e.deleted)
@@ -317,9 +344,10 @@ const Standalone = (() => {
     const host = hostOf(address);
     if (!host) return [];
     const port = portOf(address);
-    // A login kept for an https page is not handed to the same site over plain http.
-    const plain = address.trim().toLowerCase().startsWith('http://');
-    const withAddress = visible(data).filter((e) => hostOf(e.url) && !(plain && (e.url || '').trim().toLowerCase().startsWith('https://')));
+    // A login kept for an https page is not handed to the same site over
+    // plain http; an address kept without its scheme counts as https.
+    const plain = isPlain(address);
+    const withAddress = visible(data).filter((e) => hostOf(e.url) && !(plain && !isPlain(e.url)));
     const exact = withAddress.filter((e) => hostOf(e.url) === host && (!port || portOf(e.url) === port));
     if (exact.length) return exact;
     return withAddress.filter((e) => {
@@ -395,7 +423,8 @@ const Standalone = (() => {
         .then(async (icon) => {
           const map = await iconMap();
           map[key] = icon || { failed: Date.now() };
-          iconSaving = iconSaving.then(() => local.set({ icons: map }));
+          // One save that fails must not stop every later one.
+          iconSaving = iconSaving.then(() => local.set({ icons: map })).catch(() => {});
         })
         .finally(() => {
           iconRunning--;
@@ -495,10 +524,12 @@ const Standalone = (() => {
     const host = hostOf(address);
     if (!host) return [];
     const port = portOf(address);
-    const exact = (site) => hostOf(site) === host && (!port || portOf(site) === port);
+    // As for logins: a code used on an https page does not go to plain http.
+    const allowed = (site) => !(isPlain(address) && !isPlain(site));
+    const exact = (site) => allowed(site) && hostOf(site) === host && (!port || portOf(site) === port);
     const related = (site) => {
       const h = hostOf(site);
-      return !!h && (h === host || host.endsWith(`.${h}`) || h.endsWith(`.${host}`));
+      return allowed(site) && !!h && (h === host || host.endsWith(`.${h}`) || h.endsWith(`.${host}`));
     };
     const found = codesOf(data).filter((c) => sitesOf(data, c).some(exact));
     return found.length ? found : codesOf(data).filter((c) => sitesOf(data, c).some(related));
@@ -802,9 +833,9 @@ const Standalone = (() => {
         result: await signedIn(() => write((fresh) => {
           const e = (fresh.entries || []).find((x) => x.id === body.id);
           if (!e) return 'missing';
+          // As in the app: only the mark that it is gone stays, never its notes.
+          for (const key of Object.keys(e)) if (key !== 'id') delete e[key];
           e.deleted = true;
-          e.password = '';
-          delete e.totp;
           e.updatedAt = Date.now();
           return 'deleted';
         })),
@@ -820,10 +851,11 @@ const Standalone = (() => {
 
   return {
     /// Answers like the app would, or null while the vault is not open here.
-    async handle(path, body) {
+    /// [byUser]: asked because of the user (the popup), not by a page.
+    async handle(path, body, byUser = false) {
       const route = routes[path];
       if (!route) return null;
-      const data = await vault();
+      const data = await vault(byUser || BY_USER.has(path));
       if (!data) return null;
       try {
         return await route(data, body || {});
@@ -836,6 +868,7 @@ const Standalone = (() => {
     async state() {
       const { vaultFile, driveConnected } = await local.get(['vaultFile', 'driveConnected']);
       if (!vaultFile && !driveConnected) return { state: 'none' };
+      if (await idle()) await shut();
       const { dek } = await session.get('dek');
       return { state: dek ? 'open' : 'locked' };
     },
@@ -871,7 +904,8 @@ const Standalone = (() => {
         }
       };
       const opened = async (dek) => {
-        await session.set({ dek: toB64(dek), usedAt: Date.now() });
+        await session.set({ dek: toB64(dek) });
+        await touch();
         loaded = null;
         // Every missing icon, so the list under the fields has them too.
         const map = await iconMap();
@@ -902,8 +936,7 @@ const Standalone = (() => {
     },
 
     async lock() {
-      loaded = null;
-      await session.remove(['dek', 'aloneOffers', 'usedAt']);
+      await shut();
       return { ok: true };
     },
 

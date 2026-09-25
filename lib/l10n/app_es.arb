@@ -208,7 +208,7 @@
   "passwordsDiffer": "Las contraseñas no coinciden",
   "passwordDoesNotOpen": "Esa contraseña no abre esta caja fuerte",
   "unlockVault": "Desbloquear caja fuerte",
-  "unlockHint": "Esta caja fuerte viene de otro equipo. Escribe la contraseña maestra para abrirla aquí.",
+  "unlockHint": "Keyhold no puede abrir esta caja fuerte por sí solo en este dispositivo, por ejemplo tras reinstalar el sistema o copiarla desde otro ordenador. Escribe su contraseña maestra.",
   "newMasterPassword": "Nueva contraseña maestra",
   "repeatIt": "Repítela",
   "openVault": "Abrir caja fuerte",
@@ -261,7 +261,7 @@
   "sheetOnlyHere": "Solo en este dispositivo. Activa una copia de seguridad en Keyhold.",
   "sheetSteps": "En un equipo o teléfono nuevo",
   "sheetStep1": "Instala Keyhold: galusz.github.io/keyhold",
-  "sheetStep2": "Conecta el mismo Google Drive en Keyhold.",
+  "sheetStep2": "Elige «Abrir mi caja fuerte» y luego «Desde Google Drive» (o «Desde un archivo (.khd)» si tienes una copia).",
   "sheetDriveNoEmail": "Google Drive, carpeta \"Keyhold\"",
   "noBackupPlaces": "Sin carpeta de copia, servidor ni Google Drive: la caja fuerte solo está en este equipo. Haz clic para configurarlo.",
   "deleteVault": "Eliminar la caja fuerte",
@@ -270,7 +270,7 @@
   "deleteVaultSureHint": "No se puede deshacer.",
   "nobodyCanRecover": "Si la olvidas, solo la clave de recuperación abre tu caja fuerte: imprime la hoja de recuperación.",
   "recoveryIntro": "Esta clave abre tu caja fuerte si alguna vez olvidas la contraseña maestra. Imprime la hoja, copia a mano en ella la última fila y guárdala en casa.",
-  "sheetStep3": "Cuando Keyhold te pida la contraseña maestra, escribe esta clave de recuperación. Después elige una nueva contraseña maestra.",
+  "sheetStep3": "Escribe esta clave de recuperación en lugar de la contraseña maestra. Después elige una contraseña maestra nueva.",
   "sheetKeepSafe": "Cualquiera que tenga esta hoja completa puede abrir tu caja fuerte. Guárdala como una llave de repuesto de tu casa.",
   "recoveryGate": "Escribe tu contraseña maestra para ver la clave de recuperación.",
   "showKey": "Mostrar la clave",
@@ -373,5 +373,9 @@
   "guardedSwitchHint": "Huella en el móvil, Windows Hello en el ordenador, antes de que la contraseña o el código entren en una página o app.",
   "helloSwitch": "Abrir Keyhold con Windows Hello",
   "helloSwitchHint": "Cara, huella o PIN de Windows. Se bloquea tras 5 minutos sin uso. El relleno en el navegador sigue funcionando.",
-  "helloConfirmHint": "Confirma con Windows Hello"
+  "helloConfirmHint": "Confirma con Windows Hello",
+  "lockedInstead": "¿Sin contraseña ni clave de recuperación? Abre otra caja fuerte o crea una nueva. Esta se aparta, no se borra.",
+  "setAsideOn": "apartada el {date}, se abre con su contraseña maestra",
+  "doneAfterCheck": "«Listo» se activa cuando la última fila coincida.",
+  "lastCopyFailed": "La última copia falló"
 }

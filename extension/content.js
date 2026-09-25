@@ -132,6 +132,17 @@ api.runtime.onMessage.addListener((message) => {
   }
 });
 
+// Other sites' codes (those with no site yet, the whole list) only on a secure
+// page in its own window: not over plain http, not in someone else's frame.
+const secureTop = (() => {
+  if (location.protocol !== 'https:') return false;
+  try {
+    return window.top === window || window.top.location.origin === location.origin;
+  } catch (e) {
+    return false;
+  }
+})();
+
 // EXPIRES: when no Keyhold app 1.1.0 is left — it does not say which entries match exactly.
 const exact = (e) => e.exact !== false;
 
@@ -146,7 +157,7 @@ async function scan() {
   const result = await lookupResult();
   // On the page itself only what is kept for exactly this host.
   const list = (result.entries || []).filter((e) => !e.isCode && exact(e));
-  const anyCode = (result.entries || []).some((e) => e.hasCode && exact(e)) || (result.codeCount || 0) > 0;
+  const anyCode = (result.entries || []).some((e) => e.hasCode && exact(e)) || (secureTop && (result.codeCount || 0) > 0);
 
   for (const input of found) {
     const kind = kindOf(input);
@@ -305,8 +316,8 @@ async function openMenu(field, allCodes) {
     items = allCodes || items.filter((e) => e.hasCode && !e.linked);
     // No code of this site's own: the codes not tied to any site yet, and
     // the whole list at the bottom in case the right one is paired elsewhere.
-    if (!allCodes && items.length === 0) items = (result.unpaired || []).map((e) => ({ ...e, unpaired: true }));
-    if (!allCodes && (result.codeCount || 0) > items.length) items = [...items, { all: true, title: t('allCodes') }];
+    if (secureTop && !allCodes && items.length === 0) items = (result.unpaired || []).map((e) => ({ ...e, unpaired: true }));
+    if (secureTop && !allCodes && (result.codeCount || 0) > items.length) items = [...items, { all: true, title: t('allCodes') }];
   }
   if (items.length === 0) return;
 
@@ -498,6 +509,13 @@ document.addEventListener(
 
 let lastSent = '';
 
+// A login counts as sent only right after the user's own click or Enter: a
+// page cannot make up submits (fake events, requestSubmit()) to fill the vault.
+const GESTURE_WINDOW = 2000;
+let gestureAt = -Infinity;
+const byUser = () => performance.now() - gestureAt < GESTURE_WINDOW;
+document.addEventListener('pointerdown', (e) => e.isTrusted && (gestureAt = performance.now()), true);
+
 function capture(scope) {
   const inputs = deepInputs(scope);
   const passwords = inputs.filter((p) => p.type === 'password' && p.value);
@@ -558,13 +576,14 @@ setTimeout(() => {
   api.runtime.sendMessage({ type: 'outcome', passwordField: hasPasswordField() }).catch(() => {});
 }, 1500);
 
-document.addEventListener('submit', (e) => capture(e.target), true);
+document.addEventListener('submit', (e) => e.isTrusted && byUser() && capture(e.target), true);
 
 document.addEventListener(
   'keydown',
   (e) => {
     const input = pathOf(e)[0];
-    if (e.key !== 'Enter' || !(input instanceof HTMLInputElement)) return;
+    if (!e.isTrusted || e.key !== 'Enter' || !(input instanceof HTMLInputElement)) return;
+    gestureAt = performance.now();
     if (menu && menu.index >= 0) return;
     capture(input.form || formOf(e));
   },

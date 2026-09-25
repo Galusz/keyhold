@@ -1363,7 +1363,7 @@ abstract class AppLocalizations {
   /// No description provided for @unlockHint.
   ///
   /// In en, this message translates to:
-  /// **'This vault came from another machine. Type the master password to open it here.'**
+  /// **'Keyhold cannot open this vault by itself on this device, for example after the system was reinstalled or the vault was copied from another computer. Type its master password.'**
   String get unlockHint;
 
   /// No description provided for @newMasterPassword.
@@ -1693,13 +1693,13 @@ abstract class AppLocalizations {
   /// No description provided for @sheetStep2.
   ///
   /// In en, this message translates to:
-  /// **'Connect the same Google Drive in Keyhold.'**
+  /// **'Choose “Open my vault”, then “From Google Drive” (or “From a file (.khd)” if you have a copy).'**
   String get sheetStep2;
 
   /// No description provided for @sheetStep3.
   ///
   /// In en, this message translates to:
-  /// **'When Keyhold asks for the master password, type this recovery key. Then choose a new master password.'**
+  /// **'Type this recovery key instead of the master password. Then choose a new master password.'**
   String get sheetStep3;
 
   /// No description provided for @sheetKeepSafe.
@@ -2355,6 +2355,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm with Windows Hello'**
   String get helloConfirmHint;
+
+  /// No description provided for @lockedInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Neither the password nor the recovery key? Open another vault or create a new one. This one is set aside, not deleted.'**
+  String get lockedInstead;
+
+  /// No description provided for @setAsideOn.
+  ///
+  /// In en, this message translates to:
+  /// **'set aside on {date}, opens with its master password'**
+  String setAsideOn(String date);
+
+  /// No description provided for @doneAfterCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'“Done” turns on once the last row matches.'**
+  String get doneAfterCheck;
+
+  /// No description provided for @lastCopyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The last copy failed'**
+  String get lastCopyFailed;
 }
 
 class _AppLocalizationsDelegate

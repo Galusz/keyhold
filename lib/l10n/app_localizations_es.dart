@@ -826,7 +826,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get unlockHint =>
-      'Esta caja fuerte viene de otro equipo. Escribe la contraseña maestra para abrirla aquí.';
+      'Keyhold no puede abrir esta caja fuerte por sí solo en este dispositivo, por ejemplo tras reinstalar el sistema o copiarla desde otro ordenador. Escribe su contraseña maestra.';
 
   @override
   String get newMasterPassword => 'Nueva contraseña maestra';
@@ -1021,11 +1021,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sheetStep1 => 'Instala Keyhold: galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => 'Conecta el mismo Google Drive en Keyhold.';
+  String get sheetStep2 =>
+      'Elige «Abrir mi caja fuerte» y luego «Desde Google Drive» (o «Desde un archivo (.khd)» si tienes una copia).';
 
   @override
   String get sheetStep3 =>
-      'Cuando Keyhold te pida la contraseña maestra, escribe esta clave de recuperación. Después elige una nueva contraseña maestra.';
+      'Escribe esta clave de recuperación en lugar de la contraseña maestra. Después elige una contraseña maestra nueva.';
 
   @override
   String get sheetKeepSafe =>
@@ -1426,4 +1427,20 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get helloConfirmHint => 'Confirma con Windows Hello';
+
+  @override
+  String get lockedInstead =>
+      '¿Sin contraseña ni clave de recuperación? Abre otra caja fuerte o crea una nueva. Esta se aparta, no se borra.';
+
+  @override
+  String setAsideOn(String date) {
+    return 'apartada el $date, se abre con su contraseña maestra';
+  }
+
+  @override
+  String get doneAfterCheck =>
+      '«Listo» se activa cuando la última fila coincida.';
+
+  @override
+  String get lastCopyFailed => 'La última copia falló';
 }

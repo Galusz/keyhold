@@ -208,7 +208,7 @@
   "passwordsDiffer": "Hasła się różnią",
   "passwordDoesNotOpen": "To hasło nie otwiera tego sejfu",
   "unlockVault": "Odblokuj sejf",
-  "unlockHint": "Ten sejf pochodzi z innego komputera. Wpisz hasło główne, aby go tu otworzyć.",
+  "unlockHint": "Keyhold nie może sam otworzyć tego sejfu na tym urządzeniu, np. po ponownej instalacji systemu albo przeniesieniu z innego komputera. Wpisz jego hasło główne.",
   "newMasterPassword": "Nowe hasło główne",
   "repeatIt": "Powtórz hasło",
   "openVault": "Otwórz sejf",
@@ -261,7 +261,7 @@
   "sheetOnlyHere": "Tylko na tym urządzeniu. Włącz kopię zapasową w Keyhold.",
   "sheetSteps": "Na nowym komputerze lub telefonie",
   "sheetStep1": "Zainstaluj Keyhold: galusz.github.io/keyhold",
-  "sheetStep2": "Połącz Keyhold z tym samym Google Drive.",
+  "sheetStep2": "Wybierz „Otwórz mój sejf”, potem „Z Google Drive” (albo „Z pliku (.khd)”, jeśli masz kopię).",
   "sheetDriveNoEmail": "Google Drive, folder „Keyhold”",
   "noBackupPlaces": "Brak folderu kopii, serwera i Google Drive: sejf jest tylko na tym komputerze. Kliknij, aby to ustawić.",
   "deleteVault": "Usuń sejf",
@@ -270,7 +270,7 @@
   "deleteVaultSureHint": "Tego nie da się cofnąć.",
   "nobodyCanRecover": "Jeśli je zapomnisz, sejf otworzy tylko klucz ratunkowy: wydrukuj zestaw ratunkowy.",
   "recoveryIntro": "Ten klucz otworzy sejf, jeśli kiedyś zapomnisz hasła głównego. Wydrukuj zestaw, przepisz na niego odręcznie ostatni wiersz i trzymaj go w domu.",
-  "sheetStep3": "Gdy Keyhold poprosi o hasło główne, wpisz ten klucz ratunkowy. Potem wybierz nowe hasło główne.",
+  "sheetStep3": "Zamiast hasła głównego wpisz ten klucz odzyskiwania. Potem wybierz nowe hasło główne.",
   "sheetKeepSafe": "Każdy, kto ma ten wypełniony zestaw, może otworzyć sejf. Przechowuj go jak zapasowy klucz do domu.",
   "recoveryGate": "Wpisz hasło główne, aby zobaczyć klucz ratunkowy.",
   "showKey": "Pokaż klucz",
@@ -373,5 +373,9 @@
   "guardedSwitchHint": "Odcisk palca na telefonie, Windows Hello na komputerze — zanim hasło lub kod trafi do strony albo aplikacji.",
   "helloSwitch": "Otwieraj Keyhold przez Windows Hello",
   "helloSwitchHint": "Twarz, odcisk palca lub PIN Windowsa. Blokuje się po 5 minutach bez używania. Wypełnianie w przeglądarce nadal działa.",
-  "helloConfirmHint": "Potwierdź przez Windows Hello"
+  "helloConfirmHint": "Potwierdź przez Windows Hello",
+  "lockedInstead": "Nie masz ani hasła, ani klucza odzyskiwania? Otwórz inny sejf albo utwórz nowy. Ten zostanie odłożony, nie usunięty.",
+  "setAsideOn": "odłożony {date}, otwiera się hasłem głównym",
+  "doneAfterCheck": "„Gotowe” włączy się, gdy ostatni wiersz się zgodzi.",
+  "lastCopyFailed": "Ostatnia kopia się nie udała"
 }

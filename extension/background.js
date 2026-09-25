@@ -27,7 +27,7 @@ const FAILED_SHOW = 30 * 1000;
 async function call(path, body, fresh = false) {
   const result = await callApp(path, body, fresh);
   if (result.error === 'app offline' || result.error === 'no token') {
-    const alone = await Standalone.handle(path, body);
+    const alone = await Standalone.handle(path, body, fresh);
     if (alone) return alone;
   }
   // Never paired, and Keyhold answers here: pairing is the next step, not Google Drive.
@@ -86,15 +86,27 @@ async function allowed(message, sender) {
   return (result.entries || []).some((e) => e.id === message.id && e.exact !== false);
 }
 
+// https, and the page itself or a frame of its own origin: not plain http,
+// not someone else's frame inside it.
+function secureFrame(sender) {
+  try {
+    const frame = new URL(sender.url);
+    return frame.protocol === 'https:' && (sender.frameId === 0 || frame.origin === new URL(sender.tab.url).origin);
+  } catch (e) {
+    return false;
+  }
+}
+
 // Pages that found nothing while the vault was shut look again.
 async function rescanTabs() {
   for (const tab of await api.tabs.query({})) api.tabs.sendMessage(tab.id, { type: 'rescan' }).catch(() => {});
 }
 
-// A code may be picked on any page: from this site's, from those with no site
-// yet, or from the full list.
+// A code may be picked from this site's own, and on a secure page in its own
+// window also from those with no site yet or the full list.
 async function allowedCode(message, sender) {
   if (await allowed(message, sender)) return true;
+  if (sender.tab && !secureFrame(sender)) return false;
   const all = await call('/codes');
   return (all.codes || []).some((e) => e.id === message.id);
 }
@@ -105,10 +117,13 @@ async function save(message, sender) {
   const tabId = sender.tab?.id;
   let username = message.username || '';
 
-  // Two-step logins ask for the username on the page before the password.
+  // Two-step logins ask for the username on the page before the password,
+  // on the same site: one typed elsewhere in the tab is not taken.
   if (!username && tabId != null) {
     const remembered = await read(`user:${tabId}`);
-    if (remembered && Date.now() - remembered.at < USER_TTL) username = remembered.username;
+    if (remembered && Date.now() - remembered.at < USER_TTL && remembered.host === new URL(sender.url).hostname) {
+      username = remembered.username;
+    }
   }
 
   const result = await call('/save', { url: sender.url, username, password: message.password });
@@ -309,7 +324,10 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
     codes: () => call('/codes'),
     'pin-offer': () => offerPin(message, sender),
     save: () => save(message, sender),
-    user: () => session.set({ [`user:${sender.tab?.id}`]: { username: message.username, at: Date.now() } }),
+    user: () =>
+      session.set({
+        [`user:${sender.tab?.id}`]: { username: message.username, at: Date.now(), host: new URL(sender.url).hostname },
+      }),
     outcome: () => outcome(message, sender),
   };
   // Answering what Keyhold caught, and editing, is for the extension's own

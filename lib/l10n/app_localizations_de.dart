@@ -796,7 +796,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get unlockHint =>
-      'Dieser Tresor stammt von einem anderen Computer. Zum Öffnen hier das Master-Passwort eingeben.';
+      'Keyhold kann diesen Tresor auf diesem Gerät nicht von selbst öffnen, etwa nach einer Neuinstallation des Systems oder wenn er von einem anderen Computer kopiert wurde. Gib sein Master-Passwort ein.';
 
   @override
   String get newMasterPassword => 'Neues Master-Passwort';
@@ -991,11 +991,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sheetStep1 => 'Keyhold installieren: galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => 'In Keyhold dasselbe Google Drive verbinden.';
+  String get sheetStep2 =>
+      'Wähle „Meinen Tresor öffnen“, dann „Aus Google Drive“ (oder „Aus einer Datei (.khd)“, wenn du eine Kopie hast).';
 
   @override
   String get sheetStep3 =>
-      'Wenn Keyhold nach dem Master-Passwort fragt, diesen Wiederherstellungsschlüssel eingeben. Dann ein neues Master-Passwort wählen.';
+      'Gib statt des Master-Passworts diesen Wiederherstellungsschlüssel ein. Wähle danach ein neues Master-Passwort.';
 
   @override
   String get sheetKeepSafe =>
@@ -1398,4 +1399,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get helloConfirmHint => 'Mit Windows Hello bestätigen';
+
+  @override
+  String get lockedInstead =>
+      'Weder Passwort noch Wiederherstellungsschlüssel? Öffne einen anderen Tresor oder lege einen neuen an. Dieser wird beiseitegelegt, nicht gelöscht.';
+
+  @override
+  String setAsideOn(String date) {
+    return 'beiseitegelegt am $date, öffnet mit seinem Master-Passwort';
+  }
+
+  @override
+  String get doneAfterCheck =>
+      '„Fertig“ wird aktiv, sobald die letzte Zeile stimmt.';
+
+  @override
+  String get lastCopyFailed => 'Die letzte Kopie ist fehlgeschlagen';
 }

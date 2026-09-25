@@ -145,10 +145,15 @@ class VaultStore {
   /// Puts the open vault aside: its file moves among the closed ones and
   /// opens again with its master password. Nothing is deleted.
   Future<void> _close() async {
-    // A vault this device cannot open (its key lost) is put aside, never overwritten.
+    // A vault this device cannot open (its key lost) is put aside among the
+    // closed ones, never overwritten: its master password opens it later.
     if (_key == null && _vaultFile.existsSync()) {
-      _vaultFile.renameSync(
-          '${_dir.path}${Platform.pathSeparator}vault-locked-${DateTime.now().millisecondsSinceEpoch}.khd');
+      final aside = 'locked-${DateTime.now().millisecondsSinceEpoch}';
+      _closedDir.createSync(recursive: true);
+      _vaultFile.renameSync(closedFile(aside).path);
+      backup
+        ..closed = [ClosedVault(tag: aside, name: '', count: -1, at: DateTime.now()), ...backup.closed]
+        ..saveSettings();
     }
     if (_key != null && _vaultFile.existsSync()) {
       // A vault without a master password could never be opened again.

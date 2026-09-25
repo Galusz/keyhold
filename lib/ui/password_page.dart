@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../core/crypto.dart';
+import '../core/drive.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
 import 'recovery_page.dart';
+import 'start_page.dart';
 
 /// After the vault was opened with the recovery key: a new master password,
 /// which then reaches the other devices.
@@ -38,10 +40,15 @@ class PasswordPage extends StatefulWidget {
     this.title,
     this.hint,
     this.attempt,
+    this.drive,
   });
 
   final VaultStore store;
   final PasswordMode mode;
+
+  /// At start, for a vault this device cannot open by itself: with it,
+  /// another vault can be opened or a new one made instead.
+  final DriveSync? drive;
 
   /// For [PasswordMode.unlock]: what is being opened, and how.
   final String? title;
@@ -132,6 +139,13 @@ class _PasswordPageState extends State<PasswordPage> {
         });
       }
     }
+  }
+
+  /// A vault that does not open here need not hold Keyhold up: it is set
+  /// aside, not deleted, and another one opens or a new one starts.
+  Future<void> _instead(Widget page) async {
+    final done = await Navigator.of(context).push(MaterialPageRoute<bool>(builder: (_) => page));
+    if (done == true && mounted) Navigator.of(context).pop(true);
   }
 
   Future<void> _recoverySheet() => Navigator.of(context).push(
@@ -262,6 +276,34 @@ class _PasswordPageState extends State<PasswordPage> {
                       child: Text(_byKey ? t.usePassword : t.forgotPassword),
                     ),
                   ),
+                  if (widget.drive != null) ...[
+                    const Divider(height: 32),
+                    Text(
+                      t.lockedInstead,
+                      style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: _busy
+                              ? null
+                              : () => _instead(OpenVaultPage(store: widget.store, drive: widget.drive!)),
+                          icon: const Icon(Icons.folder_open_outlined),
+                          label: Text(t.openOtherVault),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _busy
+                              ? null
+                              : () => _instead(PasswordPage(store: widget.store, mode: PasswordMode.create)),
+                          icon: const Icon(Icons.add),
+                          label: Text(t.createVault),
+                        ),
+                      ],
+                    ),
+                  ],
                 ] else if (_mode != PasswordMode.reset) ...[
                   const SizedBox(height: 16),
                   Text(

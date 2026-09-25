@@ -806,7 +806,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get unlockHint =>
-      'Ten sejf pochodzi z innego komputera. Wpisz hasło główne, aby go tu otworzyć.';
+      'Keyhold nie może sam otworzyć tego sejfu na tym urządzeniu, np. po ponownej instalacji systemu albo przeniesieniu z innego komputera. Wpisz jego hasło główne.';
 
   @override
   String get newMasterPassword => 'Nowe hasło główne';
@@ -1001,11 +1001,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String get sheetStep1 => 'Zainstaluj Keyhold: galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => 'Połącz Keyhold z tym samym Google Drive.';
+  String get sheetStep2 =>
+      'Wybierz „Otwórz mój sejf”, potem „Z Google Drive” (albo „Z pliku (.khd)”, jeśli masz kopię).';
 
   @override
   String get sheetStep3 =>
-      'Gdy Keyhold poprosi o hasło główne, wpisz ten klucz ratunkowy. Potem wybierz nowe hasło główne.';
+      'Zamiast hasła głównego wpisz ten klucz odzyskiwania. Potem wybierz nowe hasło główne.';
 
   @override
   String get sheetKeepSafe =>
@@ -1408,4 +1409,20 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get helloConfirmHint => 'Potwierdź przez Windows Hello';
+
+  @override
+  String get lockedInstead =>
+      'Nie masz ani hasła, ani klucza odzyskiwania? Otwórz inny sejf albo utwórz nowy. Ten zostanie odłożony, nie usunięty.';
+
+  @override
+  String setAsideOn(String date) {
+    return 'odłożony $date, otwiera się hasłem głównym';
+  }
+
+  @override
+  String get doneAfterCheck =>
+      '„Gotowe” włączy się, gdy ostatni wiersz się zgodzi.';
+
+  @override
+  String get lastCopyFailed => 'Ostatnia kopia się nie udała';
 }

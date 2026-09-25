@@ -15,6 +15,8 @@ void main() {
 
   final firefox = jsonDecode(jsonEncode(manifest)) as Map<String, dynamic>;
   (firefox['background'] as Map).remove('service_worker');
+  // Firefox has no 10 MB limit on its storage to lift, and would ask the user for this.
+  (firefox['permissions'] as List).remove('unlimitedStorage');
 
   for (final (name, content) in [('chromium', chromium), ('firefox', firefox)]) {
     final stage = Directory('${out.path}/$name');

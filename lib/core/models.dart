@@ -266,12 +266,13 @@ class Vault {
     final host = hostOf(address);
     if (host.isEmpty) return [];
     final port = _portOf(address);
-    // A login kept for an https page is not handed to the same site over plain http.
-    final plain = address.trim().toLowerCase().startsWith('http://');
+    // A login kept for an https page is not handed to the same site over
+    // plain http; an address kept without its scheme counts as https.
+    final plain = _isPlain(address);
     final withAddress = visible.where((e) =>
         !isAppAddress(e.url) &&
         hostOf(e.url).isNotEmpty &&
-        !(plain && e.url.trim().toLowerCase().startsWith('https://')));
+        !(plain && !_isPlain(e.url)));
 
     final exact = withAddress
         .where((e) => hostOf(e.url) == host && (port == null || _portOf(e.url) == port))
@@ -314,9 +315,12 @@ class Vault {
     final host = hostOf(address);
     if (host.isEmpty) return [];
     final port = _portOf(address);
-    bool exact(String site) => !isAppAddress(site) && hostOf(site) == host && (port == null || _portOf(site) == port);
+    // As for logins: a code used on an https page does not go to plain http.
+    final plain = _isPlain(address);
+    bool exact(String site) =>
+        !isAppAddress(site) && !(plain && !_isPlain(site)) && hostOf(site) == host && (port == null || _portOf(site) == port);
     bool related(String site) {
-      if (isAppAddress(site)) return false;
+      if (isAppAddress(site) || (plain && !_isPlain(site))) return false;
       final h = hostOf(site);
       return h.isNotEmpty && (h == host || host.endsWith('.$h') || h.endsWith('.$host'));
     }
@@ -463,6 +467,8 @@ class Vault {
     return e.isCode ? sitesOf(e).any(here) : here(e.url);
   }
 
+  static bool _isPlain(String url) => url.trim().toLowerCase().startsWith('http://');
+
   static int? _portOf(String url) {
     var text = url.trim();
     if (!text.contains('://')) text = 'https://$text';
@@ -492,10 +498,21 @@ class Vault {
   void remove(String id) {
     final e = entries[id];
     if (e == null) return;
-    e.deleted = true;
-    e.password = '';
-    e.totpSecret = null;
-    e.touch();
+    // Only the mark that it is gone reaches the other devices and the
+    // backups: notes often hold PINs or spare codes.
+    e
+      ..deleted = true
+      ..title = ''
+      ..username = ''
+      ..password = ''
+      ..url = ''
+      ..notes = ''
+      ..group = ''
+      ..totpSecret = null
+      ..twoFactor = ''
+      ..sites = []
+      ..guarded = false
+      ..touch();
   }
 
   String encode() => jsonEncode({

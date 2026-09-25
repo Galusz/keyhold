@@ -208,7 +208,7 @@
   "passwordsDiffer": "Le due password sono diverse",
   "passwordDoesNotOpen": "Questa password non apre la cassaforte",
   "unlockVault": "Sblocca cassaforte",
-  "unlockHint": "Questa cassaforte viene da un altro computer. Digita la password principale per aprirla qui.",
+  "unlockHint": "Keyhold non riesce ad aprire da solo questa cassaforte su questo dispositivo, ad esempio dopo una reinstallazione del sistema o una copia da un altro computer. Digita la sua password principale.",
   "newMasterPassword": "Nuova password principale",
   "repeatIt": "Ripetila",
   "openVault": "Apri cassaforte",
@@ -261,7 +261,7 @@
   "sheetOnlyHere": "Solo su questo dispositivo. Attiva un backup in Keyhold.",
   "sheetSteps": "Su un nuovo computer o telefono",
   "sheetStep1": "Installa Keyhold: galusz.github.io/keyhold",
-  "sheetStep2": "Connetti lo stesso Google Drive in Keyhold.",
+  "sheetStep2": "Scegli «Apri la mia cassaforte», poi «Da Google Drive» (oppure «Da un file (.khd)» se hai una copia).",
   "sheetDriveNoEmail": "Google Drive, cartella \"Keyhold\"",
   "noBackupPlaces": "Nessuna cartella di backup, server o Google Drive: la cassaforte è solo su questo computer. Fai clic per configurarne uno.",
   "deleteVault": "Elimina la cassaforte",
@@ -270,7 +270,7 @@
   "deleteVaultSureHint": "L’operazione non si può annullare.",
   "nobodyCanRecover": "Se la dimentichi, solo la chiave di recupero apre la tua cassaforte: stampa il foglio di recupero.",
   "recoveryIntro": "Questa chiave apre la tua cassaforte se dimentichi la password principale. Stampa il foglio, copiaci a mano l'ultima riga e tienilo a casa.",
-  "sheetStep3": "Quando Keyhold chiede la password principale, digita questa chiave di recupero. Poi scegli una nuova password principale.",
+  "sheetStep3": "Digita questa chiave di recupero al posto della password principale. Poi scegli una nuova password principale.",
   "sheetKeepSafe": "Chiunque abbia questo foglio completato può aprire la tua cassaforte. Custodiscilo come una chiave di casa di riserva.",
   "recoveryGate": "Digita la tua password principale per vedere la chiave di recupero.",
   "showKey": "Mostra la chiave",
@@ -373,5 +373,9 @@
   "guardedSwitchHint": "Impronta sul telefono, Windows Hello sul computer, prima che la password o il codice finiscano in una pagina o app.",
   "helloSwitch": "Apri Keyhold con Windows Hello",
   "helloSwitchHint": "Volto, impronta o PIN di Windows. Si blocca dopo 5 minuti di inutilizzo. La compilazione nel browser continua a funzionare.",
-  "helloConfirmHint": "Conferma con Windows Hello"
+  "helloConfirmHint": "Conferma con Windows Hello",
+  "lockedInstead": "Niente password né chiave di recupero? Apri un’altra cassaforte o creane una nuova. Questa viene messa da parte, non eliminata.",
+  "setAsideOn": "messa da parte il {date}, si apre con la sua password principale",
+  "doneAfterCheck": "«Fatto» si attiva quando l’ultima riga corrisponde.",
+  "lastCopyFailed": "L’ultima copia non è riuscita"
 }

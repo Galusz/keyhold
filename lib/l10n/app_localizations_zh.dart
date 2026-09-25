@@ -764,7 +764,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unlockVault => '解锁密码库';
 
   @override
-  String get unlockHint => '此密码库来自另一台电脑。请输入主密码，在这里打开它。';
+  String get unlockHint =>
+      'Keyhold 无法在此设备上自行打开这个密码库，例如重装系统后，或从另一台电脑复制过来后。请输入它的主密码。';
 
   @override
   String get newMasterPassword => '新主密码';
@@ -949,10 +950,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sheetStep1 => '安装 Keyhold：galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => '在 Keyhold 中连接同一个 Google Drive。';
+  String get sheetStep2 =>
+      '选择“打开我的密码库”，然后选择“从 Google Drive”（如果有副本，也可以选“从文件（.khd）”）。';
 
   @override
-  String get sheetStep3 => 'Keyhold 要求输入主密码时，请输入此恢复密钥。然后设置新的主密码。';
+  String get sheetStep3 => '在要求输入主密码时，输入这个恢复密钥。然后设置新的主密码。';
 
   @override
   String get sheetKeepSafe => '任何人拿到这张填好的恢复单，都能打开您的密码库。请像保管家里的备用钥匙一样保管它。';
@@ -1323,4 +1325,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get helloConfirmHint => '使用 Windows Hello 确认';
+
+  @override
+  String get lockedInstead =>
+      '既没有密码，也没有恢复密钥？请打开其他密码库或创建新的密码库。这个密码库会被放到一边，不会被删除。';
+
+  @override
+  String setAsideOn(String date) {
+    return '$date 放到一边，可用它的主密码打开';
+  }
+
+  @override
+  String get doneAfterCheck => '最后一行核对无误后，“完成”才可点按。';
+
+  @override
+  String get lastCopyFailed => '上一次备份失败';
 }

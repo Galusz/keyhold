@@ -208,7 +208,7 @@
   "passwordsDiffer": "两次输入的密码不一致",
   "passwordDoesNotOpen": "该密码无法打开此密码库",
   "unlockVault": "解锁密码库",
-  "unlockHint": "此密码库来自另一台电脑。请输入主密码，在这里打开它。",
+  "unlockHint": "Keyhold 无法在此设备上自行打开这个密码库，例如重装系统后，或从另一台电脑复制过来后。请输入它的主密码。",
   "newMasterPassword": "新主密码",
   "repeatIt": "再输入一次",
   "openVault": "打开密码库",
@@ -261,7 +261,7 @@
   "sheetOnlyHere": "只保存在这台设备上。请在 Keyhold 中开启备份。",
   "sheetSteps": "在新电脑或新手机上",
   "sheetStep1": "安装 Keyhold：galusz.github.io/keyhold",
-  "sheetStep2": "在 Keyhold 中连接同一个 Google Drive。",
+  "sheetStep2": "选择“打开我的密码库”，然后选择“从 Google Drive”（如果有副本，也可以选“从文件（.khd）”）。",
   "sheetDriveNoEmail": "Google Drive 中的“Keyhold”文件夹",
   "noBackupPlaces": "没有备份文件夹、服务器或 Google Drive：密码库只在这台电脑上。点击进行设置。",
   "deleteVault": "删除密码库",
@@ -270,7 +270,7 @@
   "deleteVaultSureHint": "此操作无法撤消。",
   "nobodyCanRecover": "如果您忘记了它，只有恢复密钥才能打开您的密码库：请打印恢复单。",
   "recoveryIntro": "如果您忘记了主密码，这个密钥可以打开您的密码库。请打印恢复单，把最后一行亲手抄上去，然后放在家里。",
-  "sheetStep3": "Keyhold 要求输入主密码时，请输入此恢复密钥。然后设置新的主密码。",
+  "sheetStep3": "在要求输入主密码时，输入这个恢复密钥。然后设置新的主密码。",
   "sheetKeepSafe": "任何人拿到这张填好的恢复单，都能打开您的密码库。请像保管家里的备用钥匙一样保管它。",
   "recoveryGate": "输入主密码即可查看恢复密钥。",
   "showKey": "显示密钥",
@@ -373,5 +373,9 @@
   "guardedSwitchHint": "先在手机上验证指纹、在电脑上验证 Windows Hello，密码或验证码才会填入网页或应用。",
   "helloSwitch": "使用 Windows Hello 打开 Keyhold",
   "helloSwitchHint": "面部、指纹或 Windows PIN。5 分钟未使用后锁定。浏览器中的自动填写仍可使用。",
-  "helloConfirmHint": "使用 Windows Hello 确认"
+  "helloConfirmHint": "使用 Windows Hello 确认",
+  "lockedInstead": "既没有密码，也没有恢复密钥？请打开其他密码库或创建新的密码库。这个密码库会被放到一边，不会被删除。",
+  "setAsideOn": "{date} 放到一边，可用它的主密码打开",
+  "doneAfterCheck": "最后一行核对无误后，“完成”才可点按。",
+  "lastCopyFailed": "上一次备份失败"
 }

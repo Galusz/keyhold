@@ -102,7 +102,7 @@ class _VaultPageState extends State<VaultPage> with WindowListener {
     if (state == VaultState.locked && mounted) {
       await Navigator.of(context).push(
         MaterialPageRoute<bool>(
-          builder: (_) => PasswordPage(store: _store, mode: PasswordMode.unlock),
+          builder: (_) => PasswordPage(store: _store, mode: PasswordMode.unlock, drive: _drive),
         ),
       );
     }

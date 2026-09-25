@@ -826,7 +826,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get unlockHint =>
-      'Este cofre veio de outro computador. Digite a senha mestra para abri-lo aqui.';
+      'O Keyhold não consegue abrir este cofre sozinho neste dispositivo, por exemplo depois de reinstalar o sistema ou copiá-lo de outro computador. Digite a senha mestra dele.';
 
   @override
   String get newMasterPassword => 'Nova senha mestra';
@@ -1021,11 +1021,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sheetStep1 => 'Instale o Keyhold: galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => 'Conecte o mesmo Google Drive no Keyhold.';
+  String get sheetStep2 =>
+      'Escolha “Abrir meu cofre” e depois “Do Google Drive” (ou “De um arquivo (.khd)” se tiver uma cópia).';
 
   @override
   String get sheetStep3 =>
-      'Quando o Keyhold pedir a senha mestra, digite esta chave de recuperação. Depois escolha uma nova senha mestra.';
+      'Digite esta chave de recuperação no lugar da senha mestra. Depois escolha uma senha mestra nova.';
 
   @override
   String get sheetKeepSafe =>
@@ -1425,4 +1426,20 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get helloConfirmHint => 'Confirme com o Windows Hello';
+
+  @override
+  String get lockedInstead =>
+      'Sem a senha e sem a chave de recuperação? Abra outro cofre ou crie um novo. Este fica guardado à parte, não é apagado.';
+
+  @override
+  String setAsideOn(String date) {
+    return 'guardado à parte em $date, abre com a senha mestra dele';
+  }
+
+  @override
+  String get doneAfterCheck =>
+      '“Concluído” fica ativo quando a última linha conferir.';
+
+  @override
+  String get lastCopyFailed => 'A última cópia falhou';
 }

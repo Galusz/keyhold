@@ -208,7 +208,7 @@
   "passwordsDiffer": "Die Passwörter stimmen nicht überein",
   "passwordDoesNotOpen": "Mit diesem Passwort lässt sich der Tresor nicht öffnen",
   "unlockVault": "Tresor entsperren",
-  "unlockHint": "Dieser Tresor stammt von einem anderen Computer. Zum Öffnen hier das Master-Passwort eingeben.",
+  "unlockHint": "Keyhold kann diesen Tresor auf diesem Gerät nicht von selbst öffnen, etwa nach einer Neuinstallation des Systems oder wenn er von einem anderen Computer kopiert wurde. Gib sein Master-Passwort ein.",
   "newMasterPassword": "Neues Master-Passwort",
   "repeatIt": "Wiederholen",
   "openVault": "Tresor öffnen",
@@ -261,7 +261,7 @@
   "sheetOnlyHere": "Nur auf diesem Gerät. In Keyhold eine Sicherung einschalten.",
   "sheetSteps": "Auf einem neuen Computer oder Smartphone",
   "sheetStep1": "Keyhold installieren: galusz.github.io/keyhold",
-  "sheetStep2": "In Keyhold dasselbe Google Drive verbinden.",
+  "sheetStep2": "Wähle „Meinen Tresor öffnen“, dann „Aus Google Drive“ (oder „Aus einer Datei (.khd)“, wenn du eine Kopie hast).",
   "sheetDriveNoEmail": "Google Drive, Ordner „Keyhold“",
   "noBackupPlaces": "Kein Sicherungsordner, Server oder Google Drive: Der Tresor ist nur auf diesem Computer. Zum Einrichten klicken.",
   "deleteVault": "Tresor löschen",
@@ -270,7 +270,7 @@
   "deleteVaultSureHint": "Das lässt sich nicht rückgängig machen.",
   "nobodyCanRecover": "Wenn du es vergisst, öffnet nur der Wiederherstellungsschlüssel deinen Tresor: Notfallblatt drucken.",
   "recoveryIntro": "Dieser Schlüssel öffnet deinen Tresor, falls du das Master-Passwort einmal vergisst. Das Blatt drucken, die letzte Zeile von Hand daraufschreiben und zu Hause aufbewahren.",
-  "sheetStep3": "Wenn Keyhold nach dem Master-Passwort fragt, diesen Wiederherstellungsschlüssel eingeben. Dann ein neues Master-Passwort wählen.",
+  "sheetStep3": "Gib statt des Master-Passworts diesen Wiederherstellungsschlüssel ein. Wähle danach ein neues Master-Passwort.",
   "sheetKeepSafe": "Mit diesem ausgefüllten Blatt kann jeder deinen Tresor öffnen. Wie einen Ersatzschlüssel fürs Haus aufbewahren.",
   "recoveryGate": "Master-Passwort eingeben, um den Wiederherstellungsschlüssel zu sehen.",
   "showKey": "Schlüssel anzeigen",
@@ -373,5 +373,9 @@
   "guardedSwitchHint": "Fingerabdruck auf dem Handy, Windows Hello am Computer – bevor Passwort oder Code in eine Seite oder App gelangt.",
   "helloSwitch": "Keyhold mit Windows Hello öffnen",
   "helloSwitchHint": "Gesicht, Fingerabdruck oder Windows-PIN. Sperrt nach 5 Minuten ohne Nutzung. Das Ausfüllen im Browser funktioniert weiter.",
-  "helloConfirmHint": "Mit Windows Hello bestätigen"
+  "helloConfirmHint": "Mit Windows Hello bestätigen",
+  "lockedInstead": "Weder Passwort noch Wiederherstellungsschlüssel? Öffne einen anderen Tresor oder lege einen neuen an. Dieser wird beiseitegelegt, nicht gelöscht.",
+  "setAsideOn": "beiseitegelegt am {date}, öffnet mit seinem Master-Passwort",
+  "doneAfterCheck": "„Fertig“ wird aktiv, sobald die letzte Zeile stimmt.",
+  "lastCopyFailed": "Die letzte Kopie ist fehlgeschlagen"
 }

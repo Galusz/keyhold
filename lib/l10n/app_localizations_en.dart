@@ -783,7 +783,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unlockHint =>
-      'This vault came from another machine. Type the master password to open it here.';
+      'Keyhold cannot open this vault by itself on this device, for example after the system was reinstalled or the vault was copied from another computer. Type its master password.';
 
   @override
   String get newMasterPassword => 'New master password';
@@ -979,11 +979,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sheetStep1 => 'Install Keyhold: galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => 'Connect the same Google Drive in Keyhold.';
+  String get sheetStep2 =>
+      'Choose “Open my vault”, then “From Google Drive” (or “From a file (.khd)” if you have a copy).';
 
   @override
   String get sheetStep3 =>
-      'When Keyhold asks for the master password, type this recovery key. Then choose a new master password.';
+      'Type this recovery key instead of the master password. Then choose a new master password.';
 
   @override
   String get sheetKeepSafe =>
@@ -1382,4 +1383,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helloConfirmHint => 'Confirm with Windows Hello';
+
+  @override
+  String get lockedInstead =>
+      'Neither the password nor the recovery key? Open another vault or create a new one. This one is set aside, not deleted.';
+
+  @override
+  String setAsideOn(String date) {
+    return 'set aside on $date, opens with its master password';
+  }
+
+  @override
+  String get doneAfterCheck => '“Done” turns on once the last row matches.';
+
+  @override
+  String get lastCopyFailed => 'The last copy failed';
 }

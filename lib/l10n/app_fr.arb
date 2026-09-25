@@ -208,7 +208,7 @@
   "passwordsDiffer": "Les deux mots de passe sont différents",
   "passwordDoesNotOpen": "Ce mot de passe n’ouvre pas ce coffre-fort",
   "unlockVault": "Déverrouiller le coffre-fort",
-  "unlockHint": "Ce coffre-fort vient d’un autre appareil. Saisissez le mot de passe principal pour l’ouvrir ici.",
+  "unlockHint": "Keyhold ne peut pas ouvrir ce coffre-fort tout seul sur cet appareil, par exemple après une réinstallation du système ou une copie depuis un autre ordinateur. Saisissez son mot de passe principal.",
   "newMasterPassword": "Nouveau mot de passe principal",
   "repeatIt": "Répétez-le",
   "openVault": "Ouvrir le coffre-fort",
@@ -261,7 +261,7 @@
   "sheetOnlyHere": "Uniquement sur cet appareil. Activez une sauvegarde dans Keyhold.",
   "sheetSteps": "Sur un nouvel ordinateur ou téléphone",
   "sheetStep1": "Installez Keyhold : galusz.github.io/keyhold",
-  "sheetStep2": "Connectez le même Google Drive dans Keyhold.",
+  "sheetStep2": "Choisissez « Ouvrir mon coffre-fort », puis « Depuis Google Drive » (ou « Depuis un fichier (.khd) » si vous avez une copie).",
   "sheetDriveNoEmail": "Google Drive, dossier « Keyhold »",
   "noBackupPlaces": "Aucun dossier de sauvegarde, serveur ni Google Drive : le coffre-fort n’est que sur cet ordinateur. Cliquez pour en configurer un.",
   "deleteVault": "Supprimer le coffre-fort",
@@ -270,7 +270,7 @@
   "deleteVaultSureHint": "Cette action est irréversible.",
   "nobodyCanRecover": "Si vous l’oubliez, seule la clé de récupération ouvre votre coffre-fort : imprimez la fiche de récupération.",
   "recoveryIntro": "Cette clé ouvre votre coffre-fort si vous oubliez un jour le mot de passe principal. Imprimez la fiche, recopiez-y la dernière ligne à la main et gardez-la chez vous.",
-  "sheetStep3": "Quand Keyhold demande le mot de passe principal, saisissez cette clé de récupération. Choisissez ensuite un nouveau mot de passe principal.",
+  "sheetStep3": "Saisissez cette clé de récupération à la place du mot de passe principal. Choisissez ensuite un nouveau mot de passe principal.",
   "sheetKeepSafe": "Toute personne qui a cette fiche complétée peut ouvrir votre coffre-fort. Rangez-la comme un double des clés de la maison.",
   "recoveryGate": "Saisissez votre mot de passe principal pour voir la clé de récupération.",
   "showKey": "Afficher la clé",
@@ -373,5 +373,9 @@
   "guardedSwitchHint": "Empreinte sur le téléphone, Windows Hello sur l'ordinateur, avant que le mot de passe ou le code n'aille dans une page ou une appli.",
   "helloSwitch": "Ouvrir Keyhold avec Windows Hello",
   "helloSwitchHint": "Visage, empreinte ou code PIN Windows. Se verrouille après 5 minutes sans utilisation. Le remplissage dans le navigateur continue de fonctionner.",
-  "helloConfirmHint": "Confirmez avec Windows Hello"
+  "helloConfirmHint": "Confirmez avec Windows Hello",
+  "lockedInstead": "Ni mot de passe ni clé de récupération ? Ouvrez un autre coffre-fort ou créez-en un nouveau. Celui-ci est mis de côté, pas supprimé.",
+  "setAsideOn": "mis de côté le {date}, s’ouvre avec son mot de passe principal",
+  "doneAfterCheck": "« Terminé » s’active dès que la dernière ligne correspond.",
+  "lastCopyFailed": "La dernière copie a échoué"
 }

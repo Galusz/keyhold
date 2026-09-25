@@ -767,7 +767,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unlockVault => '保管庫のロックを解除';
 
   @override
-  String get unlockHint => 'この保管庫は別のパソコンから移されたものです。ここで開くには、マスターパスワードを入力してください。';
+  String get unlockHint =>
+      'この端末では Keyhold がこの保管庫を自動で開けません（システムの再インストール後や、別のパソコンからコピーした場合など）。保管庫のマスターパスワードを入力してください。';
 
   @override
   String get newMasterPassword => '新しいマスターパスワード';
@@ -957,11 +958,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sheetStep1 => 'Keyhold をインストールします：galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => 'Keyhold で同じ Google Drive に接続します。';
+  String get sheetStep2 =>
+      '「自分の保管庫を開く」を選び、次に「Google Drive から」を選びます（コピーがあれば「ファイルから（.khd）」でも可）。';
 
   @override
   String get sheetStep3 =>
-      'Keyhold にマスターパスワードを求められたら、このリカバリーキーを入力します。その後、新しいマスターパスワードを設定します。';
+      'マスターパスワードの代わりにこのリカバリーキーを入力します。その後、新しいマスターパスワードを決めます。';
 
   @override
   String get sheetKeepSafe =>
@@ -1343,4 +1345,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get helloConfirmHint => 'Windows Hello で確認';
+
+  @override
+  String get lockedInstead =>
+      'パスワードもリカバリーキーもない場合は、別の保管庫を開くか、新しく作成してください。この保管庫は削除されず、別に保管されます。';
+
+  @override
+  String setAsideOn(String date) {
+    return '$date に別に保管、マスターパスワードで開けます';
+  }
+
+  @override
+  String get doneAfterCheck => '最後の行が一致すると「完了」を押せるようになります。';
+
+  @override
+  String get lastCopyFailed => '前回のコピーに失敗しました';
 }

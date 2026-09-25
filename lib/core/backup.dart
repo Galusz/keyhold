@@ -229,7 +229,7 @@ class BackupService {
       status = BackupStatus(
         at: at == null ? null : DateTime.tryParse(at),
         targets: (raw['lastBackupTargets'] as List<dynamic>?)?.cast<String>() ?? const [],
-        errors: const [],
+        errors: (raw['lastBackupErrors'] as List<dynamic>?)?.cast<String>() ?? const [],
       );
     } catch (_) {
       // a broken settings file must never stop the app from opening
@@ -256,6 +256,7 @@ class BackupService {
       if (closed.isNotEmpty) 'closed': [for (final c in closed) c.toJson()],
       'lastBackupAt': status.at?.toIso8601String(),
       'lastBackupTargets': status.targets,
+      if (status.errors.isNotEmpty) 'lastBackupErrors': status.errors,
     }), flush: true);
     tmp.renameSync(_settingsFile.path);
   }
@@ -283,7 +284,9 @@ class BackupService {
       }
     }
 
-    status = BackupStatus(at: DateTime.now(), targets: done, errors: errors);
+    // The time of the last copy that did get somewhere: a run where every
+    // place failed is no backup, and its errors stay on show.
+    status = BackupStatus(at: done.isEmpty ? status.at : DateTime.now(), targets: done, errors: errors);
     try {
       saveSettings();
     } catch (_) {

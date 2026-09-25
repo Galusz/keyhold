@@ -832,7 +832,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unlockHint =>
-      'Ce coffre-fort vient d’un autre appareil. Saisissez le mot de passe principal pour l’ouvrir ici.';
+      'Keyhold ne peut pas ouvrir ce coffre-fort tout seul sur cet appareil, par exemple après une réinstallation du système ou une copie depuis un autre ordinateur. Saisissez son mot de passe principal.';
 
   @override
   String get newMasterPassword => 'Nouveau mot de passe principal';
@@ -1028,11 +1028,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sheetStep1 => 'Installez Keyhold : galusz.github.io/keyhold';
 
   @override
-  String get sheetStep2 => 'Connectez le même Google Drive dans Keyhold.';
+  String get sheetStep2 =>
+      'Choisissez « Ouvrir mon coffre-fort », puis « Depuis Google Drive » (ou « Depuis un fichier (.khd) » si vous avez une copie).';
 
   @override
   String get sheetStep3 =>
-      'Quand Keyhold demande le mot de passe principal, saisissez cette clé de récupération. Choisissez ensuite un nouveau mot de passe principal.';
+      'Saisissez cette clé de récupération à la place du mot de passe principal. Choisissez ensuite un nouveau mot de passe principal.';
 
   @override
   String get sheetKeepSafe =>
@@ -1435,4 +1436,20 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get helloConfirmHint => 'Confirmez avec Windows Hello';
+
+  @override
+  String get lockedInstead =>
+      'Ni mot de passe ni clé de récupération ? Ouvrez un autre coffre-fort ou créez-en un nouveau. Celui-ci est mis de côté, pas supprimé.';
+
+  @override
+  String setAsideOn(String date) {
+    return 'mis de côté le $date, s’ouvre avec son mot de passe principal';
+  }
+
+  @override
+  String get doneAfterCheck =>
+      '« Terminé » s’active dès que la dernière ligne correspond.';
+
+  @override
+  String get lastCopyFailed => 'La dernière copie a échoué';
 }

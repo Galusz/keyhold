@@ -208,7 +208,7 @@
   "passwordsDiffer": "2 つのパスワードが一致しません",
   "passwordDoesNotOpen": "そのパスワードではこの保管庫を開けません",
   "unlockVault": "保管庫のロックを解除",
-  "unlockHint": "この保管庫は別のパソコンから移されたものです。ここで開くには、マスターパスワードを入力してください。",
+  "unlockHint": "この端末では Keyhold がこの保管庫を自動で開けません（システムの再インストール後や、別のパソコンからコピーした場合など）。保管庫のマスターパスワードを入力してください。",
   "newMasterPassword": "新しいマスターパスワード",
   "repeatIt": "もう一度入力",
   "openVault": "保管庫を開く",
@@ -261,7 +261,7 @@
   "sheetOnlyHere": "このデバイスにしか保存されていません。Keyhold でバックアップをオンにしてください。",
   "sheetSteps": "新しいパソコンやスマートフォンで",
   "sheetStep1": "Keyhold をインストールします：galusz.github.io/keyhold",
-  "sheetStep2": "Keyhold で同じ Google Drive に接続します。",
+  "sheetStep2": "「自分の保管庫を開く」を選び、次に「Google Drive から」を選びます（コピーがあれば「ファイルから（.khd）」でも可）。",
   "sheetDriveNoEmail": "Google Drive の「Keyhold」フォルダ",
   "noBackupPlaces": "バックアップ先のフォルダ、サーバー、Google Drive がありません。保管庫はこのパソコンにしかありません。クリックして設定します。",
   "deleteVault": "保管庫を削除",
@@ -270,7 +270,7 @@
   "deleteVaultSureHint": "この操作は元に戻せません。",
   "nobodyCanRecover": "忘れた場合、保管庫を開けるのはリカバリーキーだけです。リカバリーシートを印刷してください。",
   "recoveryIntro": "マスターパスワードを忘れたときは、このキーで保管庫を開けます。シートを印刷し、最後の行を手書きで書き写して、自宅に保管してください。",
-  "sheetStep3": "Keyhold にマスターパスワードを求められたら、このリカバリーキーを入力します。その後、新しいマスターパスワードを設定します。",
+  "sheetStep3": "マスターパスワードの代わりにこのリカバリーキーを入力します。その後、新しいマスターパスワードを決めます。",
   "sheetKeepSafe": "記入済みのこのシートがあれば、誰でも保管庫を開けます。家の合鍵と同じように大切に保管してください。",
   "recoveryGate": "リカバリーキーを表示するには、マスターパスワードを入力してください。",
   "showKey": "キーを表示",
@@ -373,5 +373,9 @@
   "guardedSwitchHint": "パスワードやコードをページやアプリに入力する前に、スマホでは指紋、パソコンでは Windows Hello で確認します。",
   "helloSwitch": "Windows Hello で Keyhold を開く",
   "helloSwitchHint": "顔、指紋、または Windows の PIN。5 分間使わないとロックされます。ブラウザーでの入力は引き続き使えます。",
-  "helloConfirmHint": "Windows Hello で確認"
+  "helloConfirmHint": "Windows Hello で確認",
+  "lockedInstead": "パスワードもリカバリーキーもない場合は、別の保管庫を開くか、新しく作成してください。この保管庫は削除されず、別に保管されます。",
+  "setAsideOn": "{date} に別に保管、マスターパスワードで開けます",
+  "doneAfterCheck": "最後の行が一致すると「完了」を押せるようになります。",
+  "lastCopyFailed": "前回のコピーに失敗しました"
 }

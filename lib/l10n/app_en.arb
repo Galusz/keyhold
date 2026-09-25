@@ -547,7 +547,7 @@
   "passwordsDiffer": "The two passwords differ",
   "passwordDoesNotOpen": "That password does not open this vault",
   "unlockVault": "Unlock vault",
-  "unlockHint": "This vault came from another machine. Type the master password to open it here.",
+  "unlockHint": "Keyhold cannot open this vault by itself on this device, for example after the system was reinstalled or the vault was copied from another computer. Type its master password.",
   "newMasterPassword": "New master password",
   "repeatIt": "Repeat it",
   "openVault": "Open vault",
@@ -661,8 +661,8 @@
   "sheetOnlyHere": "Only on this device. Turn on a backup in Keyhold.",
   "sheetSteps": "On a new computer or phone",
   "sheetStep1": "Install Keyhold: galusz.github.io/keyhold",
-  "sheetStep2": "Connect the same Google Drive in Keyhold.",
-  "sheetStep3": "When Keyhold asks for the master password, type this recovery key. Then choose a new master password.",
+  "sheetStep2": "Choose “Open my vault”, then “From Google Drive” (or “From a file (.khd)” if you have a copy).",
+  "sheetStep3": "Type this recovery key instead of the master password. Then choose a new master password.",
   "sheetKeepSafe": "Anyone with this completed sheet can open your vault. Keep it like a spare house key.",
   "sheetDriveNoEmail": "Google Drive, folder \"Keyhold\"",
   "noBackupPlaces": "No backup folder, server or Google Drive: the vault is only on this computer. Click to set one up.",
@@ -872,5 +872,16 @@
   "guardedSwitchHint": "A fingerprint on the phone, Windows Hello on the computer — before the password or code goes into a page or an app.",
   "helloSwitch": "Open Keyhold with Windows Hello",
   "helloSwitchHint": "Face, fingerprint or Windows PIN. Locks after 5 minutes without use. Filling in from the browser keeps working.",
-  "helloConfirmHint": "Confirm with Windows Hello"
+  "helloConfirmHint": "Confirm with Windows Hello",
+  "lockedInstead": "Neither the password nor the recovery key? Open another vault or create a new one. This one is set aside, not deleted.",
+  "setAsideOn": "set aside on {date}, opens with its master password",
+  "doneAfterCheck": "“Done” turns on once the last row matches.",
+  "@setAsideOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "lastCopyFailed": "The last copy failed"
 }

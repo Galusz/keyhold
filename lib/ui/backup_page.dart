@@ -55,6 +55,8 @@ class _BackupPageState extends State<BackupPage> {
 
   @override
   void dispose() {
+    // Back keeps what is on the screen, the server's fields too.
+    _keep();
     _host.dispose();
     _port.dispose();
     _user.dispose();
@@ -75,12 +77,16 @@ class _BackupPageState extends State<BackupPage> {
     // On a phone the folder comes from Android's own folder window.
     if (Platform.isAndroid) {
       final tree = await PhoneFolderPlace.pick();
-      if (tree != null && !_folders.contains(tree)) setState(() => _folders.add(tree));
+      if (tree != null && !_folders.contains(tree)) {
+        setState(() => _folders.add(tree));
+        _keep();
+      }
       return;
     }
     final path = await getDirectoryPath();
     if (path == null || _folders.contains(path)) return;
     setState(() => _folders.add(path));
+    _keep();
     // Copies of another vault in it (an earlier one, before a reinstall): it can be looked into.
     final copies = Directory(path)
         .listSync()
@@ -235,17 +241,18 @@ class _BackupPageState extends State<BackupPage> {
     );
   }
 
-  void _save() {
+  /// Kept as it is, at every folder added or taken off and on the way out:
+  /// what is on the screen is what backs up.
+  void _keep() {
     final backup = widget.store.backup;
     // A phone folder taken off the list gives back Keyhold's right to write there.
     for (final gone in backup.targets.where((t) => !_folders.contains(t) && PhoneFolderPlace.owns(t))) {
       PhoneFolderPlace.release(gone);
     }
     backup
-      ..targets = _folders
+      ..targets = List<String>.from(_folders)
       ..remote = _collect()
       ..saveSettings();
-    Navigator.of(context).pop(true);
   }
 
   @override
@@ -253,13 +260,7 @@ class _BackupPageState extends State<BackupPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.copiesTab),
-        actions: [
-          TextButton(onPressed: _save, child: Text(t.save)),
-          const SizedBox(width: 8),
-        ],
-      ),
+      appBar: AppBar(title: Text(t.copiesTab)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
@@ -268,9 +269,11 @@ class _BackupPageState extends State<BackupPage> {
             title: Platform.isAndroid ? t.foldersOnPhone : t.foldersOnComputer,
             state: _folders.isEmpty
                 ? t.off
-                : widget.store.backup.status.at == null
-                    ? t.folderCount(_folders.length)
-                    : t.folderCountCopied(_folders.length, _when(widget.store.backup.status.at!)),
+                : _copyFailed(_folders)
+                    ? t.backupFailed(t.lastCopyFailed)
+                    : widget.store.backup.status.at == null
+                        ? t.folderCount(_folders.length)
+                        : t.folderCountCopied(_folders.length, _when(widget.store.backup.status.at!)),
             children: _folderSection(theme),
           ),
           // For those who run their own machine; folded away until set up.
@@ -285,6 +288,10 @@ class _BackupPageState extends State<BackupPage> {
       ),
     );
   }
+
+  /// Whether the last backup could not write to one of [places].
+  bool _copyFailed(List<String> places) =>
+      widget.store.backup.status.errors.any((e) => places.any((p) => e.startsWith('$p:')));
 
   List<Widget> _folderSection(ThemeData theme) => [
     Text(
@@ -392,22 +399,28 @@ class _BackupPageState extends State<BackupPage> {
     final theme = Theme.of(context);
     final phone = PhoneFolderPlace.owns(path);
     final reachable = phone || Directory(path).existsSync();
+    // A folder Android still lists can refuse the copy (its right withdrawn, the provider unable to rename).
+    final failed = _copyFailed([path]);
+    final ok = reachable && !failed;
 
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
       leading: Icon(
-        reachable ? Icons.folder_outlined : Icons.folder_off_outlined,
-        color: reachable ? null : theme.colorScheme.error,
+        ok ? Icons.folder_outlined : Icons.folder_off_outlined,
+        color: ok ? null : theme.colorScheme.error,
       ),
       title: Text(phone ? PhoneFolderPlace.label(path) : path, maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitle: reachable
+      subtitle: ok
           ? null
-          : Text(t.notReachable, style: TextStyle(color: theme.colorScheme.error)),
+          : Text(reachable ? t.lastCopyFailed : t.notReachable, style: TextStyle(color: theme.colorScheme.error)),
       trailing: IconButton(
         tooltip: t.remove,
         icon: const Icon(Icons.close),
-        onPressed: () => setState(() => _folders.remove(path)),
+        onPressed: () {
+          setState(() => _folders.remove(path));
+          _keep();
+        },
       ),
     );
   }

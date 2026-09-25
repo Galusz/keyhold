@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../core/backup.dart';
 import '../core/drive.dart';
 import '../core/favicons.dart';
 import '../core/models.dart';
@@ -118,7 +119,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     final state = await _store.init();
     if (state == VaultState.locked && mounted) {
       await Navigator.of(context).push(MaterialPageRoute<bool>(
-        builder: (_) => PasswordPage(store: _store, mode: PasswordMode.unlock),
+        builder: (_) => PasswordPage(store: _store, mode: PasswordMode.unlock, drive: _drive),
       ));
     }
     if (!await _ensureVault()) return;
@@ -809,6 +810,10 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
   String _copiesState(BuildContext context) {
     final backup = widget.store.backup;
     if (backup.targets.isEmpty && !backup.remote.configured) return t.off;
+    // As on the computer: a failed copy says so, not the time of an older one.
+    final places = [...backup.targets, if (backup.remote.configured) backup.remote.host];
+    final failed = places.where((p) => backup.status.errors.any((e) => e.startsWith('$p:'))).firstOrNull;
+    if (failed != null) return t.backupFailed(PhoneFolderPlace.owns(failed) ? PhoneFolderPlace.label(failed) : failed);
     final at = backup.status.at;
     return at == null ? t.noBackupYet : t.lastBackup(TimeOfDay.fromDateTime(at).format(context));
   }

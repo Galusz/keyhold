@@ -153,6 +153,11 @@ class _OpenVaultPageState extends State<OpenVaultPage> {
       final key = await _store.keyFor(bytes, typed);
       if (key == null) return t.passwordDoesNotOpen;
       await _store.openVault(bytes, key);
+      // One set aside while it could not open here is this device's vault again.
+      if (file.existsSync()) file.deleteSync();
+      _store.backup
+        ..closed = _store.backup.closed.where((c) => c.tag != closed.tag).toList()
+        ..saveSettings();
       return null;
     });
   }
@@ -200,7 +205,7 @@ class _OpenVaultPageState extends State<OpenVaultPage> {
               _option(
                 Icons.history,
                 _nameOf(c),
-                '${t.itemCount(c.count)} · ${t.closedOn(_date(c.at))}',
+                c.count < 0 ? t.setAsideOn(_date(c.at)) : '${t.itemCount(c.count)} · ${t.closedOn(_date(c.at))}',
                 () => _fromClosed(c),
               ),
           ],

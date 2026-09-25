@@ -175,16 +175,23 @@ font:600 22px/38px ui-monospace,Consolas,monospace;text-align:center}
     await Process.start('cmd', ['/c', 'start', '', 'msedge', url]);
   }
 
+  /// Right after a vault gets its key, the sheet is finished only once its
+  /// last row, copied by hand, matches: a sheet short of it opens nothing.
+  bool get _canFinish => !widget.verified || _matches == true;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(t.recoverySheet)),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: ListView(
-            padding: const EdgeInsets.all(24),
-            children: _code == null ? _gate(context) : _key(context),
+    return PopScope(
+      canPop: _canFinish,
+      child: Scaffold(
+        appBar: AppBar(title: Text(t.recoverySheet), automaticallyImplyLeading: _canFinish),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: _code == null ? _gate(context) : _key(context),
+            ),
           ),
         ),
       ),
@@ -245,17 +252,13 @@ font:600 22px/38px ui-monospace,Consolas,monospace;text-align:center}
         ),
       ),
       const SizedBox(height: 16),
-      Wrap(
-        spacing: 12,
-        runSpacing: 8,
-        children: [
-          FilledButton.icon(
-            onPressed: _printSheet,
-            icon: const Icon(Icons.print_outlined),
-            label: Text(t.print),
-          ),
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(t.done)),
-        ],
+      Align(
+        alignment: Alignment.centerLeft,
+        child: FilledButton.icon(
+          onPressed: _printSheet,
+          icon: const Icon(Icons.print_outlined),
+          label: Text(t.print),
+        ),
       ),
       const Divider(height: 40),
       Text(t.checkRow, style: theme.textTheme.titleSmall),
@@ -282,6 +285,18 @@ font:600 22px/38px ui-monospace,Consolas,monospace;text-align:center}
             ),
         ],
       ),
+      const SizedBox(height: 24),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: FilledButton(
+          onPressed: _canFinish ? () => Navigator.of(context).pop() : null,
+          child: Text(t.done),
+        ),
+      ),
+      if (!_canFinish) ...[
+        const SizedBox(height: 8),
+        Text(t.doneAfterCheck, style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor)),
+      ],
     ];
   }
 }
