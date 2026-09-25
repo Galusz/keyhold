@@ -219,17 +219,8 @@
   },
   "watchedHint": "Watched — copied into the vault whenever they change, every 15 minutes",
   "nothingWatched": "Nothing watched yet",
-  "pathNotFound": "{path} — not found",
-  "@pathNotFound": {
-    "placeholders": {
-      "path": {
-        "type": "String"
-      }
-    }
-  },
   "stopWatching": "Stop watching",
   "watchFolder": "Watch folder",
-  "watchFile": "Watch file",
   "checkNow": "Check now",
   "fileTooBig": "{name} is {size} — the limit is 25 MB",
   "@fileTooBig": {

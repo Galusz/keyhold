@@ -354,18 +354,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nothingWatched => 'Rien n’est surveillé pour l’instant';
 
   @override
-  String pathNotFound(String path) {
-    return '$path — introuvable';
-  }
-
-  @override
   String get stopWatching => 'Arrêter la surveillance';
 
   @override
   String get watchFolder => 'Surveiller un dossier';
-
-  @override
-  String get watchFile => 'Surveiller un fichier';
 
   @override
   String get checkNow => 'Vérifier maintenant';

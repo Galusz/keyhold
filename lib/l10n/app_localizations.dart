@@ -634,12 +634,6 @@ abstract class AppLocalizations {
   /// **'Nothing watched yet'**
   String get nothingWatched;
 
-  /// No description provided for @pathNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'{path} — not found'**
-  String pathNotFound(String path);
-
   /// No description provided for @stopWatching.
   ///
   /// In en, this message translates to:
@@ -651,12 +645,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Watch folder'**
   String get watchFolder;
-
-  /// No description provided for @watchFile.
-  ///
-  /// In en, this message translates to:
-  /// **'Watch file'**
-  String get watchFile;
 
   /// No description provided for @checkNow.
   ///

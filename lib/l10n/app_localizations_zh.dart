@@ -318,18 +318,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nothingWatched => '尚未监视任何内容';
 
   @override
-  String pathNotFound(String path) {
-    return '找不到 $path';
-  }
-
-  @override
   String get stopWatching => '停止监视';
 
   @override
   String get watchFolder => '监视文件夹';
-
-  @override
-  String get watchFile => '监视文件';
 
   @override
   String get checkNow => '立即检查';

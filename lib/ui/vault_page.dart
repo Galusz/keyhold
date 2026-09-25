@@ -809,6 +809,15 @@ class _VaultPageState extends State<VaultPage> {
   Future<void> _scan() async {
     if (_scanning) return;
     _scanning = true;
+    // EXPIRES: when no Keyhold 1.1.0 or older is left — those could watch a single file.
+    // Such a file is already in the vault; only folders are watched now.
+    final folders = _watched
+        .where((p) => !FileSystemEntity.isFileSync(p) && !_vault.files.values.any((f) => f.source == p))
+        .toList();
+    if (folders.length != _watched.length) {
+      _store.backup.watched = folders;
+      _store.backup.saveSettings();
+    }
     try {
       final result = await scanWatched(_vault, _watched);
       if (result.changed) await _persist();
@@ -823,8 +832,8 @@ class _VaultPageState extends State<VaultPage> {
     }
   }
 
-  Future<void> _watch({required bool folder}) async {
-    final path = folder ? await getDirectoryPath() : (await openFile())?.path;
+  Future<void> _watch() async {
+    final path = await getDirectoryPath();
     if (path == null || _watched.contains(path)) return;
     _store.backup.watched = [..._watched, path];
     _store.backup.saveSettings();
@@ -845,7 +854,7 @@ class _VaultPageState extends State<VaultPage> {
       final src = f.source;
       if (src == null) continue;
       for (final root in _watched) {
-        if (src == root || src.startsWith('$root${Platform.pathSeparator}')) {
+        if (src.startsWith('$root${Platform.pathSeparator}')) {
           countFor[root] = (countFor[root] ?? 0) + 1;
         }
       }
@@ -882,25 +891,15 @@ class _VaultPageState extends State<VaultPage> {
               child: Text(t.nothingWatched, style: theme.textTheme.bodyMedium),
             ),
           ..._watched.map((path) {
-            final missing = scan?.missing.contains(path) ?? false;
             return Row(
               children: [
-                Icon(
-                  missing
-                      ? Icons.error_outline
-                      : FileSystemEntity.isDirectorySync(path)
-                          ? Icons.folder_outlined
-                          : Icons.insert_drive_file_outlined,
-                  size: 18,
-                  color: missing ? theme.colorScheme.error : null,
-                ),
+                const Icon(Icons.folder_outlined, size: 18),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    missing ? t.pathNotFound(path) : '$path  (${countFor[path] ?? 0})',
+                    '$path  (${countFor[path] ?? 0})',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: missing ? theme.colorScheme.error : null),
                   ),
                 ),
                 IconButton(
@@ -920,14 +919,9 @@ class _VaultPageState extends State<VaultPage> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               OutlinedButton.icon(
-                onPressed: () => _watch(folder: true),
+                onPressed: _watch,
                 icon: const Icon(Icons.create_new_folder_outlined, size: 18),
                 label: Text(t.watchFolder),
-              ),
-              OutlinedButton.icon(
-                onPressed: () => _watch(folder: false),
-                icon: const Icon(Icons.note_add_outlined, size: 18),
-                label: Text(t.watchFile),
               ),
               TextButton.icon(
                 onPressed: _scanning ? null : _scan,

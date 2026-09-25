@@ -352,18 +352,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get nothingWatched => 'Nada monitorado ainda';
 
   @override
-  String pathNotFound(String path) {
-    return '$path — não encontrado';
-  }
-
-  @override
   String get stopWatching => 'Parar de monitorar';
 
   @override
   String get watchFolder => 'Monitorar pasta';
-
-  @override
-  String get watchFile => 'Monitorar arquivo';
 
   @override
   String get checkNow => 'Verificar agora';

@@ -594,11 +594,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
                 ),
                 Positioned(
                   right: 0,
-                  bottom: -18,
-                  // The next code sits in the room the shrinking bar leaves.
+                  bottom: -13,
+                  // The next code sits in the room the shrinking bar leaves,
+                  // high enough to stay clear of the line under the row.
                   child: SizedBox(
                     width: 100,
-                    height: 14,
+                    height: 18,
                     child: Stack(
                       children: [
                         Align(

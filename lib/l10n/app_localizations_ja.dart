@@ -319,18 +319,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get nothingWatched => 'まだ何も監視していません';
 
   @override
-  String pathNotFound(String path) {
-    return '$path — 見つかりません';
-  }
-
-  @override
   String get stopWatching => '監視を停止';
 
   @override
   String get watchFolder => 'フォルダを監視';
-
-  @override
-  String get watchFile => 'ファイルを監視';
 
   @override
   String get checkNow => '今すぐ確認';

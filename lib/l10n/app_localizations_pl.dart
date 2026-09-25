@@ -331,18 +331,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get nothingWatched => 'Nic nie jest jeszcze obserwowane';
 
   @override
-  String pathNotFound(String path) {
-    return '$path — nie znaleziono';
-  }
-
-  @override
   String get stopWatching => 'Przestań obserwować';
 
   @override
   String get watchFolder => 'Obserwuj folder';
-
-  @override
-  String get watchFile => 'Obserwuj plik';
 
   @override
   String get checkNow => 'Sprawdź teraz';

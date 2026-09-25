@@ -12,13 +12,11 @@ class WatchResult {
     required this.added,
     required this.updated,
     required this.skipped,
-    required this.missing,
   });
 
   final int added;
   final int updated;
   final List<String> skipped;
-  final List<String> missing;
 
   bool get changed => added + updated > 0;
 }
@@ -29,24 +27,19 @@ Future<String> _sha256(List<int> bytes) async {
 }
 
 Iterable<File> _filesUnder(String path) sync* {
-  final type = FileSystemEntity.typeSync(path);
-  if (type == FileSystemEntityType.file) {
-    yield File(path);
-    return;
-  }
-  if (type != FileSystemEntityType.directory) return;
   for (final entity in Directory(path).listSync(recursive: true, followLinks: false)) {
     if (entity is File) yield entity;
   }
 }
 
-/// Copies every watched file into the vault when its content changed.
-/// Files removed from disk stay in the vault on purpose — that is the backup.
+/// Copies every file of the watched folders into the vault when it is new
+/// or its content changed. Files removed from disk stay in the vault on
+/// purpose — that is the backup — and a folder that is not there (a drive
+/// not plugged in) is simply passed over.
 Future<WatchResult> scanWatched(Vault vault, List<String> watched) async {
   var added = 0;
   var updated = 0;
   final skipped = <String>[];
-  final missing = <String>[];
 
   final bySource = <String, VaultFile>{
     for (final f in vault.files.values)
@@ -54,10 +47,7 @@ Future<WatchResult> scanWatched(Vault vault, List<String> watched) async {
   };
 
   for (final root in watched) {
-    if (FileSystemEntity.typeSync(root) == FileSystemEntityType.notFound) {
-      missing.add(root);
-      continue;
-    }
+    if (!FileSystemEntity.isDirectorySync(root)) continue;
 
     for (final file in _filesUnder(root)) {
       final path = file.path;
@@ -98,6 +88,6 @@ Future<WatchResult> scanWatched(Vault vault, List<String> watched) async {
     }
   }
 
-  return WatchResult(added: added, updated: updated, skipped: skipped, missing: missing);
+  return WatchResult(added: added, updated: updated, skipped: skipped);
 }
 
