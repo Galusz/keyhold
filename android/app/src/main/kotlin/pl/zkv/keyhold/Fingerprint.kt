@@ -17,11 +17,35 @@ import io.flutter.plugin.common.MethodChannel
 object Fingerprint {
     private const val ALLOWED = BIOMETRIC_WEAK or DEVICE_CREDENTIAL
 
+    /// Once the owner said yes, the app and the suggestions do not ask again
+    /// for five minutes; the screen going dark ends that at once.
+    private const val TRUST_MS = 5 * 60 * 1000L
+    @Volatile
+    private var trustedUntil = 0L
+
+    fun forget() {
+        trustedUntil = 0L
+    }
+
+    private fun trust() {
+        trustedUntil = System.currentTimeMillis() + TRUST_MS
+    }
+
     fun register(activity: FragmentActivity, engine: FlutterEngine) {
         MethodChannel(engine.dartExecutor.binaryMessenger, "keyhold/fingerprint")
             .setMethodCallHandler { call, result ->
+                // The vault's password stood in for the finger: it counts the same.
+                if (call.method == "trusted") {
+                    trust()
+                    result.success(true)
+                    return@setMethodCallHandler
+                }
                 if (call.method != "ask") {
                     result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                if (System.currentTimeMillis() < trustedUntil) {
+                    result.success(true)
                     return@setMethodCallHandler
                 }
                 if (BiometricManager.from(activity).canAuthenticate(ALLOWED) != BiometricManager.BIOMETRIC_SUCCESS) {
@@ -30,6 +54,7 @@ object Fingerprint {
                 }
                 val callback = object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationSucceeded(outcome: BiometricPrompt.AuthenticationResult) {
+                        trust()
                         result.success(true)
                     }
 

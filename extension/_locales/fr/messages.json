@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "Cet identifiant a été modifié entre-temps sur un autre appareil. Fermez cette page et rouvrez-la pour voir la modification."
+  },
+  "guardUnlock": {
+    "message": "Déverrouiller les entrées protégées pour 5 minutes"
+  },
+  "guardLock": {
+    "message": "Verrouiller maintenant les entrées protégées"
+  },
+  "guardOpenFor": {
+    "message": "Entrées protégées déverrouillées : $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "Confirmez avec Windows Hello sur cet ordinateur…"
   }
 }

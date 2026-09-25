@@ -11,6 +11,11 @@ let autoSaveOn = null;
 // 'unpaired' or 'off'; null until it answered. The menu opens from this at once.
 let appState = null;
 
+// The entries marked to ask for Windows Hello: how many, and until when the
+// owner's last yes holds them open.
+let guard = { count: 0, until: 0 };
+let menuTimer = 0;
+
 // Runs inside the page, so it must not reference anything outside itself.
 // Only into the site the logins were looked up for: the tab may have moved on.
 function fillPage(data, origin) {
@@ -338,6 +343,7 @@ async function load() {
   render(result.entries || [], tab, result.alone === true);
   neverSwitch(result.never === true, tab);
   autoSaveOn = result.autoSave === true;
+  guard = { count: result.guardedCount || 0, until: Date.now() + (result.guardOpenFor || 0) * 1000 };
 }
 
 // ---------- the menu: where the logins come from, and switching that ----------
@@ -349,6 +355,7 @@ menuButton.title = t('menu');
 function closeMenu() {
   menuPanel.hidden = true;
   menuButton.classList.remove('open');
+  clearInterval(menuTimer);
 }
 
 // From the menu and from the "not running" screen alike: the pairing goes
@@ -424,10 +431,37 @@ async function showMenu() {
       load();
     });
   }
+  if (appState === 'paired' && guard.count > 0) guardItems(state, item);
   if (autoSaveOn !== null) menuPanel.append(autoSaveSwitch(autoSaveOn));
 
   menuPanel.hidden = false;
   menuButton.classList.add('open');
+}
+
+// The marked entries opened at once for five minutes with one Windows Hello,
+// instead of at every fill; the time left ticks here.
+function guardItems(state, item) {
+  clearInterval(menuTimer);
+  const left = () => Math.max(0, Math.round((guard.until - Date.now()) / 1000));
+  const clock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const answer = async (body) => {
+    message(t('confirmOnComputer'));
+    const result = await api.runtime.sendMessage({ type: 'guard', ...body });
+    if (result && !result.error) guard = { count: result.guardedCount || 0, until: Date.now() + (result.openFor || 0) * 1000 };
+    await load();
+    showMenu();
+  };
+  if (left() > 0) {
+    state(t('guardOpenFor', clock(left())));
+    const line = menuPanel.lastChild;
+    menuTimer = setInterval(() => {
+      if (left() > 0) line.textContent = t('guardOpenFor', clock(left()));
+      else showMenu();
+    }, 1000);
+    item(t('guardLock'), () => answer({ close: true }));
+  } else {
+    item(t('guardUnlock'), () => answer({ open: true }));
+  }
 }
 
 // No Keyhold app on this computer: the vault can come from Google Drive instead.

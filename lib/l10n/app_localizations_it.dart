@@ -1435,4 +1435,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get lastCopyFailed => 'L’ultima copia non è riuscita';
+
+  @override
+  String get guardOpenHint => 'Sblocca le voci protette per 5 minuti';
 }

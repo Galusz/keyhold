@@ -377,5 +377,6 @@
   "lockedInstead": "Nie masz ani hasła, ani klucza odzyskiwania? Otwórz inny sejf albo utwórz nowy. Ten zostanie odłożony, nie usunięty.",
   "setAsideOn": "odłożony {date}, otwiera się hasłem głównym",
   "doneAfterCheck": "„Gotowe” włączy się, gdy ostatni wiersz się zgodzi.",
-  "lastCopyFailed": "Ostatnia kopia się nie udała"
+  "lastCopyFailed": "Ostatnia kopia się nie udała",
+  "guardOpenHint": "Odblokuj zabezpieczone wpisy na 5 minut"
 }

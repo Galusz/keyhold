@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "Dieses Login wurde inzwischen auf einem anderen Gerät geändert. Schließe diese Seite und öffne sie erneut, um die Änderung zu sehen."
+  },
+  "guardUnlock": {
+    "message": "Geschützte Einträge für 5 Minuten entsperren"
+  },
+  "guardLock": {
+    "message": "Geschützte Einträge jetzt sperren"
+  },
+  "guardOpenFor": {
+    "message": "Geschützte Einträge entsperrt: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "Mit Windows Hello auf diesem Computer bestätigen …"
   }
 }

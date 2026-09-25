@@ -362,8 +362,8 @@ async function openMenu(field, allCodes) {
     text.className = 'text';
     const title = document.createElement('div');
     title.className = 'title';
-    // Marked to ask for Windows Hello before it goes in.
-    title.textContent = entry.guarded ? `${entry.title} 🔒` : entry.title;
+    // Marked to ask for Windows Hello before it goes in: shut, or opened for a while.
+    title.textContent = entry.guarded ? `${entry.title} ${result.guardOpenFor > 0 ? '🔓' : '🔒'}` : entry.title;
     const sub = document.createElement('div');
     sub.className = 'sub';
     sub.textContent = entry.unpaired ? `${entry.username || ''} · ${t('notTiedToSite')}` : entry.username || '';

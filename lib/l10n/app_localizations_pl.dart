@@ -1425,4 +1425,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get lastCopyFailed => 'Ostatnia kopia się nie udała';
+
+  @override
+  String get guardOpenHint => 'Odblokuj zabezpieczone wpisy na 5 minut';
 }

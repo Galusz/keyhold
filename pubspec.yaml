@@ -54,8 +54,6 @@ dependencies:
   pointycastle: ^4.0.0
   archive: ^4.3.0
   xml: ^6.6.1
-  local_auth_windows: ^2.0.2
-  local_auth_platform_interface: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

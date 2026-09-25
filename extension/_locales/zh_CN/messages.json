@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "此登录信息在此期间已在其他设备上被修改。请关闭此页面并重新打开以查看更改。"
+  },
+  "guardUnlock": {
+    "message": "将受保护的条目解锁 5 分钟"
+  },
+  "guardLock": {
+    "message": "立即锁定受保护的条目"
+  },
+  "guardOpenFor": {
+    "message": "受保护的条目已解锁：$TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "请在这台电脑上用 Windows Hello 确认…"
   }
 }

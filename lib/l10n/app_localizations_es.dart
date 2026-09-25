@@ -1443,4 +1443,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get lastCopyFailed => 'La última copia falló';
+
+  @override
+  String get guardOpenHint =>
+      'Desbloquear las entradas protegidas durante 5 minutos';
 }

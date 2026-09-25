@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "This login was changed on another device meanwhile. Close this page and open it again to see the change."
+  },
+  "guardUnlock": {
+    "message": "Unlock protected entries for 5 minutes"
+  },
+  "guardLock": {
+    "message": "Lock protected entries now"
+  },
+  "guardOpenFor": {
+    "message": "Protected entries unlocked: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "Confirm with Windows Hello on this computer…"
   }
 }

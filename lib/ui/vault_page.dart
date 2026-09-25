@@ -133,8 +133,10 @@ class _VaultPageState extends State<VaultPage> with WindowListener {
   void _lockWhenIdle() {
     if (!_store.backup.fingerprintLock || _locked || _unlocking != null) return;
     if (DateTime.now().difference(_lastUse) < _idleLock) return;
-    // Nothing stays open behind the lock: entries, settings and pages close.
+    // Nothing stays open behind the lock: entries, settings and pages close,
+    // and the marked entries ask again.
     Navigator.of(context).popUntil((route) => route.isFirst);
+    forgetOwner();
     setState(() {
       _locked = true;
       _askedOnFocus = false;
@@ -321,7 +323,9 @@ class _VaultPageState extends State<VaultPage> with WindowListener {
         _store.backup.autoSave = on;
         _store.backup.saveSettings();
       }
-      ..confirm = ((entry) => _confirmOwner(_fillHint(entry)))
+      ..confirm = ((entry) => _confirmOwner(entry == null ? t.guardOpenHint : _fillHint(entry)))
+      ..guardOpenFor = (() => ownerTrustLeft.inSeconds)
+      ..closeGuard = forgetOwner
       ..onPair = (id, pageUrl) async {
         final entry = _vault.entries[id];
         if (entry == null || entry.deleted) return;

@@ -883,5 +883,6 @@
       }
     }
   },
-  "lastCopyFailed": "The last copy failed"
+  "lastCopyFailed": "The last copy failed",
+  "guardOpenHint": "Unlock protected entries for 5 minutes"
 }

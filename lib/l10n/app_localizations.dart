@@ -2379,6 +2379,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The last copy failed'**
   String get lastCopyFailed;
+
+  /// No description provided for @guardOpenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock protected entries for 5 minutes'**
+  String get guardOpenHint;
 }
 
 class _AppLocalizationsDelegate

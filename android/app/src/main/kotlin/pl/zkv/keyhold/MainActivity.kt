@@ -58,6 +58,8 @@ class MainActivity : FlutterFragmentActivity() {
         }
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                // A dark screen ends the five minutes the owner's finger holds.
+                Fingerprint.forget()
                 lock.invokeMethod("screenOff", null)
             }
         }

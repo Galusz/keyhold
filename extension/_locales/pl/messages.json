@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "Ten login zmienił się w międzyczasie na innym urządzeniu. Zamknij tę stronę i otwórz ją ponownie, aby zobaczyć zmianę."
+  },
+  "guardUnlock": {
+    "message": "Odblokuj zabezpieczone na 5 minut"
+  },
+  "guardLock": {
+    "message": "Zablokuj zabezpieczone teraz"
+  },
+  "guardOpenFor": {
+    "message": "Zabezpieczone odblokowane: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "Potwierdź przez Windows Hello na tym komputerze…"
   }
 }

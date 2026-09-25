@@ -1340,4 +1340,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lastCopyFailed => '上一次备份失败';
+
+  @override
+  String get guardOpenHint => '将受保护的条目解锁 5 分钟';
 }

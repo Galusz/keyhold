@@ -1398,4 +1398,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lastCopyFailed => 'The last copy failed';
+
+  @override
+  String get guardOpenHint => 'Unlock protected entries for 5 minutes';
 }

@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "このログインはその間に別のデバイスで変更されました。このページを閉じて開き直すと変更が表示されます。"
+  },
+  "guardUnlock": {
+    "message": "保護された項目を 5 分間ロック解除"
+  },
+  "guardLock": {
+    "message": "保護された項目を今すぐロック"
+  },
+  "guardOpenFor": {
+    "message": "保護された項目のロック解除中：$TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "このパソコンで Windows Hello により確認してください…"
   }
 }

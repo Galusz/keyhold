@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "Este login foi alterado nesse meio-tempo em outro dispositivo. Feche esta página e abra-a de novo para ver a alteração."
+  },
+  "guardUnlock": {
+    "message": "Desbloquear as protegidas por 5 minutos"
+  },
+  "guardLock": {
+    "message": "Bloquear agora as protegidas"
+  },
+  "guardOpenFor": {
+    "message": "Protegidas desbloqueadas: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "Confirme com o Windows Hello neste computador…"
   }
 }

@@ -377,5 +377,6 @@
   "lockedInstead": "Weder Passwort noch Wiederherstellungsschlüssel? Öffne einen anderen Tresor oder lege einen neuen an. Dieser wird beiseitegelegt, nicht gelöscht.",
   "setAsideOn": "beiseitegelegt am {date}, öffnet mit seinem Master-Passwort",
   "doneAfterCheck": "„Fertig“ wird aktiv, sobald die letzte Zeile stimmt.",
-  "lastCopyFailed": "Die letzte Kopie ist fehlgeschlagen"
+  "lastCopyFailed": "Die letzte Kopie ist fehlgeschlagen",
+  "guardOpenHint": "Geschützte Einträge für 5 Minuten entsperren"
 }

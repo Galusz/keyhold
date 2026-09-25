@@ -52,8 +52,15 @@ class BrowserBridge {
   /// Ties a code that has no site yet to the page it was just used on.
   void Function(String id, String pageUrl)? onPair;
 
-  /// Asks the owner (Windows Hello) before a marked entry's password or code leaves.
-  Future<bool> Function(VaultEntry entry)? confirm;
+  /// Asks the owner (Windows Hello) before a marked entry's password or code
+  /// leaves; with no entry, to open the marked ones for a while.
+  Future<bool> Function(VaultEntry? entry)? confirm;
+
+  /// How long the owner's last yes still holds, in seconds; and ending it now.
+  int Function()? guardOpenFor;
+  void Function()? closeGuard;
+
+  bool get _guardOpen => (guardOpenFor?.call() ?? 0) > 0;
 
   /// PNG of a site's icon when Keyhold already has one.
   final Uint8List? Function(String address) iconOf;
@@ -123,6 +130,14 @@ class BrowserBridge {
           if (host.isNotEmpty) onNever?.call(host, never);
           if (never) _drop((o) => o.host == host);
           await _json(response, HttpStatus.ok, {'never': neverSave().contains(host)});
+        case '/guard':
+          // From the extension's menu: the marked entries opened at once, or shut again.
+          if (payload['close'] == true) closeGuard?.call();
+          if (payload['open'] == true && !_guardOpen) await confirm?.call(null);
+          await _json(response, HttpStatus.ok, {
+            'openFor': guardOpenFor?.call() ?? 0,
+            'guardedCount': vault().visible.where(vault().guarded).length,
+          });
         case '/codes':
           await _json(response, HttpStatus.ok, {
             'codes': [for (final e in vault().codes) _codeOf(e)],
@@ -253,6 +268,8 @@ class BrowserBridge {
       'autoSave': autoSave(),
       'unpaired': [for (final e in vault().unpairedCodes) _codeOf(e)],
       'codeCount': vault().codes.length,
+      'guardedCount': vault().visible.where(vault().guarded).length,
+      'guardOpenFor': guardOpenFor?.call() ?? 0,
       'entries': matches
           .map((e) => {
                 'id': e.id,
@@ -310,7 +327,7 @@ class BrowserBridge {
       return {'error': 'not found'};
     }
     // A marked code is listed without its digits; they leave once the owner says so.
-    if (vault().guarded(entry)) {
+    if (vault().guarded(entry) && !_guardOpen) {
       if (!use) return {'guarded': true, 'left': secondsLeft()};
       if (!(await confirm?.call(entry) ?? false)) return {'error': 'denied'};
     }

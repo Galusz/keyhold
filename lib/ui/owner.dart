@@ -2,50 +2,80 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:local_auth_platform_interface/local_auth_platform_interface.dart';
 
 import '../core/models.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
 
+/// Once the owner said yes, Keyhold does not ask again for this long: the
+/// marked entries fill one after another without a finger each time.
+const ownerTrustTime = Duration(minutes: 5);
+
+// On the computer the time is kept here. On the phone Android's side keeps
+// it, as the suggestions run apart from the app.
+DateTime? _trustedUntil;
+Future<bool>? _asking;
+
+/// How long the owner's last yes still holds on this computer.
+Duration get ownerTrustLeft {
+  final until = _trustedUntil;
+  if (until == null) return Duration.zero;
+  final left = until.difference(DateTime.now());
+  return left.isNegative ? Duration.zero : left;
+}
+
+/// The marked entries ask again from now on.
+void forgetOwner() => _trustedUntil = null;
+
 /// The owner shows it is them: on the phone by finger (or the phone's PIN or
 /// pattern), on the computer by Windows Hello. A device with neither set up
 /// asks for the vault's password instead, so no one is ever locked out.
 /// [beforePassword] runs before that question, to bring the window up.
+/// A yes holds for [ownerTrustTime], and several asking at once share one question.
 Future<bool> confirmOwner(
   BuildContext context,
   VaultStore store, {
   String? hint,
   Future<void> Function()? beforePassword,
 }) async {
-  final reason = hint ?? t.fingerprintUnlockHint;
-  final byDevice = Platform.isWindows ? await _hello(reason) : await _finger(reason);
-  if (byDevice != null) return byDevice;
-  await beforePassword?.call();
-  if (!context.mounted) return false;
-  return await showDialog<bool>(
-        context: context,
-        builder: (_) => _PasswordCheck(store: store, hint: reason),
-      ) ??
-      false;
+  if (Platform.isWindows && ownerTrustLeft > Duration.zero) return true;
+  return _asking ??= _ask(context, store, hint ?? t.fingerprintUnlockHint, beforePassword)
+      .whenComplete(() => _asking = null);
 }
 
-/// The phone's panel: null when the phone has no screen lock to ask with.
-Future<bool?> _finger(String hint) async {
+Future<bool> _ask(BuildContext context, VaultStore store, String reason, Future<void> Function()? beforePassword) async {
+  final byDevice = Platform.isWindows ? await _hello(reason) : await _finger(reason);
+  var ok = byDevice ?? false;
+  if (byDevice == null) {
+    await beforePassword?.call();
+    if (!context.mounted) return false;
+    ok = await showDialog<bool>(
+          context: context,
+          builder: (_) => _PasswordCheck(store: store, hint: reason),
+        ) ??
+        false;
+    // The phone keeps the time too for a yes given by password.
+    if (ok && !Platform.isWindows) await _fingerprint('trusted');
+  }
+  if (ok && Platform.isWindows) _trustedUntil = DateTime.now().add(ownerTrustTime);
+  return ok;
+}
+
+Future<bool?> _fingerprint(String method, [Map<String, String>? args]) async {
   try {
-    return await const MethodChannel('keyhold/fingerprint')
-        .invokeMethod<bool>('ask', {'title': t.fingerprintTitle, 'hint': hint});
+    return await const MethodChannel('keyhold/fingerprint').invokeMethod<bool>(method, args);
   } catch (_) {
     return false;
   }
 }
 
-/// Windows Hello: null when it is not set up on this computer.
+/// The phone's panel: null when the phone has no screen lock to ask with.
+Future<bool?> _finger(String hint) => _fingerprint('ask', {'title': t.fingerprintTitle, 'hint': hint});
+
+/// Windows Hello, over the window in front: null when it is not set up on this computer.
 Future<bool?> _hello(String reason) async {
-  final hello = LocalAuthPlatform.instance;
   try {
-    if (!await hello.isDeviceSupported()) return null;
-    return await hello.authenticate(localizedReason: reason, authMessages: const []);
+    return await const MethodChannel('keyhold/hello').invokeMethod<bool>('ask', {'reason': reason});
   } catch (_) {
     return null;
   }

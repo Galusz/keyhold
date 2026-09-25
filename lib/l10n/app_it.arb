@@ -377,5 +377,6 @@
   "lockedInstead": "Niente password né chiave di recupero? Apri un’altra cassaforte o creane una nuova. Questa viene messa da parte, non eliminata.",
   "setAsideOn": "messa da parte il {date}, si apre con la sua password principale",
   "doneAfterCheck": "«Fatto» si attiva quando l’ultima riga corrisponde.",
-  "lastCopyFailed": "L’ultima copia non è riuscita"
+  "lastCopyFailed": "L’ultima copia non è riuscita",
+  "guardOpenHint": "Sblocca le voci protette per 5 minuti"
 }

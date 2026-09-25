@@ -377,5 +377,6 @@
   "lockedInstead": "Sem a senha e sem a chave de recuperação? Abra outro cofre ou crie um novo. Este fica guardado à parte, não é apagado.",
   "setAsideOn": "guardado à parte em {date}, abre com a senha mestra dele",
   "doneAfterCheck": "“Concluído” fica ativo quando a última linha conferir.",
-  "lastCopyFailed": "A última cópia falhou"
+  "lastCopyFailed": "A última cópia falhou",
+  "guardOpenHint": "Desbloquear as entradas protegidas por 5 minutos"
 }

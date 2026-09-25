@@ -1415,4 +1415,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get lastCopyFailed => 'Die letzte Kopie ist fehlgeschlagen';
+
+  @override
+  String get guardOpenHint => 'Geschützte Einträge für 5 Minuten entsperren';
 }

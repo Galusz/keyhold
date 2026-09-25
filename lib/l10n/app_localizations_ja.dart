@@ -1360,4 +1360,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get lastCopyFailed => '前回のコピーに失敗しました';
+
+  @override
+  String get guardOpenHint => '保護された項目を 5 分間ロック解除';
 }

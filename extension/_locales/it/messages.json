@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "Questo accesso è stato modificato nel frattempo su un altro dispositivo. Chiudi questa pagina e riaprila per vedere la modifica."
+  },
+  "guardUnlock": {
+    "message": "Sblocca le voci protette per 5 minuti"
+  },
+  "guardLock": {
+    "message": "Blocca subito le voci protette"
+  },
+  "guardOpenFor": {
+    "message": "Voci protette sbloccate: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "Conferma con Windows Hello su questo computer…"
   }
 }

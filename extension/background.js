@@ -11,7 +11,7 @@ const APP_WAIT = 200;
 const SAVE_WAIT = 30 * 1000;
 const CONFIRM_WAIT = 60 * 1000;
 const QUESTIONS = ['/lookup', '/codes', '/entry'];
-const CONFIRMS = ['/fill', '/code'];
+const CONFIRMS = ['/fill', '/code', '/guard'];
 // An app that did not answer is not asked again for a while: every question of
 // a page or the popup would wait out the limit again.
 const APP_RETRY = 20 * 1000;
@@ -349,6 +349,7 @@ api.runtime.onMessage.addListener((message, sender, reply) => {
       'alone-lock': () => Standalone.lock(),
       'alone-disconnect': () => Standalone.disconnect(),
       open: () => call('/open', { id: message.id }),
+      guard: () => call('/guard', { open: message.open === true, close: message.close === true }),
       pins: () => pins(),
       'pin-answer': () => answerPin(message),
       entry: () => call('/entry', { id: message.id }),

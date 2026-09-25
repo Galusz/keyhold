@@ -301,5 +301,22 @@
   },
   "changedElsewhere": {
     "message": "Este inicio de sesión se cambió mientras tanto en otro dispositivo. Cierra esta página y ábrela de nuevo para ver el cambio."
+  },
+  "guardUnlock": {
+    "message": "Desbloquear las protegidas durante 5 minutos"
+  },
+  "guardLock": {
+    "message": "Bloquear ahora las protegidas"
+  },
+  "guardOpenFor": {
+    "message": "Protegidas desbloqueadas: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmOnComputer": {
+    "message": "Confirma con Windows Hello en este ordenador…"
   }
 }
