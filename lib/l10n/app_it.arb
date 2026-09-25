@@ -364,5 +364,10 @@
   "importPasswordsList": "Chrome, Edge, Firefox e Safari (CSV), Bitwarden (CSV o JSON), 1Password (.1pux o CSV), KeePass e KeePassXC (.kdbx o CSV), LastPass, Proton Pass, NordPass e Dashlane (CSV), e un’altra cassaforte Keyhold (.khd).",
   "importCodesFrom": "Codici a due fattori",
   "importCodesList": "Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ e andOTP, e qualsiasi file di link otpauth://. Google Authenticator: mostra il suo QR code di esportazione e usa il pulsante QR code di Keyhold.",
-  "importNoExport": "Microsoft Authenticator e Authy non fanno uscire i codici: riattiva la verifica in due passaggi su ogni servizio e scansiona il nuovo QR code."
+  "importNoExport": "Microsoft Authenticator e Authy non fanno uscire i codici: riattiva la verifica in due passaggi su ogni servizio e scansiona il nuovo QR code.",
+  "foldersOnPhone": "Cartelle su questo telefono",
+  "phoneFoldersHint": "Scegli una cartella del telefono, della scheda di memoria o di un’app come Nextcloud o OneDrive che permette ad Android di salvarci.",
+  "copiesPlaces": "Cartelle e il tuo server",
+  "shareVaultCopy": "Condividi una copia della cassaforte",
+  "shareVaultHint": "Puoi anche inviare il file per e-mail o tenerlo in File: si apre solo con la password principale o la chiave di recupero."
 }

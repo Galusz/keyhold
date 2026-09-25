@@ -1351,4 +1351,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get importNoExport =>
       'Microsoft Authenticator and Authy don\'t let codes out: turn two-factor on again at each service and scan its new QR code.';
+
+  @override
+  String get foldersOnPhone => 'Folders on this phone';
+
+  @override
+  String get phoneFoldersHint =>
+      'Pick a folder in the phone, on its memory card, or of an app such as Nextcloud or OneDrive that lets Android save there.';
+
+  @override
+  String get copiesPlaces => 'Folders and your server';
+
+  @override
+  String get shareVaultCopy => 'Share a copy of the vault';
+
+  @override
+  String get shareVaultHint =>
+      'You can also mail the vault file or keep it in Files: it opens only with the master password or the recovery key.';
 }

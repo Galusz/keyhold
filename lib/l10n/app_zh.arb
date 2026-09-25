@@ -364,5 +364,10 @@
   "importPasswordsList": "Chrome、Edge、Firefox 和 Safari（CSV），Bitwarden（CSV 或 JSON），1Password（.1pux 或 CSV），KeePass 和 KeePassXC（.kdbx 或 CSV），LastPass、Proton Pass、NordPass 和 Dashlane（CSV），以及其他 Keyhold 密码库（.khd）。",
   "importCodesFrom": "双重验证码",
   "importCodesList": "Aegis（.json）、2FAS（.2fas）、Ente Auth、FreeOTP+ 和 andOTP，以及任何包含 otpauth:// 链接的文件。Google Authenticator：在其中显示导出二维码，然后使用 Keyhold 的二维码按钮。",
-  "importNoExport": "Microsoft Authenticator 和 Authy 不允许导出验证码：请在每个服务中重新开启双重验证并扫描新的二维码。"
+  "importNoExport": "Microsoft Authenticator 和 Authy 不允许导出验证码：请在每个服务中重新开启双重验证并扫描新的二维码。",
+  "foldersOnPhone": "此手机上的文件夹",
+  "phoneFoldersHint": "选择手机、存储卡中的文件夹，或 Nextcloud、OneDrive 等允许 Android 保存到其中的应用文件夹。",
+  "copiesPlaces": "文件夹和您的服务器",
+  "shareVaultCopy": "分享密码库副本",
+  "shareVaultHint": "您也可以通过邮件发送密码库文件或保存到“文件”中：它只能用主密码或恢复密钥打开。"
 }

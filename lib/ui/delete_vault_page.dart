@@ -52,7 +52,7 @@ class _DeleteVaultPageState extends State<DeleteVaultPage> {
     try {
       // Google Drive first: if it cannot be reached, nothing is gone yet.
       if (_drive && widget.drive.connected) await widget.drive.deleteMine();
-      if (_folders) widget.store.backup.deleteCopies(await widget.store.tag());
+      if (_folders) await widget.store.backup.deleteCopies(await widget.store.tag());
       await widget.store.deleteLocal();
     } catch (e) {
       setState(() {

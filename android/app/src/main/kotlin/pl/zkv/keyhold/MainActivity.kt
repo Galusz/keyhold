@@ -29,10 +29,16 @@ class MainActivity : FlutterFragmentActivity() {
         super.onDestroy()
     }
 
+    @Deprecated("The folder window answers here; Flutter's own screens use the same path.")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (!Folders.onResult(this, requestCode, resultCode, data)) super.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         Keystore.register(flutterEngine)
         Fingerprint.register(this, flutterEngine)
+        Folders.register(this, flutterEngine)
 
         // The screen going dark locks Keyhold, when the fingerprint lock is on.
         val lock = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/lock")
@@ -62,6 +68,20 @@ class MainActivity : FlutterFragmentActivity() {
                 }
                 view.loadDataWithBaseURL(null, call.argument<String>("html") ?: "", "text/html", "UTF-8", null)
                 printing = view
+                result.success(null)
+            }
+
+        // A copy of the vault file handed to the app the user picks: mail, chat, Files, Drive.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/share")
+            .setMethodCallHandler { call, result ->
+                val file = java.io.File(call.argument<String>("path")!!)
+                val uri = androidx.core.content.FileProvider.getUriForFile(this, "$packageName.files", file)
+                val send = Intent(Intent.ACTION_SEND)
+                    .setType("application/octet-stream")
+                    .putExtra(Intent.EXTRA_STREAM, uri)
+                    .putExtra(Intent.EXTRA_SUBJECT, file.name)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                startActivity(Intent.createChooser(send, call.argument<String>("title")))
                 result.success(null)
             }
 

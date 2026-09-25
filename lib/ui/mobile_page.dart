@@ -9,6 +9,8 @@ import '../core/models.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../l10n/l10n.dart';
+import 'backup_page.dart';
+import 'copy_page.dart';
 import 'entry_page.dart';
 import 'import_page.dart';
 import 'password_page.dart';
@@ -478,6 +480,8 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
                       ),
                     ])
                   : ListView.separated(
+                      // Room under the last entry, so it can come out from under the + button.
+                      padding: const EdgeInsets.only(bottom: 88),
                       itemCount: items.length,
                       separatorBuilder: (_, _) => const Divider(height: 1),
                       itemBuilder: (context, i) => _row(items[i]),
@@ -546,6 +550,8 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     return ListTile(
       onTap: () => code != null ? _copy(t.code, code) : _details(e),
       onLongPress: () => _details(e),
+      // Tall enough for the countdown hanging under the code.
+      minTileHeight: code == null ? null : 64,
       leading: SiteAvatar(
         entry: e,
         icons: _store.icons,
@@ -565,42 +571,47 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             ),
       trailing: code == null
           ? const Icon(Icons.chevron_right)
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
+          // The code on the name's line; the countdown and the next code hang
+          // under it, so neither moves anything.
+          : Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.centerRight,
               children: [
                 Text(
                   '${code.substring(0, 3)} ${code.substring(3)}',
                   style: TextStyle(fontFamily: 'monospace', fontSize: 22, letterSpacing: 1, color: warn),
                 ),
-                const SizedBox(height: 4),
-                // The next code sits in the room the shrinking bar leaves: nothing above it moves.
-                SizedBox(
-                  width: 100,
-                  height: 14,
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          width: 100 * _left / 30,
-                          height: 2,
-                          color: warn ?? Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      if (next != null)
+                Positioned(
+                  right: 0,
+                  bottom: -18,
+                  // The next code sits in the room the shrinking bar leaves.
+                  child: SizedBox(
+                    width: 100,
+                    height: 14,
+                    child: Stack(
+                      children: [
                         Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            '${next.substring(0, 3)} ${next.substring(3)}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontFamily: 'monospace',
-                                  fontSize: 11,
-                                  color: Theme.of(context).hintColor,
-                                ),
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            width: 100 * _left / 30,
+                            height: 2,
+                            color: warn ?? Theme.of(context).colorScheme.primary,
                           ),
                         ),
-                    ],
+                        if (next != null)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              '${next.substring(0, 3)} ${next.substring(3)}',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontFamily: 'monospace',
+                                    fontSize: 11,
+                                    color: Theme.of(context).hintColor,
+                                  ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -763,6 +774,13 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
     if (mounted) setState(() => _filler = state);
   }
 
+  String _copiesState(BuildContext context) {
+    final backup = widget.store.backup;
+    if (backup.targets.isEmpty && !backup.remote.configured) return t.off;
+    final at = backup.status.at;
+    return at == null ? t.noBackupYet : t.lastBackup(TimeOfDay.fromDateTime(at).format(context));
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -820,6 +838,27 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
               widget.store.backup
                 ..fingerprintLock = on
                 ..saveSettings();
+              if (mounted) setState(() {});
+            },
+          ),
+          const Divider(height: 40),
+          Text(t.copiesTab, style: theme.textTheme.titleMedium),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.history),
+            title: Text(t.copiesPlaces),
+            subtitle: Text(_copiesState(context)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => BackupPage(
+                  store: widget.store,
+                  onOpenCopy: (bytes, name) async {
+                    final picked = await reviewCopy(context, widget.store, widget.vault, bytes, name);
+                    if (picked != null && picked.isNotEmpty) await widget.onImport(picked);
+                  },
+                ),
+              ));
               if (mounted) setState(() {});
             },
           ),

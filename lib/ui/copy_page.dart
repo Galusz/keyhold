@@ -3,8 +3,59 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../core/importers.dart';
 import '../core/models.dart';
+import '../core/storage.dart';
 import '../l10n/l10n.dart';
+
+/// A backup copy (from a folder, a pendrive, a year ago) opened only to look
+/// inside; the entries ticked there come back, to be added as new ones. The
+/// vault itself stays as it is.
+Future<List<VaultEntry>?> reviewCopy(
+    BuildContext context, VaultStore store, Vault vault, Uint8List bytes, String name) async {
+  var copy = await store.openCopy(bytes);
+  if (copy == null && context.mounted) {
+    final field = TextEditingController();
+    final password = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.copyPasswordTitle),
+        content: SizedBox(
+          width: 380,
+          child: TextField(
+            controller: field,
+            obscureText: true,
+            autofocus: true,
+            decoration: InputDecoration(labelText: t.masterPassword, helperText: t.orRecoveryCode, helperMaxLines: 2),
+            onSubmitted: (v) => Navigator.pop(context, v),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, field.text), child: Text(t.open)),
+        ],
+      ),
+    ).whenComplete(field.dispose);
+    if (password == null) return null;
+    copy = await store.openCopy(bytes, password);
+  }
+  if (!context.mounted) return null;
+  if (copy == null) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(t.copyNotOpened)));
+    return null;
+  }
+  return Navigator.of(context).push(MaterialPageRoute<List<VaultEntry>>(
+    builder: (_) => CopyPage(
+      title: t.copyTitle(name),
+      hint: t.copyReadOnly,
+      entries: entriesOf(copy!),
+      vault: vault,
+      ticked: false,
+    ),
+  ));
+}
 
 /// Entries from somewhere else — a backup copy, another vault, another app's
 /// export — to look through and tick; the ticked ones go into the vault as

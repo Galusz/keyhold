@@ -1312,4 +1312,21 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get importNoExport =>
       'Microsoft Authenticator と Authy はコードをエクスポートできません。各サービスで 2 段階認証をもう一度有効にし、新しい QR コードをスキャンしてください。';
+
+  @override
+  String get foldersOnPhone => 'このスマートフォンのフォルダ';
+
+  @override
+  String get phoneFoldersHint =>
+      'スマートフォン本体、メモリーカード、または Nextcloud や OneDrive など Android から保存できるアプリのフォルダを選んでください。';
+
+  @override
+  String get copiesPlaces => 'フォルダと自分のサーバー';
+
+  @override
+  String get shareVaultCopy => '保管庫のコピーを共有';
+
+  @override
+  String get shareVaultHint =>
+      '保管庫ファイルはメールで送ったり「ファイル」に保存したりできます。開けるのはマスターパスワードかリカバリーキーだけです。';
 }

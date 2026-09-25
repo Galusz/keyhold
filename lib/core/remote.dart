@@ -57,39 +57,13 @@ class RemoteClient {
     );
   }
 
-  /// The same 7 slots as in a folder: each copy moves one slot on when its
-  /// slot is due, then the latest save goes up.
-  Future<void> backup(File vault, String tag) async {
+  /// The same 7 slots as in a folder.
+  Future<void> backup(Uint8List bytes, String tag) async {
     final client = await _connect();
     try {
       final sftp = await client.sftp();
       await _ensureDir(sftp, config.remoteDir);
-      String path(int slot) => '${config.remoteDir}/${BackupService.slotName(tag, slot)}';
-      Future<DateTime?> heldSince(int slot) async {
-        try {
-          final seconds = (await sftp.stat(path(slot))).modifyTime;
-          return seconds == null ? null : DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
-        } catch (_) {
-          return null;
-        }
-      }
-
-      for (var i = BackupService.slots.length - 1; i >= 1; i--) {
-        if (await heldSince(i - 1) == null) continue;
-        if (!BackupService.movesOn(await heldSince(i), i)) continue;
-        try {
-          await sftp.remove(path(i));
-        } catch (_) {
-          // the slot was empty
-        }
-        await sftp.rename(path(i - 1), path(i));
-      }
-      final handle = await sftp.open(
-        path(0),
-        mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate,
-      );
-      await handle.write(vault.openRead().cast<Uint8List>());
-      await handle.close();
+      await BackupService.keepCopy(_ServerPlace(sftp, config.remoteDir), tag, bytes);
     } finally {
       client.close();
     }
@@ -124,4 +98,43 @@ class RemoteClient {
       client.close();
     }
   }
+}
+
+class _ServerPlace implements CopyPlace {
+  _ServerPlace(this.sftp, this.dir);
+
+  final SftpClient sftp;
+  final String dir;
+
+  String _path(String name) => '$dir/$name';
+
+  @override
+  Future<Map<String, DateTime?>> files() async => {
+        for (final f in await sftp.listdir(dir))
+          if (!f.attr.isDirectory && f.filename != '.' && f.filename != '..')
+            f.filename: f.attr.modifyTime == null ? null : DateTime.fromMillisecondsSinceEpoch(f.attr.modifyTime! * 1000),
+      };
+
+  @override
+  Future<void> move(String from, String to) async {
+    try {
+      await sftp.remove(_path(to));
+    } catch (_) {
+      // nothing there yet
+    }
+    await sftp.rename(_path(from), _path(to));
+  }
+
+  @override
+  Future<void> write(String name, Uint8List bytes) async {
+    final handle = await sftp.open(
+      _path(name),
+      mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate,
+    );
+    await handle.writeBytes(bytes);
+    await handle.close();
+  }
+
+  @override
+  Future<void> delete(String name) => sftp.remove(_path(name));
 }

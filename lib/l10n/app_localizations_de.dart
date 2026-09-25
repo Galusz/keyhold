@@ -1367,4 +1367,21 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get importNoExport =>
       'Microsoft Authenticator und Authy geben keine Codes heraus: Zwei-Faktor bei jedem Dienst neu einschalten und den neuen QR-Code scannen.';
+
+  @override
+  String get foldersOnPhone => 'Ordner auf diesem Smartphone';
+
+  @override
+  String get phoneFoldersHint =>
+      'Wähle einen Ordner im Smartphone, auf der Speicherkarte oder einer App wie Nextcloud oder OneDrive, in die Android speichern darf.';
+
+  @override
+  String get copiesPlaces => 'Ordner und dein Server';
+
+  @override
+  String get shareVaultCopy => 'Kopie des Tresors teilen';
+
+  @override
+  String get shareVaultHint =>
+      'Du kannst die Tresordatei auch mailen oder in Dateien ablegen: Sie öffnet sich nur mit dem Master-Passwort oder dem Wiederherstellungsschlüssel.';
 }

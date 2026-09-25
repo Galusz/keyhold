@@ -364,5 +364,10 @@
   "importPasswordsList": "Chrome, Edge, Firefox und Safari (CSV), Bitwarden (CSV oder JSON), 1Password (.1pux oder CSV), KeePass und KeePassXC (.kdbx oder CSV), LastPass, Proton Pass, NordPass und Dashlane (CSV) sowie ein anderer Keyhold-Tresor (.khd).",
   "importCodesFrom": "Zwei-Faktor-Codes",
   "importCodesList": "Aegis (.json), 2FAS (.2fas), Ente Auth, FreeOTP+ und andOTP sowie jede Datei mit otpauth://-Links. Google Authenticator: dort den Export-QR-Code anzeigen und in Keyhold die QR-Code-Schaltfläche nutzen.",
-  "importNoExport": "Microsoft Authenticator und Authy geben keine Codes heraus: Zwei-Faktor bei jedem Dienst neu einschalten und den neuen QR-Code scannen."
+  "importNoExport": "Microsoft Authenticator und Authy geben keine Codes heraus: Zwei-Faktor bei jedem Dienst neu einschalten und den neuen QR-Code scannen.",
+  "foldersOnPhone": "Ordner auf diesem Smartphone",
+  "phoneFoldersHint": "Wähle einen Ordner im Smartphone, auf der Speicherkarte oder einer App wie Nextcloud oder OneDrive, in die Android speichern darf.",
+  "copiesPlaces": "Ordner und dein Server",
+  "shareVaultCopy": "Kopie des Tresors teilen",
+  "shareVaultHint": "Du kannst die Tresordatei auch mailen oder in Dateien ablegen: Sie öffnet sich nur mit dem Master-Passwort oder dem Wiederherstellungsschlüssel."
 }

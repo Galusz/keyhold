@@ -2301,6 +2301,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Microsoft Authenticator and Authy don\'t let codes out: turn two-factor on again at each service and scan its new QR code.'**
   String get importNoExport;
+
+  /// No description provided for @foldersOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders on this phone'**
+  String get foldersOnPhone;
+
+  /// No description provided for @phoneFoldersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a folder in the phone, on its memory card, or of an app such as Nextcloud or OneDrive that lets Android save there.'**
+  String get phoneFoldersHint;
+
+  /// No description provided for @copiesPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders and your server'**
+  String get copiesPlaces;
+
+  /// No description provided for @shareVaultCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Share a copy of the vault'**
+  String get shareVaultCopy;
+
+  /// No description provided for @shareVaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can also mail the vault file or keep it in Files: it opens only with the master password or the recovery key.'**
+  String get shareVaultHint;
 }
 
 class _AppLocalizationsDelegate

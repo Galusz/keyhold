@@ -4,6 +4,13 @@ const ORIGINS = ['http://127.0.0.1:19919/*', '*://*/*'];
 const content = document.getElementById('content');
 content.textContent = t('lookingForMatches');
 
+// Whether logins are saved without asking, as the last lookup said; unknown until then.
+let autoSaveOn = null;
+
+// What the last lookup found about the app on this computer: 'paired',
+// 'unpaired' or 'off'; null until it answered. The menu opens from this at once.
+let appState = null;
+
 // Runs inside the page, so it must not reference anything outside itself.
 function fillPage(data) {
   const visible = (el) => el && !el.disabled && el.getClientRects().length > 0;
@@ -288,6 +295,14 @@ async function load() {
   }
 
   const result = await api.runtime.sendMessage({ type: 'lookup', url: tab.url });
+  appState = !result
+    ? null
+    : result.error === 'bad token'
+      ? 'unpaired'
+      : result.error || result.alone
+        ? 'off'
+        : 'paired';
+  if (!menuPanel.hidden) showMenu();
   if (!result || result.error === 'bad token') {
     pairingScreen();
     return;
@@ -310,8 +325,91 @@ async function load() {
   renderOffers(offers || []);
   render(result.entries || [], tab, result.alone === true);
   neverSwitch(result.never === true, tab);
-  autoSaveSwitch(result.autoSave === true);
-  if (result.alone) aloneFooter();
+  autoSaveOn = result.autoSave === true;
+}
+
+// ---------- the menu: where the logins come from, and switching that ----------
+
+const menuButton = document.getElementById('menu');
+const menuPanel = document.getElementById('menu-panel');
+menuButton.title = t('menu');
+
+function closeMenu() {
+  menuPanel.hidden = true;
+  menuButton.classList.remove('open');
+}
+
+async function useDrive() {
+  closeMenu();
+  message(t('connecting'));
+  const result = await api.runtime.sendMessage({ type: 'alone-connect' });
+  if (result && result.ok) unlockScreen();
+  else message((result && result.error) || t('driveNotConnected'));
+}
+
+menuButton.onclick = () => (menuPanel.hidden ? showMenu() : closeMenu());
+
+async function showMenu() {
+  const { token } = await api.storage.local.get('token');
+  const drive = ((await api.runtime.sendMessage({ type: 'alone' })) || {}).state || 'none';
+  menuPanel.innerHTML = '';
+  const state = (text) => {
+    const line = document.createElement('div');
+    line.className = 'state';
+    line.textContent = text;
+    menuPanel.append(line);
+  };
+  const item = (text, action) => {
+    const button = document.createElement('button');
+    button.className = 'item';
+    button.textContent = text;
+    button.onclick = async () => {
+      closeMenu();
+      await action();
+    };
+    menuPanel.append(button);
+  };
+  const unpair = async () => {
+    await api.storage.local.remove('token');
+    load();
+  };
+
+  if (drive === 'open') state(t('statusDriveOpen'));
+  else if (drive === 'locked') state(t('statusDriveLocked'));
+  else if (appState === 'paired') state(t('statusPaired'));
+  else if (appState === 'unpaired') state(t('statusUnpaired'));
+  else if (appState === 'off') state(token ? t('statusPairedOff') : t('notRunning'));
+
+  if (token) {
+    item(t('pairAgain'), pairingScreen);
+    item(t('unpair'), unpair);
+  } else if (drive === 'none') {
+    item(t('pairApp'), pairingScreen);
+  }
+  if (drive === 'none') {
+    item(token ? t('useDriveInstead') : t('useDriveVault'), async () => {
+      // The app is asked first while paired, so the vault from Drive needs the pairing gone.
+      await api.storage.local.remove('token');
+      await useDrive();
+    });
+  } else {
+    if (drive === 'open') {
+      item(t('lockVault'), async () => {
+        await api.runtime.sendMessage({ type: 'alone-lock' });
+        load();
+      });
+    } else {
+      item(t('unlockDriveVault'), unlockScreen);
+    }
+    item(t('disconnectDrive'), async () => {
+      await api.runtime.sendMessage({ type: 'alone-disconnect' });
+      load();
+    });
+  }
+  if (autoSaveOn !== null) menuPanel.append(autoSaveSwitch(autoSaveOn));
+
+  menuPanel.hidden = false;
+  menuButton.classList.add('open');
 }
 
 // No Keyhold app on this computer: the vault can come from Google Drive instead.
@@ -407,21 +505,6 @@ function unlockScreen() {
   input.focus();
 }
 
-function aloneFooter() {
-  const row = document.createElement('div');
-  row.className = 'alone';
-  const text = document.createElement('span');
-  text.textContent = t('vaultFromDrive');
-  const lock = document.createElement('button');
-  lock.textContent = t('lock');
-  lock.onclick = async () => {
-    await api.runtime.sendMessage({ type: 'alone-lock' });
-    load();
-  };
-  row.append(text, lock);
-  content.append(row);
-}
-
 function autoSaveSwitch(on) {
   const row = document.createElement('label');
   row.className = 'switch';
@@ -429,11 +512,14 @@ function autoSaveSwitch(on) {
   const box = document.createElement('input');
   box.type = 'checkbox';
   box.checked = on;
-  box.onchange = () => api.runtime.sendMessage({ type: 'autosave', on: box.checked });
+  box.onchange = () => {
+    autoSaveOn = box.checked;
+    api.runtime.sendMessage({ type: 'autosave', on: box.checked });
+  };
   const text = document.createElement('span');
   text.textContent = t('autoSave');
   row.append(box, text);
-  content.append(row);
+  return row;
 }
 
 // The struck-through lock by the title: saving off (or back on) for this site.

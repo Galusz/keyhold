@@ -12,7 +12,7 @@
     "message": "Allow"
   },
   "pairingHint": {
-    "message": "Open Keyhold, click the puzzle icon and paste the pairing token here."
+    "message": "Open Keyhold, choose Menu → Browser extension and paste the pairing token here."
   },
   "pairingToken": {
     "message": "Pairing token"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Disconnect Google Drive"
-  },
-  "vaultFromDrive": {
-    "message": "Vault from Google Drive"
-  },
-  "lock": {
-    "message": "Lock"
   },
   "autoSaveHint": {
     "message": "When a login clearly works, Keyhold keeps it straight away"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "No vault in your Google Drive opens with this password"
+  },
+  "menu": {
+    "message": "Menu"
+  },
+  "statusPaired": {
+    "message": "Connected to the Keyhold app on this computer."
+  },
+  "statusUnpaired": {
+    "message": "The Keyhold app runs here but is not paired yet."
+  },
+  "statusPairedOff": {
+    "message": "Paired with the Keyhold app, but it is not running now."
+  },
+  "statusDriveOpen": {
+    "message": "Vault from Google Drive: open."
+  },
+  "statusDriveLocked": {
+    "message": "Vault from Google Drive: locked."
+  },
+  "pairApp": {
+    "message": "Pair with the Keyhold app"
+  },
+  "unpair": {
+    "message": "Unpair from the app"
+  },
+  "useDriveInstead": {
+    "message": "Use my vault from Google Drive instead"
+  },
+  "lockVault": {
+    "message": "Lock the vault"
+  },
+  "unlockDriveVault": {
+    "message": "Unlock the vault from Google Drive"
   }
 }

@@ -12,7 +12,7 @@
     "message": "許可"
   },
   "pairingHint": {
-    "message": "Keyhold を開き、パズルのアイコンをクリックして、ペアリングトークンをここに貼り付けてください。"
+    "message": "Keyhold を開き、「メニュー → ブラウザ拡張機能」を選んで、ペアリングトークンをここに貼り付けます。"
   },
   "pairingToken": {
     "message": "ペアリングトークン"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Google Drive との接続を解除"
-  },
-  "vaultFromDrive": {
-    "message": "Google Drive の保管庫"
-  },
-  "lock": {
-    "message": "ロック"
   },
   "autoSaveHint": {
     "message": "ログインの成功が明らかな場合、Keyhold がすぐに保存します"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "このパスワードで開ける保管庫は Google Drive にありません"
+  },
+  "menu": {
+    "message": "メニュー"
+  },
+  "statusPaired": {
+    "message": "このパソコンの Keyhold アプリに接続しています。"
+  },
+  "statusUnpaired": {
+    "message": "Keyhold アプリはここで動いていますが、まだペアリングされていません。"
+  },
+  "statusPairedOff": {
+    "message": "Keyhold アプリとペアリング済みですが、今は動いていません。"
+  },
+  "statusDriveOpen": {
+    "message": "Google Drive の保管庫：開いています。"
+  },
+  "statusDriveLocked": {
+    "message": "Google Drive の保管庫：ロック中です。"
+  },
+  "pairApp": {
+    "message": "Keyhold アプリとペアリング"
+  },
+  "unpair": {
+    "message": "アプリとのペアリングを解除"
+  },
+  "useDriveInstead": {
+    "message": "代わりに Google Drive の保管庫を使う"
+  },
+  "lockVault": {
+    "message": "保管庫をロック"
+  },
+  "unlockDriveVault": {
+    "message": "Google Drive の保管庫のロックを解除"
   }
 }

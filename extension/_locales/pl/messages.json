@@ -12,7 +12,7 @@
     "message": "Zezwól"
   },
   "pairingHint": {
-    "message": "Otwórz Keyhold, kliknij ikonę puzzla i wklej tu token parowania."
+    "message": "Otwórz Keyhold, wybierz Menu → Rozszerzenie przeglądarki i wklej tu token parowania."
   },
   "pairingToken": {
     "message": "Token parowania"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Rozłącz Google Drive"
-  },
-  "vaultFromDrive": {
-    "message": "Sejf z Google Drive"
-  },
-  "lock": {
-    "message": "Zablokuj"
   },
   "autoSaveHint": {
     "message": "Gdy dane logowania na pewno działają, Keyhold od razu je zapisuje"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "Żaden sejf na Twoim Dysku Google nie otwiera się tym hasłem"
+  },
+  "menu": {
+    "message": "Menu"
+  },
+  "statusPaired": {
+    "message": "Połączono z aplikacją Keyhold na tym komputerze."
+  },
+  "statusUnpaired": {
+    "message": "Aplikacja Keyhold działa tutaj, ale nie jest jeszcze sparowana."
+  },
+  "statusPairedOff": {
+    "message": "Sparowano z aplikacją Keyhold, ale teraz nie działa."
+  },
+  "statusDriveOpen": {
+    "message": "Sejf z Google Drive: otwarty."
+  },
+  "statusDriveLocked": {
+    "message": "Sejf z Google Drive: zablokowany."
+  },
+  "pairApp": {
+    "message": "Sparuj z aplikacją Keyhold"
+  },
+  "unpair": {
+    "message": "Rozłącz z aplikacją"
+  },
+  "useDriveInstead": {
+    "message": "Użyj zamiast tego sejfu z Google Drive"
+  },
+  "lockVault": {
+    "message": "Zablokuj sejf"
+  },
+  "unlockDriveVault": {
+    "message": "Odblokuj sejf z Google Drive"
   }
 }

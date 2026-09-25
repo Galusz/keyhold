@@ -12,7 +12,7 @@
     "message": "允许"
   },
   "pairingHint": {
-    "message": "打开 Keyhold，点击拼图图标，然后将配对令牌粘贴到这里。"
+    "message": "打开 Keyhold，选择“菜单 → 浏览器扩展程序”，然后将配对令牌粘贴到这里。"
   },
   "pairingToken": {
     "message": "配对令牌"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "断开 Google Drive"
-  },
-  "vaultFromDrive": {
-    "message": "来自 Google Drive 的密码库"
-  },
-  "lock": {
-    "message": "锁定"
   },
   "autoSaveHint": {
     "message": "登录明显成功时，Keyhold 会立即保存"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "您的 Google Drive 中没有能用此密码打开的密码库"
+  },
+  "menu": {
+    "message": "菜单"
+  },
+  "statusPaired": {
+    "message": "已连接到这台电脑上的 Keyhold 应用。"
+  },
+  "statusUnpaired": {
+    "message": "Keyhold 应用正在此运行，但尚未配对。"
+  },
+  "statusPairedOff": {
+    "message": "已与 Keyhold 应用配对，但它现在没有运行。"
+  },
+  "statusDriveOpen": {
+    "message": "来自 Google Drive 的密码库：已打开。"
+  },
+  "statusDriveLocked": {
+    "message": "来自 Google Drive 的密码库：已锁定。"
+  },
+  "pairApp": {
+    "message": "与 Keyhold 应用配对"
+  },
+  "unpair": {
+    "message": "取消与应用的配对"
+  },
+  "useDriveInstead": {
+    "message": "改用 Google Drive 中的密码库"
+  },
+  "lockVault": {
+    "message": "锁定密码库"
+  },
+  "unlockDriveVault": {
+    "message": "解锁来自 Google Drive 的密码库"
   }
 }

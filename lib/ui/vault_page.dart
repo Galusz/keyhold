@@ -12,7 +12,6 @@ import '../core/autotype.dart';
 import '../core/bridge.dart';
 import '../core/drive.dart';
 import '../core/favicons.dart';
-import '../core/importers.dart';
 import '../core/storage.dart';
 import '../core/totp.dart';
 import '../core/watch.dart';
@@ -1154,54 +1153,8 @@ class _VaultPageState extends State<VaultPage> {
     return t.daysAgo(diff.inDays);
   }
 
-  /// A backup copy (from a folder, a pendrive, a year ago) opened only to look
-  /// inside; single entries can be taken back. The vault itself stays as it is.
-  Future<void> _openCopy(Uint8List bytes, String name) async {
-    var copy = await _store.openCopy(bytes);
-    if (copy == null) {
-      final password = await _askCopyPassword();
-      if (password == null) return;
-      copy = await _store.openCopy(bytes, password);
-    }
-    if (copy == null) {
-      _toast(t.copyNotOpened);
-      return;
-    }
-    if (!mounted) return;
-    await _take(await Navigator.of(context).push(MaterialPageRoute<List<VaultEntry>>(
-      builder: (_) => CopyPage(
-        title: t.copyTitle(name),
-        hint: t.copyReadOnly,
-        entries: entriesOf(copy!),
-        vault: _vault,
-        ticked: false,
-      ),
-    )));
-  }
-
-  Future<String?> _askCopyPassword() {
-    final field = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(t.copyPasswordTitle),
-        content: SizedBox(
-          width: 380,
-          child: TextField(
-            controller: field,
-            obscureText: true,
-            autofocus: true,
-            decoration: InputDecoration(labelText: t.masterPassword, helperText: t.orRecoveryCode, helperMaxLines: 2),
-            onSubmitted: (v) => Navigator.pop(context, v),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(context, field.text), child: Text(t.open)),
-        ],
-      ),
-    ).whenComplete(field.dispose);
-  }
+  Future<void> _openCopy(Uint8List bytes, String name) async =>
+      _take(await reviewCopy(context, _store, _vault, bytes, name));
 
   Future<void> _openBackup() async {
     await Navigator.of(context).push(

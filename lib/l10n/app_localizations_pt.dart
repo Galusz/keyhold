@@ -1394,4 +1394,21 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get importNoExport =>
       'Microsoft Authenticator e Authy não deixam os códigos saírem: ative de novo a verificação em duas etapas em cada serviço e leia o novo QR code.';
+
+  @override
+  String get foldersOnPhone => 'Pastas neste telefone';
+
+  @override
+  String get phoneFoldersHint =>
+      'Escolha uma pasta do telefone, do cartão de memória ou de um app como Nextcloud ou OneDrive que deixe o Android salvar lá.';
+
+  @override
+  String get copiesPlaces => 'Pastas e seu servidor';
+
+  @override
+  String get shareVaultCopy => 'Compartilhar uma cópia do cofre';
+
+  @override
+  String get shareVaultHint =>
+      'Você também pode enviar o arquivo por e-mail ou guardá-lo em Arquivos: ele só abre com a senha mestra ou a chave de recuperação.';
 }

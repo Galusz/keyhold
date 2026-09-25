@@ -12,7 +12,7 @@
     "message": "Erlauben"
   },
   "pairingHint": {
-    "message": "Keyhold öffnen, auf das Puzzle-Symbol klicken und das Kopplungstoken hier einfügen."
+    "message": "Öffne Keyhold, wähle Menü → Browsererweiterung und füge hier das Kopplungstoken ein."
   },
   "pairingToken": {
     "message": "Kopplungstoken"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Google Drive trennen"
-  },
-  "vaultFromDrive": {
-    "message": "Tresor aus Google Drive"
-  },
-  "lock": {
-    "message": "Sperren"
   },
   "autoSaveHint": {
     "message": "Wenn Zugangsdaten eindeutig funktionieren, speichert Keyhold sie sofort"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "Kein Tresor in deinem Google Drive lässt sich mit diesem Passwort öffnen"
+  },
+  "menu": {
+    "message": "Menü"
+  },
+  "statusPaired": {
+    "message": "Mit der Keyhold-App auf diesem Computer verbunden."
+  },
+  "statusUnpaired": {
+    "message": "Die Keyhold-App läuft hier, ist aber noch nicht gekoppelt."
+  },
+  "statusPairedOff": {
+    "message": "Mit der Keyhold-App gekoppelt, aber sie läuft gerade nicht."
+  },
+  "statusDriveOpen": {
+    "message": "Tresor aus Google Drive: offen."
+  },
+  "statusDriveLocked": {
+    "message": "Tresor aus Google Drive: gesperrt."
+  },
+  "pairApp": {
+    "message": "Mit der Keyhold-App koppeln"
+  },
+  "unpair": {
+    "message": "Von der App trennen"
+  },
+  "useDriveInstead": {
+    "message": "Stattdessen meinen Tresor aus Google Drive nutzen"
+  },
+  "lockVault": {
+    "message": "Tresor sperren"
+  },
+  "unlockDriveVault": {
+    "message": "Tresor aus Google Drive entsperren"
   }
 }

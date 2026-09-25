@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The vault copy handed to another app to send or keep; nothing else is shared. -->
+<paths>
+    <cache-path name="share" path="share/" />
+</paths>

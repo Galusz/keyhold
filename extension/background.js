@@ -3,6 +3,16 @@ if (typeof importScripts === 'function') importScripts('lib/argon2.umd.min.js', 
 
 const api = globalThis.browser ?? chrome;
 const BRIDGE = 'http://127.0.0.1:19919';
+// Keyhold on this computer answers a question within milliseconds, while
+// Windows takes seconds to give up on a closed port: an app that is off counts
+// as off at once. Saving waits longer, as the app copies the vault to its backups.
+const APP_WAIT = 200;
+const SAVE_WAIT = 30 * 1000;
+const QUESTIONS = ['/lookup', '/codes', '/fill', '/code', '/entry'];
+// An app that did not answer is not asked again for a while: every question of
+// a page or the popup would wait out the limit again.
+const APP_RETRY = 20 * 1000;
+let appDownUntil = 0;
 const session = api.storage.session;
 const USER_TTL = 10 * 60 * 1000;
 const VERDICT_WAIT = 8 * 1000;
@@ -24,9 +34,11 @@ async function call(path, body) {
 }
 
 async function appAnswers() {
+  if (Date.now() < appDownUntil) return false;
   try {
-    return (await fetch(`${BRIDGE}/lookup`, { method: 'POST' })).status === 401;
+    return (await fetch(`${BRIDGE}/lookup`, { method: 'POST', signal: AbortSignal.timeout(APP_WAIT) })).status === 401;
   } catch (e) {
+    appDownUntil = Date.now() + APP_RETRY;
     return false;
   }
 }
@@ -34,18 +46,21 @@ async function appAnswers() {
 async function callApp(path, body) {
   const { token } = await api.storage.local.get('token');
   if (!token) return { error: 'no token' };
+  if (Date.now() < appDownUntil) return { error: 'app offline' };
 
   try {
     const response = await fetch(BRIDGE + path, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-keyhold-token': token },
       body: JSON.stringify(body || {}),
+      signal: AbortSignal.timeout(QUESTIONS.includes(path) ? APP_WAIT : SAVE_WAIT),
     });
     if (!response.ok) {
       return { error: response.status === 401 ? 'bad token' : 'app error' };
     }
     return await response.json();
   } catch (e) {
+    appDownUntil = Date.now() + APP_RETRY;
     return { error: 'app offline' };
   }
 }

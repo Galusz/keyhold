@@ -12,7 +12,7 @@
     "message": "Consenti"
   },
   "pairingHint": {
-    "message": "Apri Keyhold, fai clic sull'icona del puzzle e incolla qui il token di abbinamento."
+    "message": "Apri Keyhold, scegli Menu → Estensione del browser e incolla qui il token di abbinamento."
   },
   "pairingToken": {
     "message": "Token di abbinamento"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Disconnetti Google Drive"
-  },
-  "vaultFromDrive": {
-    "message": "Cassaforte da Google Drive"
-  },
-  "lock": {
-    "message": "Blocca"
   },
   "autoSaveHint": {
     "message": "Quando le credenziali funzionano di sicuro, Keyhold le salva subito"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "Nessuna cassaforte nel tuo Google Drive si apre con questa password"
+  },
+  "menu": {
+    "message": "Menu"
+  },
+  "statusPaired": {
+    "message": "Collegato all’app Keyhold di questo computer."
+  },
+  "statusUnpaired": {
+    "message": "L’app Keyhold è in esecuzione qui, ma non è ancora abbinata."
+  },
+  "statusPairedOff": {
+    "message": "Abbinato all’app Keyhold, ma ora non è in esecuzione."
+  },
+  "statusDriveOpen": {
+    "message": "Cassaforte da Google Drive: aperta."
+  },
+  "statusDriveLocked": {
+    "message": "Cassaforte da Google Drive: bloccata."
+  },
+  "pairApp": {
+    "message": "Abbina all’app Keyhold"
+  },
+  "unpair": {
+    "message": "Scollega dall’app"
+  },
+  "useDriveInstead": {
+    "message": "Usa invece la mia cassaforte da Google Drive"
+  },
+  "lockVault": {
+    "message": "Blocca la cassaforte"
+  },
+  "unlockDriveVault": {
+    "message": "Sblocca la cassaforte da Google Drive"
   }
 }

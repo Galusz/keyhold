@@ -22,6 +22,8 @@ open class AutofillActivity : FlutterFragmentActivity() {
         super.configureFlutterEngine(flutterEngine)
         Keystore.register(flutterEngine)
         Fingerprint.register(this, flutterEngine)
+        // A login kept from here is saved here, and its backup copies too.
+        Folders.register(this, flutterEngine)
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/autofill")
             .setMethodCallHandler { call, result ->

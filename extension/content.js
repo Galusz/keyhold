@@ -139,11 +139,7 @@ async function scan() {
       input.style.setProperty('background-repeat', 'no-repeat', 'important');
       input.style.setProperty('background-position', 'right 8px center', 'important');
       input.style.setProperty('background-size', '18px 18px', 'important');
-      // A hand over the icon, so it reads as something to click.
-      input.addEventListener('mousemove', (e) => {
-        const onIcon = e.clientX > input.getBoundingClientRect().right - 34;
-        input.style.cursor = onIcon ? 'pointer' : '';
-      });
+      withIcon.add(input);
     }
     input.addEventListener('mousedown', (e) => e.isTrusted && openMenu(input));
     // Only the user's own keys: a page must not open the list and pick from it.
@@ -152,6 +148,57 @@ async function scan() {
     });
   }
 }
+
+// ---------- the icon in the field ----------
+
+// The icon is found by where the mouse is: many pages lay a label or a
+// wrapper over their fields, which would get the hand and the click instead.
+const withIcon = new Set();
+
+function iconAt(x, y) {
+  for (const input of withIcon) {
+    if (!input.isConnected) {
+      withIcon.delete(input);
+      continue;
+    }
+    const r = input.getBoundingClientRect();
+    if (y >= r.top && y <= r.bottom && x <= r.right && x > r.right - 34) return input;
+  }
+  return null;
+}
+
+// A hand over the icon, so it reads as something to click; the page's own cursor comes back after.
+let pointed = null;
+document.addEventListener(
+  'mousemove',
+  (e) => {
+    const under = e.composedPath()[0];
+    const onIcon = withIcon.size > 0 && iconAt(e.clientX, e.clientY) && under instanceof HTMLElement;
+    if (pointed && (!onIcon || pointed.element !== under)) {
+      pointed.element.style.setProperty('cursor', pointed.value, pointed.priority);
+      pointed = null;
+    }
+    if (onIcon && !pointed) {
+      pointed = { element: under, value: under.style.getPropertyValue('cursor'), priority: under.style.getPropertyPriority('cursor') };
+      under.style.setProperty('cursor', 'pointer', 'important');
+    }
+  },
+  true
+);
+
+document.addEventListener(
+  'mousedown',
+  (e) => {
+    if (!e.isTrusted || withIcon.size === 0) return;
+    const input = iconAt(e.clientX, e.clientY);
+    if (!input) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    input.focus();
+    openMenu(input);
+  },
+  true
+);
 
 let scanTimer = 0;
 rescan = () => {

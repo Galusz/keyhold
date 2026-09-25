@@ -68,6 +68,20 @@
         padding: 2px 6px;
       }
       .muted { color: #8aa79f; font-size: 13px; line-height: 1.5; }
+      .tools { display: flex; align-items: center; gap: 4px; }
+      #menu {
+        margin: 0; padding: 2px 9px; background: transparent; color: #8aa79f; font-size: 18px; line-height: 1;
+        border: 1px solid transparent; border-radius: 6px;
+      }
+      #menu:hover, #menu.open { color: #e8f5f1; border-color: #2c4740; }
+      #menu-panel { background: #1b2a26; border-radius: 8px; padding: 8px; margin: 0 0 10px; }
+      #menu-panel .state { font-size: 12px; color: #9fe1cb; padding: 2px 6px 6px; line-height: 1.4; }
+      #menu-panel .item {
+        display: block; width: 100%; text-align: left; margin: 0; padding: 7px 6px;
+        background: transparent; color: #e8f5f1; font-weight: 400; border-radius: 6px;
+      }
+      #menu-panel .item:hover { background: #24382f; }
+      #menu-panel .switch { margin: 2px 0 0; padding: 6px; }
       .small { font-size: 12px; }
       .with-eye { position: relative; }
       .with-eye input { padding-right: 40px; }
@@ -78,11 +92,6 @@
       .eye:hover { color: #e8f5f1; }
       input::-ms-reveal { display: none; }
       .link { display: block; margin-top: 10px; color: #8aa79f; font-size: 12px; }
-      .alone {
-        display: flex; align-items: center; justify-content: space-between; gap: 8px;
-        margin-top: 10px; padding: 0 10px; font-size: 12px; color: #8aa79f;
-      }
-      .alone button { margin: 0; padding: 4px 10px; font-size: 12px; }
       input {
         width: 100%;
         box-sizing: border-box;
@@ -108,8 +117,12 @@
   <body>
     <header>
       <h1>Keyhold</h1>
-      <button id="never" hidden><img src="icons/stop32.png" alt="" /></button>
+      <div class="tools">
+        <button id="never" hidden><img src="icons/stop32.png" alt="" /></button>
+        <button id="menu">⋮</button>
+      </div>
     </header>
+    <div id="menu-panel" hidden></div>
     <div id="content" class="muted">Looking for matches…</div>
     <script src="popup.js"></script>
   </body>

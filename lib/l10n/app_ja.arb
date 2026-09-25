@@ -364,5 +364,10 @@
   "importPasswordsList": "Chrome、Edge、Firefox、Safari（CSV）、Bitwarden（CSV または JSON）、1Password（.1pux または CSV）、KeePass と KeePassXC（.kdbx または CSV）、LastPass、Proton Pass、NordPass、Dashlane（CSV）、別の Keyhold 保管庫（.khd）。",
   "importCodesFrom": "2 段階認証コード",
   "importCodesList": "Aegis（.json）、2FAS（.2fas）、Ente Auth、FreeOTP+、andOTP、otpauth:// リンクを含むファイル。Google Authenticator：エクスポート用 QR コードを表示し、Keyhold の QR コードボタンを使います。",
-  "importNoExport": "Microsoft Authenticator と Authy はコードをエクスポートできません。各サービスで 2 段階認証をもう一度有効にし、新しい QR コードをスキャンしてください。"
+  "importNoExport": "Microsoft Authenticator と Authy はコードをエクスポートできません。各サービスで 2 段階認証をもう一度有効にし、新しい QR コードをスキャンしてください。",
+  "foldersOnPhone": "このスマートフォンのフォルダ",
+  "phoneFoldersHint": "スマートフォン本体、メモリーカード、または Nextcloud や OneDrive など Android から保存できるアプリのフォルダを選んでください。",
+  "copiesPlaces": "フォルダと自分のサーバー",
+  "shareVaultCopy": "保管庫のコピーを共有",
+  "shareVaultHint": "保管庫ファイルはメールで送ったり「ファイル」に保存したりできます。開けるのはマスターパスワードかリカバリーキーだけです。"
 }

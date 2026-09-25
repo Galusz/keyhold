@@ -1,9 +1,11 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
+import '../core/backup.dart';
 import '../core/remote.dart';
 import '../core/storage.dart';
 import '../l10n/l10n.dart';
@@ -70,6 +72,12 @@ class _BackupPageState extends State<BackupPage> {
   );
 
   Future<void> _addFolder() async {
+    // On a phone the folder comes from Android's own folder window.
+    if (Platform.isAndroid) {
+      final tree = await PhoneFolderPlace.pick();
+      if (tree != null && !_folders.contains(tree)) setState(() => _folders.add(tree));
+      return;
+    }
     final path = await getDirectoryPath();
     if (path == null || _folders.contains(path)) return;
     setState(() => _folders.add(path));
@@ -98,9 +106,25 @@ class _BackupPageState extends State<BackupPage> {
     if (bring == true) await widget.onOpenCopy(bytes, newest.uri.pathSegments.last);
   }
 
+  /// On a phone: the vault file to mail, send or keep anywhere. It opens only
+  /// with the master password or the recovery key.
+  Future<void> _shareCopy() async {
+    final vault = await widget.store.load();
+    final stamp = DateTime.now().toIso8601String().substring(0, 10);
+    final name = (vault.name.isEmpty ? t.myVault : vault.name).replaceAll(RegExp(r'[\\/:*?"<>|]'), '');
+    final dir = Directory('${(await getTemporaryDirectory()).path}${Platform.pathSeparator}share')..createSync(recursive: true);
+    for (final old in dir.listSync()) {
+      old.deleteSync();
+    }
+    final file = File('${dir.path}${Platform.pathSeparator}Keyhold-$name-$stamp.khd');
+    await File(widget.store.vaultPath).copy(file.path);
+    await const MethodChannel('keyhold/share').invokeMethod('share', {'path': file.path, 'title': t.shareVaultCopy});
+  }
+
   Future<void> _openCopyFile() async {
     const type = XTypeGroup(label: 'Keyhold', extensions: ['khd']);
-    final file = await openFile(acceptedTypeGroups: const [type]);
+    // Android knows no type for .khd files: any file can be picked there.
+    final file = await openFile(acceptedTypeGroups: Platform.isAndroid ? const [] : const [type]);
     if (file == null) return;
     await widget.onOpenCopy(await file.readAsBytes(), file.name);
   }
@@ -135,7 +159,15 @@ class _BackupPageState extends State<BackupPage> {
   Future<void> _pickKey() async {
     final file = await openFile();
     if (file == null) return;
-    setState(() => _key.text = file.path);
+    if (!Platform.isAndroid) {
+      setState(() => _key.text = file.path);
+      return;
+    }
+    // A picked file on a phone is only lent for a moment: Keyhold keeps its own copy of the key.
+    final base = await getApplicationSupportDirectory();
+    final kept = File('${base.path}${Platform.pathSeparator}keyhold${Platform.pathSeparator}server-key');
+    await kept.writeAsBytes(await file.readAsBytes(), flush: true);
+    setState(() => _key.text = kept.path);
   }
 
   Future<void> _test() async {
@@ -204,7 +236,12 @@ class _BackupPageState extends State<BackupPage> {
   }
 
   void _save() {
-    widget.store.backup
+    final backup = widget.store.backup;
+    // A phone folder taken off the list gives back Keyhold's right to write there.
+    for (final gone in backup.targets.where((t) => !_folders.contains(t) && PhoneFolderPlace.owns(t))) {
+      PhoneFolderPlace.release(gone);
+    }
+    backup
       ..targets = _folders
       ..remote = _collect()
       ..saveSettings();
@@ -228,7 +265,7 @@ class _BackupPageState extends State<BackupPage> {
         children: [
           _section(
             icon: Icons.folder_copy_outlined,
-            title: t.foldersOnComputer,
+            title: Platform.isAndroid ? t.foldersOnPhone : t.foldersOnComputer,
             state: _folders.isEmpty
                 ? t.off
                 : widget.store.backup.status.at == null
@@ -251,7 +288,7 @@ class _BackupPageState extends State<BackupPage> {
 
   List<Widget> _folderSection(ThemeData theme) => [
     Text(
-      t.foldersSlotsHint,
+      Platform.isAndroid ? '${t.foldersSlotsHint} ${t.phoneFoldersHint} ${t.shareVaultHint}' : t.foldersSlotsHint,
       style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
     ),
     const SizedBox(height: 12),
@@ -274,6 +311,12 @@ class _BackupPageState extends State<BackupPage> {
           icon: const Icon(Icons.add),
           label: Text(t.addFolder),
         ),
+        if (Platform.isAndroid)
+          OutlinedButton.icon(
+            onPressed: _shareCopy,
+            icon: const Icon(Icons.share_outlined),
+            label: Text(t.shareVaultCopy),
+          ),
         OutlinedButton.icon(
           onPressed: _openCopyFile,
           icon: const Icon(Icons.visibility_outlined),
@@ -347,7 +390,8 @@ class _BackupPageState extends State<BackupPage> {
 
   Widget _folderRow(String path) {
     final theme = Theme.of(context);
-    final reachable = Directory(path).existsSync();
+    final phone = PhoneFolderPlace.owns(path);
+    final reachable = phone || Directory(path).existsSync();
 
     return ListTile(
       dense: true,
@@ -356,7 +400,7 @@ class _BackupPageState extends State<BackupPage> {
         reachable ? Icons.folder_outlined : Icons.folder_off_outlined,
         color: reachable ? null : theme.colorScheme.error,
       ),
-      title: Text(path, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(phone ? PhoneFolderPlace.label(path) : path, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: reachable
           ? null
           : Text(t.notReachable, style: TextStyle(color: theme.colorScheme.error)),

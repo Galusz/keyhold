@@ -1404,4 +1404,21 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get importNoExport =>
       'Microsoft Authenticator et Authy ne laissent pas sortir les codes : réactivez la double authentification sur chaque service et scannez son nouveau QR code.';
+
+  @override
+  String get foldersOnPhone => 'Dossiers sur ce téléphone';
+
+  @override
+  String get phoneFoldersHint =>
+      'Choisissez un dossier du téléphone, de la carte mémoire ou d’une app comme Nextcloud ou OneDrive qui laisse Android y enregistrer.';
+
+  @override
+  String get copiesPlaces => 'Dossiers et votre serveur';
+
+  @override
+  String get shareVaultCopy => 'Partager une copie du coffre-fort';
+
+  @override
+  String get shareVaultHint =>
+      'Vous pouvez aussi envoyer le fichier par e-mail ou le garder dans Fichiers : il ne s’ouvre qu’avec le mot de passe principal ou la clé de récupération.';
 }

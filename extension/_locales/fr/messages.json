@@ -12,7 +12,7 @@
     "message": "Autoriser"
   },
   "pairingHint": {
-    "message": "Ouvrez Keyhold, cliquez sur l’icône puzzle et collez ici le jeton d’association."
+    "message": "Ouvrez Keyhold, choisissez Menu → Extension de navigateur et collez ici le jeton d’association."
   },
   "pairingToken": {
     "message": "Jeton d’association"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Déconnecter Google Drive"
-  },
-  "vaultFromDrive": {
-    "message": "Coffre-fort de Google Drive"
-  },
-  "lock": {
-    "message": "Verrouiller"
   },
   "autoSaveHint": {
     "message": "Quand un identifiant fonctionne clairement, Keyhold l’enregistre aussitôt"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "Aucun coffre-fort de votre Google Drive ne s’ouvre avec ce mot de passe"
+  },
+  "menu": {
+    "message": "Menu"
+  },
+  "statusPaired": {
+    "message": "Connecté à l’app Keyhold de cet ordinateur."
+  },
+  "statusUnpaired": {
+    "message": "L’app Keyhold tourne ici mais n’est pas encore associée."
+  },
+  "statusPairedOff": {
+    "message": "Associé à l’app Keyhold, mais elle ne tourne pas en ce moment."
+  },
+  "statusDriveOpen": {
+    "message": "Coffre-fort depuis Google Drive : ouvert."
+  },
+  "statusDriveLocked": {
+    "message": "Coffre-fort depuis Google Drive : verrouillé."
+  },
+  "pairApp": {
+    "message": "Associer à l’app Keyhold"
+  },
+  "unpair": {
+    "message": "Dissocier de l’app"
+  },
+  "useDriveInstead": {
+    "message": "Utiliser plutôt mon coffre-fort depuis Google Drive"
+  },
+  "lockVault": {
+    "message": "Verrouiller le coffre-fort"
+  },
+  "unlockDriveVault": {
+    "message": "Déverrouiller le coffre-fort depuis Google Drive"
   }
 }

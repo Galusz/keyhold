@@ -1,7 +1,83 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
 import 'remote.dart';
+
+/// A place that keeps copies of the vault: a folder on this computer, a
+/// folder picked on the phone, or the user's own server.
+abstract class CopyPlace {
+  /// The files there and when each was written; null when the place does not tell.
+  Future<Map<String, DateTime?>> files();
+  Future<void> move(String from, String to);
+  Future<void> write(String name, Uint8List bytes);
+  Future<void> delete(String name);
+}
+
+class FolderPlace implements CopyPlace {
+  FolderPlace(this.dir);
+
+  final Directory dir;
+
+  String _path(String name) => '${dir.path}${Platform.pathSeparator}$name';
+
+  @override
+  Future<Map<String, DateTime?>> files() async {
+    dir.createSync(recursive: true);
+    return {for (final f in dir.listSync().whereType<File>()) f.uri.pathSegments.last: f.lastModifiedSync()};
+  }
+
+  @override
+  Future<void> move(String from, String to) async => File(_path(from)).renameSync(_path(to));
+
+  @override
+  Future<void> write(String name, Uint8List bytes) => File(_path(name)).writeAsBytes(bytes, flush: true);
+
+  @override
+  Future<void> delete(String name) async => File(_path(name)).deleteSync();
+}
+
+/// A folder picked on the phone in Android's own folder window; reached
+/// through Android, not through a path.
+class PhoneFolderPlace implements CopyPlace {
+  PhoneFolderPlace(this.tree);
+
+  final String tree;
+
+  static const _channel = MethodChannel('keyhold/folders');
+
+  static bool owns(String target) => target.startsWith('content://');
+
+  static Future<String?> pick() => _channel.invokeMethod<String>('pick');
+
+  static Future<void> release(String tree) => _channel.invokeMethod('release', {'tree': tree});
+
+  /// The folder as the user knows it: its path in the phone or on the card.
+  static String label(String tree) {
+    final id = Uri.decodeComponent(tree.split('/tree/').last);
+    final colon = id.indexOf(':');
+    if (colon < 0) return id;
+    final path = id.substring(colon + 1);
+    return path.isEmpty ? id.substring(0, colon) : path;
+  }
+
+  @override
+  Future<Map<String, DateTime?>> files() async {
+    final found = await _channel.invokeMapMethod<String, Object?>('files', {'tree': tree}) ?? {};
+    return found.map((name, ms) => MapEntry(name, ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms as int)));
+  }
+
+  @override
+  Future<void> move(String from, String to) => _channel.invokeMethod('move', {'tree': tree, 'from': from, 'to': to});
+
+  @override
+  Future<void> write(String name, Uint8List bytes) =>
+      _channel.invokeMethod('write', {'tree': tree, 'name': name, 'bytes': bytes});
+
+  @override
+  Future<void> delete(String name) => _channel.invokeMethod('delete', {'tree': tree, 'name': name});
+}
 
 class BackupStatus {
   BackupStatus({required this.at, required this.targets, required this.errors});
@@ -63,6 +139,35 @@ class BackupService {
   /// an empty slot fills straight away.
   static bool movesOn(DateTime? held, int slot) =>
       held == null || DateTime.now().difference(held) >= slots[slot].$2;
+
+  static CopyPlace placeFor(String target) =>
+      PhoneFolderPlace.owns(target) ? PhoneFolderPlace(target) : FolderPlace(Directory(target));
+
+  /// Moves each copy one slot on when its slot is due, oldest slots first,
+  /// puts the latest save in the first slot, and drops the dated copies this
+  /// vault made before there were slots. The same in every place.
+  static Future<void> keepCopy(CopyPlace place, String tag, Uint8List bytes) async {
+    final files = await place.files();
+    for (var i = slots.length - 1; i >= 1; i--) {
+      final newer = slotName(tag, i - 1);
+      if (!files.containsKey(newer)) continue;
+      final slot = slotName(tag, i);
+      // A place that does not tell a file's age keeps what it holds.
+      final held = files.containsKey(slot) ? files[slot] ?? DateTime.now() : null;
+      if (!movesOn(held, i)) continue;
+      await place.move(newer, slot);
+      files[slot] = files.remove(newer);
+    }
+    await place.write(slotName(tag, 0), bytes);
+    final dated = RegExp('^vault-$tag-\\d{8}-\\d{4}\\.khd\$');
+    for (final name in files.keys.where(dated.hasMatch)) {
+      try {
+        await place.delete(name);
+      } catch (_) {
+        // a locked file just stays until the next run
+      }
+    }
+  }
 
   /// Folders that get a copy of every save; the user picks them.
   List<String> targets = [];
@@ -153,13 +258,11 @@ class BackupService {
   Future<BackupStatus> run(File vault, String tag) async {
     final done = <String>[];
     final errors = <String>[];
+    final bytes = await vault.readAsBytes();
 
     for (final target in targets) {
       try {
-        final dir = Directory(target);
-        dir.createSync(recursive: true);
-        _rotate(dir, tag);
-        await vault.copy('${dir.path}${Platform.pathSeparator}${slotName(tag, 0)}');
+        await keepCopy(placeFor(target), tag, bytes);
         done.add(target);
       } catch (e) {
         errors.add('$target: $e');
@@ -168,7 +271,7 @@ class BackupService {
 
     if (remote.configured) {
       try {
-        await RemoteClient(remote).backup(vault, tag).timeout(const Duration(seconds: 40));
+        await RemoteClient(remote).backup(bytes, tag).timeout(const Duration(seconds: 40));
         done.add(remote.host);
       } catch (e) {
         errors.add('${remote.host}: $e');
@@ -185,36 +288,14 @@ class BackupService {
   }
 
   /// Removes the copies of one vault from the backup folders; other vaults' copies stay.
-  void deleteCopies(String tag) {
+  Future<void> deleteCopies(String tag) async {
     for (final target in targets) {
-      final dir = Directory(target);
-      if (!dir.existsSync()) continue;
-      for (final f in dir.listSync().whereType<File>()) {
-        final name = f.uri.pathSegments.last;
-        if (name.startsWith('vault-$tag-') && name.endsWith('.khd')) f.deleteSync();
+      if (!PhoneFolderPlace.owns(target) && !Directory(target).existsSync()) continue;
+      final place = placeFor(target);
+      for (final name in (await place.files()).keys) {
+        if (name.startsWith('vault-$tag-') && name.endsWith('.khd')) await place.delete(name);
       }
     }
   }
 
-  /// Moves each copy one slot on when its slot is due, oldest slots first, and
-  /// drops the dated copies this vault made before there were slots.
-  void _rotate(Directory dir, String tag) {
-    final sep = Platform.pathSeparator;
-    for (var i = slots.length - 1; i >= 1; i--) {
-      final newer = File('${dir.path}$sep${slotName(tag, i - 1)}');
-      if (!newer.existsSync()) continue;
-      final slot = File('${dir.path}$sep${slotName(tag, i)}');
-      if (!movesOn(slot.existsSync() ? slot.lastModifiedSync() : null, i)) continue;
-      newer.renameSync(slot.path);
-    }
-    final dated = RegExp('^vault-$tag-\\d{8}-\\d{4}\\.khd\$');
-    for (final f in dir.listSync().whereType<File>()) {
-      if (!dated.hasMatch(f.uri.pathSegments.last)) continue;
-      try {
-        f.deleteSync();
-      } catch (_) {
-        // a locked file just stays until the next run
-      }
-    }
-  }
 }

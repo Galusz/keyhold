@@ -1377,4 +1377,21 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get importNoExport =>
       'Microsoft Authenticator i Authy nie wypuszczają kodów: włącz weryfikację dwuetapową w każdym serwisie jeszcze raz i zeskanuj nowy kod QR.';
+
+  @override
+  String get foldersOnPhone => 'Foldery w telefonie';
+
+  @override
+  String get phoneFoldersHint =>
+      'Wybierz folder w telefonie, na karcie pamięci albo aplikacji takiej jak Nextcloud czy OneDrive, która pozwala Androidowi tam zapisywać.';
+
+  @override
+  String get copiesPlaces => 'Foldery i Twój serwer';
+
+  @override
+  String get shareVaultCopy => 'Udostępnij kopię sejfu';
+
+  @override
+  String get shareVaultHint =>
+      'Plik sejfu możesz też wysłać mailem albo zapisać w Plikach: otwiera się tylko hasłem głównym albo kluczem ratunkowym.';
 }

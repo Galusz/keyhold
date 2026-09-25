@@ -1294,4 +1294,20 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get importNoExport =>
       'Microsoft Authenticator 和 Authy 不允许导出验证码：请在每个服务中重新开启双重验证并扫描新的二维码。';
+
+  @override
+  String get foldersOnPhone => '此手机上的文件夹';
+
+  @override
+  String get phoneFoldersHint =>
+      '选择手机、存储卡中的文件夹，或 Nextcloud、OneDrive 等允许 Android 保存到其中的应用文件夹。';
+
+  @override
+  String get copiesPlaces => '文件夹和您的服务器';
+
+  @override
+  String get shareVaultCopy => '分享密码库副本';
+
+  @override
+  String get shareVaultHint => '您也可以通过邮件发送密码库文件或保存到“文件”中：它只能用主密码或恢复密钥打开。';
 }

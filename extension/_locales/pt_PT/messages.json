@@ -12,7 +12,7 @@
     "message": "Permitir"
   },
   "pairingHint": {
-    "message": "Abra o Keyhold, clique no ícone de quebra-cabeça e cole aqui o token de pareamento."
+    "message": "Abra o Keyhold, escolha Menu → Extensão do navegador e cole aqui o token de pareamento."
   },
   "pairingToken": {
     "message": "Token de pareamento"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Desconectar o Google Drive"
-  },
-  "vaultFromDrive": {
-    "message": "Cofre do Google Drive"
-  },
-  "lock": {
-    "message": "Bloquear"
   },
   "autoSaveHint": {
     "message": "Quando um login claramente funciona, o Keyhold o guarda na hora"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "Nenhum cofre do seu Google Drive abre com esta senha"
+  },
+  "menu": {
+    "message": "Menu"
+  },
+  "statusPaired": {
+    "message": "Conectado ao app Keyhold deste computador."
+  },
+  "statusUnpaired": {
+    "message": "O app Keyhold está rodando aqui, mas ainda não está pareado."
+  },
+  "statusPairedOff": {
+    "message": "Pareado com o app Keyhold, mas ele não está rodando agora."
+  },
+  "statusDriveOpen": {
+    "message": "Cofre do Google Drive: aberto."
+  },
+  "statusDriveLocked": {
+    "message": "Cofre do Google Drive: bloqueado."
+  },
+  "pairApp": {
+    "message": "Parear com o app Keyhold"
+  },
+  "unpair": {
+    "message": "Desparear do app"
+  },
+  "useDriveInstead": {
+    "message": "Usar meu cofre do Google Drive no lugar"
+  },
+  "lockVault": {
+    "message": "Bloquear o cofre"
+  },
+  "unlockDriveVault": {
+    "message": "Desbloquear o cofre do Google Drive"
   }
 }

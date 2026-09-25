@@ -12,7 +12,7 @@
     "message": "Permitir"
   },
   "pairingHint": {
-    "message": "Abre Keyhold, haz clic en el icono del rompecabezas y pega aquí el token de vinculación."
+    "message": "Abre Keyhold, elige Menú → Extensión del navegador y pega aquí el token de vinculación."
   },
   "pairingToken": {
     "message": "Token de vinculación"
@@ -126,12 +126,6 @@
   },
   "disconnectDrive": {
     "message": "Desconectar Google Drive"
-  },
-  "vaultFromDrive": {
-    "message": "Caja fuerte de Google Drive"
-  },
-  "lock": {
-    "message": "Bloquear"
   },
   "autoSaveHint": {
     "message": "Cuando un inicio de sesión funciona sin duda, Keyhold lo guarda al momento"
@@ -268,5 +262,38 @@
   },
   "noVaultMatches": {
     "message": "Ninguna caja fuerte de tu Google Drive se abre con esta contraseña"
+  },
+  "menu": {
+    "message": "Menú"
+  },
+  "statusPaired": {
+    "message": "Conectado a la app Keyhold de este ordenador."
+  },
+  "statusUnpaired": {
+    "message": "La app Keyhold funciona aquí, pero aún no está vinculada."
+  },
+  "statusPairedOff": {
+    "message": "Vinculado con la app Keyhold, pero ahora no está en marcha."
+  },
+  "statusDriveOpen": {
+    "message": "Caja fuerte de Google Drive: abierta."
+  },
+  "statusDriveLocked": {
+    "message": "Caja fuerte de Google Drive: bloqueada."
+  },
+  "pairApp": {
+    "message": "Vincular con la app Keyhold"
+  },
+  "unpair": {
+    "message": "Desvincular de la app"
+  },
+  "useDriveInstead": {
+    "message": "Usar en su lugar mi caja fuerte de Google Drive"
+  },
+  "lockVault": {
+    "message": "Bloquear la caja fuerte"
+  },
+  "unlockDriveVault": {
+    "message": "Desbloquear la caja fuerte de Google Drive"
   }
 }
