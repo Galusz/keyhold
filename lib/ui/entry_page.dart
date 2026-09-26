@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../core/models.dart';
@@ -128,6 +129,45 @@ class _EntryPageState extends State<EntryPage> {
     if (sure == true && mounted) Navigator.of(context).pop('delete');
   }
 
+  /// Whether anything on the screen differs from the entry as it came.
+  bool get _changed {
+    final e = widget.entry;
+    if (_title.text.trim() != e.title || _notes.text != e.notes || _guarded != e.guarded) return true;
+    if (_isCode) {
+      return _totp.text.trim() != (e.totpSecret ?? '') ||
+          _newSite.text.trim().isNotEmpty ||
+          !listEquals(_sites, e.sites) ||
+          _unpinned.isNotEmpty;
+    }
+    return _username.text.trim() != e.username ||
+        _password.text != e.password ||
+        _url.text.trim() != e.url ||
+        _group.text.trim() != e.group ||
+        _twoFactor != e.twoFactor;
+  }
+
+  /// Back with changes on the screen asks first: they are easy to forget.
+  Future<void> _leave() async {
+    if (!_changed) {
+      Navigator.of(context).pop();
+      return;
+    }
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.saveChanges),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
+          TextButton(onPressed: () => Navigator.pop(context, 'discard'), child: Text(t.dontSave)),
+          FilledButton(onPressed: () => Navigator.pop(context, 'save'), child: Text(t.save)),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (choice == 'save') _save();
+    if (choice == 'discard') Navigator.of(context).pop();
+  }
+
   void _save() {
     final e = widget.entry;
     e.title = _title.text.trim();
@@ -173,23 +213,29 @@ class _EntryPageState extends State<EntryPage> {
     } else {
       heading = widget.isNew ? t.newEntryTitle : t.editEntry;
     }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(heading),
-        actions: [
-          if (!widget.isNew)
-            IconButton(
-              tooltip: t.delete,
-              icon: const Icon(Icons.delete_outline),
-              onPressed: _delete,
-            ),
-          TextButton(onPressed: _save, child: Text(t.save)),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: _isCode ? _codeFields() : _loginFields(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _leave();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(heading),
+          actions: [
+            if (!widget.isNew)
+              IconButton(
+                tooltip: t.delete,
+                icon: const Icon(Icons.delete_outline),
+                onPressed: _delete,
+              ),
+            TextButton(onPressed: _save, child: Text(t.save)),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(24),
+          children: _isCode ? _codeFields() : _loginFields(),
+        ),
       ),
     );
   }

@@ -1418,4 +1418,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get guardOpenHint => 'Geschützte Einträge für 5 Minuten entsperren';
+
+  @override
+  String get saveChanges => 'Änderungen speichern?';
+
+  @override
+  String get dontSave => 'Nicht speichern';
 }

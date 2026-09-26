@@ -1343,4 +1343,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get guardOpenHint => '将受保护的条目解锁 5 分钟';
+
+  @override
+  String get saveChanges => '保存更改吗？';
+
+  @override
+  String get dontSave => '不保存';
 }

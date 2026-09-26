@@ -1363,4 +1363,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get guardOpenHint => '保護された項目を 5 分間ロック解除';
+
+  @override
+  String get saveChanges => '変更を保存しますか？';
+
+  @override
+  String get dontSave => '保存しない';
 }

@@ -2385,6 +2385,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlock protected entries for 5 minutes'**
   String get guardOpenHint;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save the changes?'**
+  String get saveChanges;
+
+  /// No description provided for @dontSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t save'**
+  String get dontSave;
 }
 
 class _AppLocalizationsDelegate

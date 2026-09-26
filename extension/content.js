@@ -282,9 +282,26 @@ const STYLE = `
   .group { color: #7F9A92; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
   .code { font: 600 18px ui-monospace, Consolas, monospace; letter-spacing: 1px; text-align: right; }
   .bar { height: 2px; background: currentColor; opacity: .6; margin-top: 4px; transition: width 1s linear; }
+  .lock { width: 13px; height: 13px; fill: currentColor; opacity: .75; vertical-align: -1px; margin-left: 6px; }
+  .code .lock { width: 18px; height: 18px; margin: 0; }
 `;
 
 let menu = null;
+
+// Flat lock icons like the app's own, drawn in the text's colour: shut, or
+// opened for a while. Built as SVG, which no page rule on images can block.
+const LOCK = 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z';
+const LOCK_OPEN = 'M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z';
+
+function lockIcon(open) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('class', 'lock');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', open ? LOCK_OPEN : LOCK);
+  svg.append(path);
+  return svg;
+}
 
 // A pick counts once the list could be seen for a moment, on a field that can be seen.
 const PICK_DELAY = 400;
@@ -362,8 +379,9 @@ async function openMenu(field, allCodes) {
     text.className = 'text';
     const title = document.createElement('div');
     title.className = 'title';
+    title.textContent = entry.title;
     // Marked to ask for Windows Hello before it goes in: shut, or opened for a while.
-    title.textContent = entry.guarded ? `${entry.title} ${result.guardOpenFor > 0 ? '🔓' : '🔒'}` : entry.title;
+    if (entry.guarded) title.append(lockIcon(result.guardOpenFor > 0));
     const sub = document.createElement('div');
     sub.className = 'sub';
     sub.textContent = entry.unpaired ? `${entry.username || ''} · ${t('notTiedToSite')}` : entry.username || '';
@@ -447,7 +465,10 @@ async function openMenu(field, allCodes) {
           items.map(async (entry, i) => {
             if (entry.all) return;
             const r = await api.runtime.sendMessage({ type: 'code', id: entry.id });
-            if (menu && r && r.guarded) rows[i].code.firstChild.textContent = '🔒';
+            if (menu && r && r.guarded && !rows[i].code.querySelector('.lock')) {
+              rows[i].code.firstChild.textContent = '';
+              rows[i].code.insertBefore(lockIcon(false), rows[i].bar);
+            }
             if (!menu || !r || !r.code) return;
             menu.codes[i] = r.code;
             rows[i].code.firstChild.textContent = `${r.code.slice(0, 3)} ${r.code.slice(3)}`;

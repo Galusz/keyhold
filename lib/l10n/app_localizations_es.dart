@@ -1447,4 +1447,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get guardOpenHint =>
       'Desbloquear las entradas protegidas durante 5 minutos';
+
+  @override
+  String get saveChanges => '¿Guardar los cambios?';
+
+  @override
+  String get dontSave => 'No guardar';
 }

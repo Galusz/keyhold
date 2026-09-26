@@ -378,5 +378,7 @@
   "setAsideOn": "guardado à parte em {date}, abre com a senha mestra dele",
   "doneAfterCheck": "“Concluído” fica ativo quando a última linha conferir.",
   "lastCopyFailed": "A última cópia falhou",
-  "guardOpenHint": "Desbloquear as entradas protegidas por 5 minutos"
+  "guardOpenHint": "Desbloquear as entradas protegidas por 5 minutos",
+  "saveChanges": "Salvar as alterações?",
+  "dontSave": "Não salvar"
 }

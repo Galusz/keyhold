@@ -1438,4 +1438,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get guardOpenHint => 'Sblocca le voci protette per 5 minuti';
+
+  @override
+  String get saveChanges => 'Salvare le modifiche?';
+
+  @override
+  String get dontSave => 'Non salvare';
 }

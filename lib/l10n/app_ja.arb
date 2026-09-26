@@ -378,5 +378,7 @@
   "setAsideOn": "{date} に別に保管、マスターパスワードで開けます",
   "doneAfterCheck": "最後の行が一致すると「完了」を押せるようになります。",
   "lastCopyFailed": "前回のコピーに失敗しました",
-  "guardOpenHint": "保護された項目を 5 分間ロック解除"
+  "guardOpenHint": "保護された項目を 5 分間ロック解除",
+  "saveChanges": "変更を保存しますか？",
+  "dontSave": "保存しない"
 }

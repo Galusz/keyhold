@@ -378,5 +378,7 @@
   "setAsideOn": "apartada el {date}, se abre con su contraseña maestra",
   "doneAfterCheck": "«Listo» se activa cuando la última fila coincida.",
   "lastCopyFailed": "La última copia falló",
-  "guardOpenHint": "Desbloquear las entradas protegidas durante 5 minutos"
+  "guardOpenHint": "Desbloquear las entradas protegidas durante 5 minutos",
+  "saveChanges": "¿Guardar los cambios?",
+  "dontSave": "No guardar"
 }

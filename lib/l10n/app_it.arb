@@ -378,5 +378,7 @@
   "setAsideOn": "messa da parte il {date}, si apre con la sua password principale",
   "doneAfterCheck": "«Fatto» si attiva quando l’ultima riga corrisponde.",
   "lastCopyFailed": "L’ultima copia non è riuscita",
-  "guardOpenHint": "Sblocca le voci protette per 5 minuti"
+  "guardOpenHint": "Sblocca le voci protette per 5 minuti",
+  "saveChanges": "Salvare le modifiche?",
+  "dontSave": "Non salvare"
 }

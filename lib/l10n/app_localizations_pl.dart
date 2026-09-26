@@ -1428,4 +1428,10 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get guardOpenHint => 'Odblokuj zabezpieczone wpisy na 5 minut';
+
+  @override
+  String get saveChanges => 'Zapisać zmiany?';
+
+  @override
+  String get dontSave => 'Nie zapisuj';
 }

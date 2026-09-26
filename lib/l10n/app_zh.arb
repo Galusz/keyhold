@@ -378,5 +378,7 @@
   "setAsideOn": "{date} 放到一边，可用它的主密码打开",
   "doneAfterCheck": "最后一行核对无误后，“完成”才可点按。",
   "lastCopyFailed": "上一次备份失败",
-  "guardOpenHint": "将受保护的条目解锁 5 分钟"
+  "guardOpenHint": "将受保护的条目解锁 5 分钟",
+  "saveChanges": "保存更改吗？",
+  "dontSave": "不保存"
 }

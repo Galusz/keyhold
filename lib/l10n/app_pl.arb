@@ -378,5 +378,7 @@
   "setAsideOn": "odłożony {date}, otwiera się hasłem głównym",
   "doneAfterCheck": "„Gotowe” włączy się, gdy ostatni wiersz się zgodzi.",
   "lastCopyFailed": "Ostatnia kopia się nie udała",
-  "guardOpenHint": "Odblokuj zabezpieczone wpisy na 5 minut"
+  "guardOpenHint": "Odblokuj zabezpieczone wpisy na 5 minut",
+  "saveChanges": "Zapisać zmiany?",
+  "dontSave": "Nie zapisuj"
 }

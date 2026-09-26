@@ -884,5 +884,7 @@
     }
   },
   "lastCopyFailed": "The last copy failed",
-  "guardOpenHint": "Unlock protected entries for 5 minutes"
+  "guardOpenHint": "Unlock protected entries for 5 minutes",
+  "saveChanges": "Save the changes?",
+  "dontSave": "Don't save"
 }

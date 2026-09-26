@@ -378,5 +378,7 @@
   "setAsideOn": "mis de côté le {date}, s’ouvre avec son mot de passe principal",
   "doneAfterCheck": "« Terminé » s’active dès que la dernière ligne correspond.",
   "lastCopyFailed": "La dernière copie a échoué",
-  "guardOpenHint": "Déverrouiller les entrées protégées pour 5 minutes"
+  "guardOpenHint": "Déverrouiller les entrées protégées pour 5 minutes",
+  "saveChanges": "Enregistrer les modifications ?",
+  "dontSave": "Ne pas enregistrer"
 }
