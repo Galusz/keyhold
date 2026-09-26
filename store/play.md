@@ -81,7 +81,11 @@ Jak Keyhold chroni dane: https://galusz.github.io/keyhold/security.html
 
 ## Signing and Google Drive
 
-With Play App Signing Google re-signs the app, so its SHA-1 differs from `keys/keyhold-release.jks`.
-Google sign-in (Drive) on a Play install works only after adding, in Google Cloud → Credentials,
-an Android OAuth client: package `pl.zkv.keyhold`, SHA-1 from Play Console → Test and release → App integrity → App signing key certificate.
+Play App Signing uses Google's key, so a Play install has a different SHA-1 than `keys/keyhold-release.jks`.
+Google Cloud project `keyhold-509509` has an Android OAuth client for each (package `pl.zkv.keyhold`):
+- `Keyhold Android (release)` — upload key / GitHub APK, SHA-1 `46:68:C4:2D:49:79:F3:A1:9A:AD:2B:49:EA:E4:DF:32:0E:15:A3:8A`
+- `Keyhold Android (Google Play)` — Play signing key, SHA-1 `B4:01:81:4E:E7:2E:3C:DC:47:D8:83:5B:B2:FA:3F:47:42:51:C6:7A`
+- `Keyhold Android (Google Play, earlier key)` — SHA-1 `B1:C8:5F:59:95:3D:95:62:03:27:EA:2A:60:2B:94:F7:02:17:79:0A`
+
+The keys are on Play Console → Protected with Play → App signing (`…/app/<id>/keymanagement`).
 The GitHub APK and the Play install cannot update each other (different signatures): switching means uninstall, install, open the vault from Drive.
