@@ -43,6 +43,8 @@ Fill and save logins and two-factor codes from the user's own Keyhold vault.
 - **activeTab** — fills the login the user picks in the toolbar popup into the page that is open.
 - **scripting** — inserts the picked username, password or code into that page from the popup.
 - **storage** — keeps the pairing token that connects the extension to the Keyhold app; without the app, the user's encrypted vault file and the site icons. For a few minutes it also keeps the username typed on the first page of a two-step login, so it can be saved together with the password.
+- **unlimitedStorage** — without the app the encrypted vault file is kept locally; with files and icons it can exceed the default 10 MB.
+- **alarms** — locks the vault opened from Google Drive after 30 minutes without use.
 - **identity** — only when the user chooses "Use my vault from Google Drive": signs in to Google with the `drive.file` scope, which reaches only the files Keyhold itself made in the user's Drive.
 - **Host permissions (all sites)** — the list under login fields and the offer to save a login have to work on every site where the user signs in; the icons of saved sites are fetched from those sites. `http://127.0.0.1:19919` is the Keyhold app on the same computer; `www.googleapis.com` is the user's Google Drive.
 - **Remote code** — none. All code is in the package (Argon2 comes as WebAssembly inside it).
@@ -60,11 +62,12 @@ Declared in the manifest (`data_collection_permissions`): **authenticationInfo**
 ## Google sign-in (Drive mode) — one-time setup in Google Cloud Console
 The "Web application" OAuth client in the Keyhold project must list these authorized redirect URIs:
 - Firefox (extension id `keyhold@zkv.pl`): `https://f3d4d6ce246a6b130ef433e32bd4b18081139064.extensions.allizom.org/`
-- Chrome and Edge: `https://<extension id>.chromiumapp.org/` — the id each store gives the extension.
+- Edge Add-ons (CRX id `jngnkhkeahkmcbilappikdkcilhnfolm`): `https://jngnkhkeahkmcbilappikdkcilhnfolm.chromiumapp.org/`
+- Chrome Web Store and the unpacked folder: `https://<extension id>.chromiumapp.org/` — the id each one gets.
 
 ## Notes for reviewers
 1. Install Keyhold for Windows from https://github.com/Galusz/keyhold/releases/latest (unzip, run `keyhold.exe`).
-2. On first start choose **Create a new vault**, set a master password and close the recovery-key screen with **Done**.
+2. On first start choose **Create a new vault**, set a master password, type the last row of the recovery key into the check field and press **Done**.
 3. Click **New** and add a login, for example Title `example`, Username `reviewer@example.com`, Password `test-password`, Address `https://practicetestautomation.com/practice-test-login/`.
 4. Open **Menu → Browser extension** in Keyhold and copy the pairing token.
 5. Click the Keyhold icon in the browser toolbar, allow access, paste the token and press Connect.
