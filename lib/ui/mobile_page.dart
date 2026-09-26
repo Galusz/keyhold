@@ -942,6 +942,14 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
               ),
             ],
           ],
+          const Divider(height: 40),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: Text(t.privacyPolicy),
+            trailing: const Icon(Icons.open_in_new),
+            onTap: openPrivacyPolicy,
+          ),
         ],
       ),
     );

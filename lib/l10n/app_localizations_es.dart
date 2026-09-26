@@ -1453,4 +1453,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dontSave => 'No guardar';
+
+  @override
+  String get privacyPolicy => 'Política de privacidad';
 }

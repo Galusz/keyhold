@@ -886,5 +886,6 @@
   "lastCopyFailed": "The last copy failed",
   "guardOpenHint": "Unlock protected entries for 5 minutes",
   "saveChanges": "Save the changes?",
-  "dontSave": "Don't save"
+  "dontSave": "Don't save",
+  "privacyPolicy": "Privacy policy"
 }

@@ -380,5 +380,6 @@
   "lastCopyFailed": "Die letzte Kopie ist fehlgeschlagen",
   "guardOpenHint": "Geschützte Einträge für 5 Minuten entsperren",
   "saveChanges": "Änderungen speichern?",
-  "dontSave": "Nicht speichern"
+  "dontSave": "Nicht speichern",
+  "privacyPolicy": "Datenschutzerklärung"
 }

@@ -2397,6 +2397,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Don\'t save'**
   String get dontSave;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get privacyPolicy;
 }
 
 class _AppLocalizationsDelegate

@@ -1349,4 +1349,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dontSave => '不保存';
+
+  @override
+  String get privacyPolicy => '隐私政策';
 }

@@ -380,5 +380,6 @@
   "lastCopyFailed": "上一次备份失败",
   "guardOpenHint": "将受保护的条目解锁 5 分钟",
   "saveChanges": "保存更改吗？",
-  "dontSave": "不保存"
+  "dontSave": "不保存",
+  "privacyPolicy": "隐私政策"
 }

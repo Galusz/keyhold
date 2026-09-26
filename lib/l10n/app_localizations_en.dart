@@ -1407,4 +1407,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dontSave => 'Don\'t save';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
 }

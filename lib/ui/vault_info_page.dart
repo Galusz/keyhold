@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../core/drive.dart';
 import '../core/models.dart';
@@ -11,6 +12,16 @@ import 'owner.dart';
 import 'password_page.dart';
 import 'recovery_page.dart';
 import 'start_page.dart';
+
+const privacyPolicyUrl = 'https://galusz.github.io/keyhold/privacy.html';
+
+Future<void> openPrivacyPolicy() async {
+  if (Platform.isAndroid) {
+    await const MethodChannel('keyhold/share').invokeMethod('open', {'url': privacyPolicyUrl});
+  } else {
+    await Process.start('rundll32', ['url.dll,FileProtocolHandler', privacyPolicyUrl]);
+  }
+}
 
 /// The vault itself: its name, its recovery key, another vault instead of
 /// this one, and deleting it. The master password is not changed here: only

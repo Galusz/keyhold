@@ -380,5 +380,6 @@
   "lastCopyFailed": "Ostatnia kopia się nie udała",
   "guardOpenHint": "Odblokuj zabezpieczone wpisy na 5 minut",
   "saveChanges": "Zapisać zmiany?",
-  "dontSave": "Nie zapisuj"
+  "dontSave": "Nie zapisuj",
+  "privacyPolicy": "Polityka prywatności"
 }

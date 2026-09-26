@@ -87,9 +87,15 @@ class MainActivity : FlutterFragmentActivity() {
                 result.success(null)
             }
 
-        // A copy of the vault file handed to the app the user picks: mail, chat, Files, Drive.
+        // A copy of the vault file handed to the app the user picks: mail, chat, Files, Drive;
+        // and a web page handed to the browser.
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "keyhold/share")
             .setMethodCallHandler { call, result ->
+                if (call.method == "open") {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(call.argument<String>("url"))))
+                    result.success(null)
+                    return@setMethodCallHandler
+                }
                 val file = java.io.File(call.argument<String>("path")!!)
                 val uri = androidx.core.content.FileProvider.getUriForFile(this, "$packageName.files", file)
                 val send = Intent(Intent.ACTION_SEND)

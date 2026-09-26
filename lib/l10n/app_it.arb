@@ -380,5 +380,6 @@
   "lastCopyFailed": "L’ultima copia non è riuscita",
   "guardOpenHint": "Sblocca le voci protette per 5 minuti",
   "saveChanges": "Salvare le modifiche?",
-  "dontSave": "Non salvare"
+  "dontSave": "Non salvare",
+  "privacyPolicy": "Informativa sulla privacy"
 }

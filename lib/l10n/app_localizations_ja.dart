@@ -1369,4 +1369,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get dontSave => '保存しない';
+
+  @override
+  String get privacyPolicy => 'プライバシーポリシー';
 }

@@ -1434,4 +1434,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get dontSave => 'Nie zapisuj';
+
+  @override
+  String get privacyPolicy => 'Polityka prywatności';
 }

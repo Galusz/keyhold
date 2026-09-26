@@ -404,6 +404,7 @@ class _VaultPageState extends State<VaultPage> with WindowListener {
         item(Icons.history, t.copiesTab, null, _openBackup),
         item(Icons.download_outlined, t.importTitle, t.importMenuHint, _import),
         item(Icons.extension_outlined, t.browserExtension, null, _openExtension),
+        item(Icons.privacy_tip_outlined, t.privacyPolicy, null, openPrivacyPolicy),
       ],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

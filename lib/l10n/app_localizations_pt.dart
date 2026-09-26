@@ -1452,4 +1452,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dontSave => 'Não salvar';
+
+  @override
+  String get privacyPolicy => 'Política de privacidade';
 }

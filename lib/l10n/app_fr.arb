@@ -380,5 +380,6 @@
   "lastCopyFailed": "La dernière copie a échoué",
   "guardOpenHint": "Déverrouiller les entrées protégées pour 5 minutes",
   "saveChanges": "Enregistrer les modifications ?",
-  "dontSave": "Ne pas enregistrer"
+  "dontSave": "Ne pas enregistrer",
+  "privacyPolicy": "Politique de confidentialité"
 }

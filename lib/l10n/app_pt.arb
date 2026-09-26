@@ -380,5 +380,6 @@
   "lastCopyFailed": "A última cópia falhou",
   "guardOpenHint": "Desbloquear as entradas protegidas por 5 minutos",
   "saveChanges": "Salvar as alterações?",
-  "dontSave": "Não salvar"
+  "dontSave": "Não salvar",
+  "privacyPolicy": "Política de privacidade"
 }
