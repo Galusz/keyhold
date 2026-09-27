@@ -55,6 +55,8 @@
   "fillerOn": "Keyhold füllt Zugangsdaten in Apps und Browsern aus: unter einem Anmeldefeld auf „Keyhold“ tippen. In Chrome zusätzlich Einstellungen → Autofill-Dienste → Autofill mit einem anderen Dienst aktivieren.",
   "fillerOff": "Keyhold Zugangsdaten und Zwei-Faktor-Codes in Apps und Browsern ausfüllen lassen.",
   "fillWithKeyhold": "Passwörter mit Keyhold ausfüllen",
+  "fillerBar": "Keyhold füllt Passwörter in Apps und Browsern noch nicht aus.",
+  "turnOn": "Einschalten",
   "deleteThisLogin": "Diese Zugangsdaten löschen?",
   "deleteNamed": "{name} löschen?",
   "noDuplicatesLeft": "Keine Duplikate mehr.",

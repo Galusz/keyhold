@@ -442,6 +442,18 @@ abstract class AppLocalizations {
   /// **'Fill passwords with Keyhold'**
   String get fillWithKeyhold;
 
+  /// No description provided for @fillerBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyhold does not fill passwords in apps and browsers yet.'**
+  String get fillerBar;
+
+  /// No description provided for @turnOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on'**
+  String get turnOn;
+
   /// No description provided for @deleteThisLogin.
   ///
   /// In en, this message translates to:

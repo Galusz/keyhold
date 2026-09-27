@@ -55,6 +55,8 @@
   "fillerOn": "O Keyhold preenche logins em apps e navegadores: toque em \"Keyhold\" abaixo de um campo de login. No Chrome, ative também Configurações → Serviços de preenchimento automático → Preenchimento automático usando outro serviço.",
   "fillerOff": "Deixe o Keyhold preencher logins e códigos de dois fatores em apps e navegadores.",
   "fillWithKeyhold": "Preencher senhas com o Keyhold",
+  "fillerBar": "O Keyhold ainda não preenche senhas em apps e navegadores.",
+  "turnOn": "Ativar",
   "deleteThisLogin": "Excluir este login?",
   "deleteNamed": "Excluir {name}?",
   "noDuplicatesLeft": "Nenhum duplicado restante.",

@@ -191,6 +191,9 @@ class BackupService {
   /// The phone app opens only with a fingerprint (or the phone's PIN).
   bool fingerprintLock = false;
 
+  /// The phone's bar offering Keyhold as the password filler was closed; the switch stays in Settings.
+  bool fillerBarClosed = false;
+
   /// Google Drive sync: the refresh token is kept DPAPI-protected, base64.
   String driveToken = '';
   String driveEmail = '';
@@ -218,6 +221,7 @@ class BackupService {
       autoSave = (raw['autoSave'] ?? false) as bool;
       noPinAsk = (raw['noPinAsk'] as List<dynamic>?)?.cast<String>() ?? [];
       fingerprintLock = (raw['fingerprintLock'] ?? false) as bool;
+      fillerBarClosed = (raw['fillerBarClosed'] ?? false) as bool;
       driveToken = (raw['driveToken'] ?? '') as String;
       driveEmail = (raw['driveEmail'] ?? '') as String;
       driveSyncedAt = DateTime.tryParse((raw['driveSyncedAt'] ?? '') as String);
@@ -250,6 +254,7 @@ class BackupService {
       if (autoSave) 'autoSave': true,
       if (noPinAsk.isNotEmpty) 'noPinAsk': noPinAsk,
       if (fingerprintLock) 'fingerprintLock': true,
+      if (fillerBarClosed) 'fillerBarClosed': true,
       if (driveToken.isNotEmpty) 'driveToken': driveToken,
       if (driveEmail.isNotEmpty) 'driveEmail': driveEmail,
       if (driveSyncedAt != null) 'driveSyncedAt': driveSyncedAt!.toIso8601String(),

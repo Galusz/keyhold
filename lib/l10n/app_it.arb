@@ -55,6 +55,8 @@
   "fillerOn": "Keyhold compila le credenziali in app e browser: tocca \"Keyhold\" sotto un campo di accesso. In Chrome attiva anche Impostazioni → Servizi di compilazione automatica → Compilazione automatica con un altro servizio.",
   "fillerOff": "Consenti a Keyhold di compilare credenziali e codici a due fattori in app e browser.",
   "fillWithKeyhold": "Compila le password con Keyhold",
+  "fillerBar": "Keyhold non compila ancora le password in app e browser.",
+  "turnOn": "Attiva",
   "deleteThisLogin": "Eliminare queste credenziali?",
   "deleteNamed": "Eliminare {name}?",
   "noDuplicatesLeft": "Nessun duplicato rimasto.",

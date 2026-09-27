@@ -201,6 +201,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fillWithKeyhold => '用 Keyhold 填写密码';
 
   @override
+  String get fillerBar => 'Keyhold 还不能在应用和浏览器中填写密码。';
+
+  @override
+  String get turnOn => '开启';
+
+  @override
   String get deleteThisLogin => '删除此登录信息？';
 
   @override

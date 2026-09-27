@@ -208,6 +208,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fillWithKeyhold => 'Preencher senhas com o Keyhold';
 
   @override
+  String get fillerBar =>
+      'O Keyhold ainda não preenche senhas em apps e navegadores.';
+
+  @override
+  String get turnOn => 'Ativar';
+
+  @override
   String get deleteThisLogin => 'Excluir este login?';
 
   @override

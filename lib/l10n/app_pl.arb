@@ -55,6 +55,8 @@
   "fillerOn": "Keyhold uzupełnia dane logowania w aplikacjach i przeglądarkach: dotknij „Keyhold” pod polem logowania. W Chrome włącz też Ustawienia → Usługi autouzupełniania → Autouzupełnianie przy użyciu innej usługi.",
   "fillerOff": "Pozwól Keyhold uzupełniać dane logowania i kody weryfikacyjne w aplikacjach i przeglądarkach.",
   "fillWithKeyhold": "Uzupełniaj hasła przez Keyhold",
+  "fillerBar": "Keyhold jeszcze nie uzupełnia haseł w aplikacjach i przeglądarkach.",
+  "turnOn": "Włącz",
   "deleteThisLogin": "Usunąć te dane logowania?",
   "deleteNamed": "Usunąć „{name}”?",
   "noDuplicatesLeft": "Nie ma już duplikatów.",

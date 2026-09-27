@@ -208,6 +208,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fillWithKeyhold => 'Compila le password con Keyhold';
 
   @override
+  String get fillerBar =>
+      'Keyhold non compila ancora le password in app e browser.';
+
+  @override
+  String get turnOn => 'Attiva';
+
+  @override
   String get deleteThisLogin => 'Eliminare queste credenziali?';
 
   @override

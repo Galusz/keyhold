@@ -202,6 +202,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get fillWithKeyhold => 'Keyhold でパスワードを自動入力';
 
   @override
+  String get fillerBar => 'Keyhold はまだアプリやブラウザでパスワードを自動入力していません。';
+
+  @override
+  String get turnOn => 'オンにする';
+
+  @override
   String get deleteThisLogin => 'このログイン情報を削除しますか？';
 
   @override

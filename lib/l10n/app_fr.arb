@@ -55,6 +55,8 @@
   "fillerOn": "Keyhold remplit les identifiants dans les applis et les navigateurs : appuyez sur « Keyhold » sous un champ de connexion. Dans Chrome, activez aussi Paramètres → Services de saisie automatique → Saisie automatique avec un autre service.",
   "fillerOff": "Laissez Keyhold remplir les identifiants et les codes de double authentification dans les applis et les navigateurs.",
   "fillWithKeyhold": "Remplir les mots de passe avec Keyhold",
+  "fillerBar": "Keyhold ne remplit pas encore les mots de passe dans les applis et les navigateurs.",
+  "turnOn": "Activer",
   "deleteThisLogin": "Supprimer cet identifiant ?",
   "deleteNamed": "Supprimer {name} ?",
   "noDuplicatesLeft": "Plus aucun doublon.",

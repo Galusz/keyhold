@@ -55,6 +55,8 @@
   "fillerOn": "Keyhold 可在应用和浏览器中填写登录信息：点按登录框下方的“Keyhold”即可。在 Chrome 中还需开启“设置 → 自动填充服务 → 使用其他服务自动填充”。",
   "fillerOff": "让 Keyhold 在应用和浏览器中填写登录信息和双重验证码。",
   "fillWithKeyhold": "用 Keyhold 填写密码",
+  "fillerBar": "Keyhold 还不能在应用和浏览器中填写密码。",
+  "turnOn": "开启",
   "deleteThisLogin": "删除此登录信息？",
   "deleteNamed": "删除“{name}”？",
   "noDuplicatesLeft": "已没有重复项。",

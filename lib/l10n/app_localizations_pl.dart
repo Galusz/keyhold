@@ -210,6 +210,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get fillWithKeyhold => 'Uzupełniaj hasła przez Keyhold';
 
   @override
+  String get fillerBar =>
+      'Keyhold jeszcze nie uzupełnia haseł w aplikacjach i przeglądarkach.';
+
+  @override
+  String get turnOn => 'Włącz';
+
+  @override
   String get deleteThisLogin => 'Usunąć te dane logowania?';
 
   @override

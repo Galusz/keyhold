@@ -55,6 +55,8 @@
   "fillerOn": "Keyhold がアプリやブラウザでログイン情報を自動入力します。ログイン欄の下の「Keyhold」をタップしてください。Chrome では「設定」→「自動入力サービス」→「別のサービスを使用して自動入力」も選択してください。",
   "fillerOff": "Keyhold がアプリやブラウザでログイン情報と 2 段階認証コードを自動入力できるようにします。",
   "fillWithKeyhold": "Keyhold でパスワードを自動入力",
+  "fillerBar": "Keyhold はまだアプリやブラウザでパスワードを自動入力していません。",
+  "turnOn": "オンにする",
   "deleteThisLogin": "このログイン情報を削除しますか？",
   "deleteNamed": "「{name}」を削除しますか？",
   "noDuplicatesLeft": "重複はもうありません。",

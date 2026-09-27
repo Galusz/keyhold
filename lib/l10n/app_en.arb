@@ -128,6 +128,8 @@
   "fillerOn": "Keyhold fills logins in apps and browsers: tap \"Keyhold\" under a login field. In Chrome also switch on Settings → Autofill services → Autofill using another service.",
   "fillerOff": "Let Keyhold fill logins and two-factor codes in apps and browsers.",
   "fillWithKeyhold": "Fill passwords with Keyhold",
+  "fillerBar": "Keyhold does not fill passwords in apps and browsers yet.",
+  "turnOn": "Turn on",
   "deleteThisLogin": "Delete this login?",
   "deleteNamed": "Delete {name}?",
   "@deleteNamed": {

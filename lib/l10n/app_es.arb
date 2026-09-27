@@ -55,6 +55,8 @@
   "fillerOn": "Keyhold rellena inicios de sesión en apps y navegadores: toca \"Keyhold\" bajo un campo de inicio de sesión. En Chrome activa también Configuración → Servicios de autocompletar → Autocompletar con otro servicio.",
   "fillerOff": "Deja que Keyhold rellene inicios de sesión y códigos de dos factores en apps y navegadores.",
   "fillWithKeyhold": "Rellenar contraseñas con Keyhold",
+  "fillerBar": "Keyhold aún no rellena contraseñas en apps y navegadores.",
+  "turnOn": "Activar",
   "deleteThisLogin": "¿Eliminar este inicio de sesión?",
   "deleteNamed": "¿Eliminar {name}?",
   "noDuplicatesLeft": "No quedan duplicados.",

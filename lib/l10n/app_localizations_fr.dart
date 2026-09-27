@@ -210,6 +210,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fillWithKeyhold => 'Remplir les mots de passe avec Keyhold';
 
   @override
+  String get fillerBar =>
+      'Keyhold ne remplit pas encore les mots de passe dans les applis et les navigateurs.';
+
+  @override
+  String get turnOn => 'Activer';
+
+  @override
   String get deleteThisLogin => 'Supprimer cet identifiant ?';
 
   @override

@@ -57,6 +57,10 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
   DateTime? _leftAt;
   static const _lockChannel = MethodChannel('keyhold/lock');
 
+  /// Keyhold is not the phone's password filler: a bar above the list offers the system switch.
+  bool _fillerOff = false;
+  static const _autofill = MethodChannel('keyhold/autofill-settings');
+
   @override
   void initState() {
     super.initState();
@@ -105,7 +109,14 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     if (ok && mounted) setState(() => _locked = false);
   }
 
+  Future<void> _checkFiller() async {
+    final state = await _autofill.invokeMethod<String>('state');
+    if (mounted) setState(() => _fillerOff = state == 'off');
+  }
+
   Future<void> _resume() async {
+    // Back from the system screen where the filler is chosen.
+    unawaited(_checkFiller());
     // The autofill screen may have saved a login to the vault file meanwhile.
     if (!_loading && _store.isOpen) {
       _vault = Vault.merge(_vault, await _store.load());
@@ -129,6 +140,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     await _loadVault();
     await _refreshCodes();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _refreshCodes());
+    unawaited(_checkFiller());
     unawaited(_sync());
   }
 
@@ -477,6 +489,7 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
             ),
           ),
           const SizedBox(height: 8),
+          if (_fillerOff && !_store.backup.fillerBarClosed) _fillerBar(),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => _sync(),
@@ -507,6 +520,33 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     if (diff.inMinutes < 60) return t.minutesAgo(diff.inMinutes);
     if (diff.inHours < 24) return t.hoursAgo(diff.inHours);
     return t.daysAgo(diff.inDays);
+  }
+
+  Widget _fillerBar() {
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+        child: Row(
+          children: [
+            const Icon(Icons.password),
+            const SizedBox(width: 12),
+            Expanded(child: Text(t.fillerBar)),
+            TextButton(
+              onPressed: () => _autofill.invokeMethod('enable'),
+              child: Text(t.turnOn),
+            ),
+            IconButton(
+              tooltip: t.dismiss,
+              icon: const Icon(Icons.close),
+              onPressed: () => setState(() => _store.backup
+                ..fillerBarClosed = true
+                ..saveSettings()),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   /// Always on screen: losing the phone must never mean losing the codes.
