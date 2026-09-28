@@ -14,12 +14,12 @@ Keyhold Password Manager & 2FA
 
 **Short description** (max 80)
 ```
-Passwords and 2FA codes in one encrypted vault. No account, no server of ours.
+2FA authenticator & passwords for Android and Windows, with Google Drive backup
 ```
 
 **Full description**
 ```
-Keyhold keeps your passwords, two-factor codes and important files in one encrypted vault that belongs to you. Free and open source — no account, no subscription, no ads, no Keyhold server.
+Keyhold is a free, open-source two-factor authenticator (TOTP) and password manager for Android and Windows, with a browser extension for Chrome, Edge and Firefox. Move your codes over from Google Authenticator in one scan and keep them backed up in your own Google Drive, so a lost phone never locks you out. Like KeePass, one master password opens one encrypted vault that belongs to you — with the 2FA codes built in. No account, no subscription, no ads, no Keyhold server.
 
 • Two-factor codes like Google Authenticator, with a countdown and the next code shown in the last seconds. Scan a QR code with the camera or bring in the Google Authenticator export.
 • Fills logins and codes into apps and browsers from the suggestion right under the field, and offers to save new logins.
@@ -45,12 +45,12 @@ Keyhold – Menedżer haseł i 2FA
 
 **Short description**
 ```
-Hasła i kody 2FA w jednym zaszyfrowanym sejfie. Bez konta i bez naszego serwera.
+Kody 2FA i hasła na Androidzie i Windows, z kopią na Twoim Google Drive.
 ```
 
 **Full description**
 ```
-Keyhold trzyma Twoje hasła, kody dwuskładnikowe i ważne pliki w jednym zaszyfrowanym sejfie, który należy do Ciebie. Darmowy i otwarty — bez konta, bez abonamentu, bez reklam, bez serwera Keyhold.
+Keyhold to darmowy i otwarty authenticator (kody 2FA, TOTP) i menedżer haseł na Androida i Windows, z rozszerzeniem do Chrome, Edge i Firefox. Przenieś kody z Google Authenticator jednym skanem i trzymaj ich kopię na własnym Google Drive — zgubiony telefon nie odetnie Cię od kont. Jak w KeePass: jedno hasło główne otwiera jeden zaszyfrowany sejf, który należy do Ciebie — z wbudowanymi kodami 2FA. Bez konta, bez abonamentu, bez reklam, bez serwera Keyhold.
 
 • Kody dwuskładnikowe jak w Google Authenticator, z odliczaniem i następnym kodem w ostatnich sekundach. Zeskanuj kod QR aparatem albo przenieś eksport z Google Authenticator.
 • Wpisuje loginy i kody w aplikacjach i przeglądarkach z podpowiedzi tuż pod polem i proponuje zapisanie nowych loginów.
@@ -76,12 +76,12 @@ Keyhold Passwort-Manager & 2FA
 
 **Short description**
 ```
-Passwörter und 2FA-Codes in einem verschlüsselten Tresor. Ohne Konto und Server.
+2FA-Authenticator & Passwörter für Android und Windows, mit Drive-Backup
 ```
 
 **Full description**
 ```
-Keyhold bewahrt deine Passwörter, Zwei-Faktor-Codes und wichtigen Dateien in einem verschlüsselten Tresor auf, der dir gehört. Kostenlos und Open Source — kein Konto, kein Abo, keine Werbung, kein Keyhold-Server.
+Keyhold ist ein kostenloser Open-Source-Authenticator für Zwei-Faktor-Codes (TOTP) und Passwort-Manager für Android und Windows, mit Browsererweiterung für Chrome, Edge und Firefox. Übernimm deine Codes mit einem Scan aus dem Google Authenticator und sichere sie in deinem eigenen Google Drive – ein verlorenes Handy sperrt dich nicht mehr aus. Wie bei KeePass öffnet ein Master-Passwort einen verschlüsselten Tresor, der dir gehört – mit eingebauten 2FA-Codes. Kein Konto, kein Abo, keine Werbung, kein Keyhold-Server.
 
 • Zwei-Faktor-Codes wie im Google Authenticator, mit Countdown und dem nächsten Code in den letzten Sekunden. Scanne einen QR-Code mit der Kamera oder übernimm den Export aus dem Google Authenticator.
 • Füllt Logins und Codes in Apps und Browsern über den Vorschlag direkt unter dem Feld aus und bietet an, neue Logins zu speichern.
@@ -107,12 +107,12 @@ Keyhold: Gestor de contraseñas
 
 **Short description**
 ```
-Contraseñas y códigos 2FA en una caja fuerte cifrada. Sin cuenta ni servidor.
+Autenticador 2FA y contraseñas para Android y Windows, con copia en Drive.
 ```
 
 **Full description**
 ```
-Keyhold guarda tus contraseñas, códigos de dos factores y archivos importantes en una caja fuerte cifrada que te pertenece. Gratis y de código abierto: sin cuenta, sin suscripción, sin anuncios y sin servidor de Keyhold.
+Keyhold es un autenticador de dos factores (TOTP) y gestor de contraseñas gratuito y de código abierto para Android y Windows, con extensión para Chrome, Edge y Firefox. Pasa tus códigos desde Google Authenticator con un solo escaneo y guárdalos con copia en tu propio Google Drive: perder el móvil ya no te deja fuera de tus cuentas. Como en KeePass, una contraseña maestra abre una caja fuerte cifrada que te pertenece, con los códigos 2FA incluidos. Sin cuenta, sin suscripción, sin anuncios y sin servidor de Keyhold.
 
 • Códigos de dos factores como en Google Authenticator, con cuenta atrás y el siguiente código en los últimos segundos. Escanea un código QR con la cámara o trae la exportación de Google Authenticator.
 • Rellena inicios de sesión y códigos en apps y navegadores desde la sugerencia justo debajo del campo, y ofrece guardar los nuevos.
@@ -138,12 +138,12 @@ Keyhold – Mots de passe et 2FA
 
 **Short description**
 ```
-Mots de passe et codes 2FA dans un coffre-fort chiffré. Sans compte ni serveur.
+Codes 2FA et mots de passe sur Android et Windows, sauvegardés sur votre Drive.
 ```
 
 **Full description**
 ```
-Keyhold conserve vos mots de passe, codes à deux facteurs et fichiers importants dans un coffre-fort chiffré qui vous appartient. Gratuit et open source — sans compte, sans abonnement, sans publicité, sans serveur Keyhold.
+Keyhold est un authentificateur à deux facteurs (TOTP) et un gestionnaire de mots de passe gratuit et open source pour Android et Windows, avec une extension pour Chrome, Edge et Firefox. Transférez vos codes depuis Google Authenticator en un seul scan et gardez-en une copie dans votre propre Google Drive : un téléphone perdu ne vous prive plus de vos comptes. Comme avec KeePass, un mot de passe principal ouvre un coffre-fort chiffré qui vous appartient, avec les codes 2FA intégrés. Sans compte, sans abonnement, sans publicité, sans serveur Keyhold.
 
 • Codes à deux facteurs comme Google Authenticator, avec compte à rebours et le code suivant affiché dans les dernières secondes. Scannez un code QR avec l’appareil photo ou reprenez l’export de Google Authenticator.
 • Remplit identifiants et codes dans les applis et les navigateurs depuis la suggestion juste sous le champ, et propose d’enregistrer les nouveaux identifiants.
@@ -169,12 +169,12 @@ Keyhold – Password e 2FA
 
 **Short description**
 ```
-Password e codici 2FA in un'unica cassaforte cifrata. Senza account né server.
+Autenticatore 2FA e password per Android e Windows, con backup su Drive.
 ```
 
 **Full description**
 ```
-Keyhold conserva le tue password, i codici a due fattori e i file importanti in un’unica cassaforte cifrata che appartiene a te. Gratis e open source: nessun account, nessun abbonamento, nessuna pubblicità, nessun server Keyhold.
+Keyhold è un autenticatore a due fattori (TOTP) e gestore di password gratuito e open source per Android e Windows, con estensione per Chrome, Edge e Firefox. Porta i tuoi codici da Google Authenticator con una sola scansione e tienine una copia nel tuo Google Drive: un telefono perso non ti chiude più fuori dai tuoi account. Come in KeePass, una password principale apre una cassaforte cifrata che appartiene a te, con i codici 2FA integrati. Nessun account, nessun abbonamento, nessuna pubblicità, nessun server Keyhold.
 
 • Codici a due fattori come Google Authenticator, con conto alla rovescia e il codice successivo negli ultimi secondi. Scansiona un codice QR con la fotocamera o importa l’esportazione di Google Authenticator.
 • Compila accessi e codici in app e browser dal suggerimento subito sotto il campo, e propone di salvare i nuovi accessi.
@@ -200,12 +200,12 @@ Keyhold: Gerenciador de senhas
 
 **Short description**
 ```
-Senhas e códigos 2FA em um cofre criptografado. Sem conta e sem nosso servidor.
+Autenticador 2FA e senhas para Android e Windows, com backup no Google Drive.
 ```
 
 **Full description**
 ```
-O Keyhold guarda suas senhas, códigos de dois fatores e arquivos importantes em um cofre criptografado que pertence a você. Gratuito e de código aberto — sem conta, sem assinatura, sem anúncios e sem servidor Keyhold.
+O Keyhold é um autenticador de dois fatores (TOTP) e gerenciador de senhas gratuito e de código aberto para Android e Windows, com extensão para Chrome, Edge e Firefox. Traga seus códigos do Google Authenticator com um só escaneamento e mantenha uma cópia no seu próprio Google Drive: perder o celular não te deixa mais fora das suas contas. Como no KeePass, uma senha mestra abre um cofre criptografado que pertence a você, com os códigos 2FA embutidos. Sem conta, sem assinatura, sem anúncios e sem servidor Keyhold.
 
 • Códigos de dois fatores como no Google Authenticator, com contagem regressiva e o próximo código nos últimos segundos. Escaneie um código QR com a câmera ou traga a exportação do Google Authenticator.
 • Preenche logins e códigos em apps e navegadores pela sugestão logo abaixo do campo e oferece salvar logins novos.
@@ -231,12 +231,12 @@ Keyhold – Palavras-passe e 2FA
 
 **Short description**
 ```
-Palavras-passe e códigos 2FA num cofre encriptado. Sem conta e sem servidor.
+Autenticador 2FA e palavras-passe para Android e Windows, com cópia no Drive.
 ```
 
 **Full description**
 ```
-O Keyhold guarda as suas palavras-passe, códigos de dois fatores e ficheiros importantes num cofre encriptado que lhe pertence. Gratuito e de código aberto — sem conta, sem subscrição, sem anúncios e sem servidor Keyhold.
+O Keyhold é um autenticador de dois fatores (TOTP) e gestor de palavras-passe gratuito e de código aberto para Android e Windows, com extensão para Chrome, Edge e Firefox. Traga os seus códigos do Google Authenticator com uma só leitura e guarde uma cópia no seu próprio Google Drive: perder o telemóvel já não o deixa fora das suas contas. Tal como no KeePass, uma palavra-passe mestra abre um cofre encriptado que lhe pertence, com os códigos 2FA incluídos. Sem conta, sem subscrição, sem anúncios e sem servidor Keyhold.
 
 • Códigos de dois fatores como no Google Authenticator, com contagem decrescente e o código seguinte nos últimos segundos. Leia um código QR com a câmara ou traga a exportação do Google Authenticator.
 • Preenche inícios de sessão e códigos em aplicações e navegadores a partir da sugestão logo abaixo do campo, e propõe guardar os novos.
@@ -262,12 +262,12 @@ Keyhold – 密码管理器和双重验证
 
 **Short description**
 ```
-密码和双重验证码保存在一个加密密码库中。无需账户，没有我们的服务器。
+适用于 Android 和 Windows 的双重验证器和密码管理器，可备份到 Google Drive。
 ```
 
 **Full description**
 ```
-Keyhold 将你的密码、双重验证码和重要文件保存在一个属于你自己的加密密码库中。免费且开源——无需账户，没有订阅，没有广告，也没有 Keyhold 服务器。
+Keyhold 是一款免费开源的双重验证器（TOTP）和密码管理器，支持 Android 和 Windows，并提供 Chrome、Edge、Firefox 浏览器扩展。只需扫描一次即可从 Google Authenticator 迁移验证码，并在你自己的 Google Drive 中保留备份——丢了手机也不会被锁在账户之外。和 KeePass 一样，一个主密码打开一个属于你的加密密码库，并内置双重验证码。无需账户，没有订阅，没有广告，也没有 Keyhold 服务器。
 
 • 像 Google Authenticator 一样的双重验证码，带倒计时，最后几秒会显示下一个验证码。用相机扫描二维码，或导入 Google Authenticator 的导出数据。
 • 通过输入框正下方的建议，在应用和浏览器中填写登录信息和验证码，并提示保存新的登录信息。
@@ -293,12 +293,12 @@ Keyhold – パスワード管理と2段階認証
 
 **Short description**
 ```
-パスワードと2段階認証コードを1つの暗号化保管庫に。アカウントもサーバーも不要。
+Android と Windows 用の 2 段階認証アプリ兼パスワード管理。Google Drive にバックアップ。
 ```
 
 **Full description**
 ```
-Keyhold は、パスワード、2 段階認証コード、大切なファイルを、あなただけの暗号化された保管庫にまとめて保存します。無料のオープンソースで、アカウント、サブスクリプション、広告、Keyhold のサーバーはありません。
+Keyhold は、Android と Windows で使える無料・オープンソースの 2 段階認証アプリ（TOTP）兼パスワードマネージャーです。Chrome・Edge・Firefox 用の拡張機能もあります。Google Authenticator のコードは 1 回のスキャンで移行でき、あなた自身の Google Drive にバックアップされるので、スマートフォンをなくしてもアカウントから締め出されません。KeePass と同じく、1 つのマスターパスワードで、あなただけの暗号化された保管庫を開きます。2 段階認証コードも内蔵。アカウント、サブスクリプション、広告、Keyhold のサーバーはありません。
 
 • Google Authenticator のような 2 段階認証コード。残り時間を表示し、最後の数秒には次のコードも表示します。カメラで QR コードを読み取るか、Google Authenticator のエクスポートを取り込めます。
 • 入力欄のすぐ下の候補から、アプリやブラウザーにログイン情報とコードを入力し、新しいログイン情報の保存を提案します。
