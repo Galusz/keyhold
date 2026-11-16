@@ -25,7 +25,10 @@ class LoginForm(
 
     companion object {
         private val USER_WORDS = Regex("user|login|e-?mail|account|identifier|nazwa|konto|phone|telefon")
-        private val CODE_WORDS = Regex("one.?time|otp|totp|2fa|mfa|two.?factor|authenticat|verification|security.?code|\\bcode\\b|kod")
+        private val CODE_WORDS = Regex("one.?time|otp|totp|2fa|mfa|two.?factor|authenticat|verification|security.?code|(?<![a-z])code(?![a-z])|(?<![a-ząćęłńóśźż])kod(u|em)?(?![a-ząćęłńóśźż])")
+        // A search box in a mail app is full of "email" and "account" and is no login.
+        private val SEARCH_WORDS = Regex("search|szukaj|wyszuk|query|filter|filtr|find|znajd")
+        private val PASSWORD_WORDS = Regex("pass|pwd|has[lł]")
         private val NOT_CODE = Regex("zip|postal|post.?code|poczt|promo|coupon|voucher|country|captcha|discount|rabat")
 
         // Where browsers keep the page address, for pages that do not report
@@ -138,6 +141,7 @@ class LoginForm(
                 node.idEntry, node.hint, attrs["name"], attrs["id"], attrs["autocomplete"],
                 attrs["placeholder"], attrs["aria-label"], hints.joinToString(" "),
             ).joinToString(" ") { it ?: "" }.lowercase()
+            if (SEARCH_WORDS.containsMatchIn(words)) return null
 
             if (hints.any { "otp" in it || "onetimecode" in it.replace("-", "") } ||
                 attrs["autocomplete"] == "one-time-code" ||
@@ -150,8 +154,11 @@ class LoginForm(
                 (cls == InputType.TYPE_CLASS_TEXT && variation in setOf(
                     InputType.TYPE_TEXT_VARIATION_PASSWORD,
                     InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
-                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
                 )) ||
+                // Apps set "visible password" on search and chat fields just to
+                // switch autocorrect off, so on its own it says nothing.
+                (cls == InputType.TYPE_CLASS_TEXT && variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD &&
+                    PASSWORD_WORDS.containsMatchIn(words)) ||
                 (cls == InputType.TYPE_CLASS_NUMBER && variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD)
             if (isPassword) return Kind.PASSWORD
 

@@ -93,10 +93,13 @@ class KeyholdAutofillService : AutofillService() {
 
         val inline = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) request.inlineSuggestionsRequest else null
         var answered = false
+        // A lone field that only looks like a username is a login only when
+        // the vault has something for this app or site.
+        val login = form.passwords.isNotEmpty() || form.codes.isNotEmpty()
         fun answer(logins: List<Map<*, *>>) {
             if (answered) return
             answered = true
-            callback.onSuccess(response(form, logins, inline))
+            callback.onSuccess(if (login || logins.isNotEmpty()) response(form, logins, inline) else null)
         }
         // Android waits only a few seconds; then at least "Keyhold" shows up.
         main.postDelayed({ answer(emptyList()) }, 3000)
