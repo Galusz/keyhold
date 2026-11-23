@@ -1458,4 +1458,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get askAgain => 'Pytaj znowu';
+
+  @override
+  String addedOn(String day) {
+    return 'dodano $day';
+  }
 }

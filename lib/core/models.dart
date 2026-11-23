@@ -43,6 +43,9 @@ class VaultEntry {
   /// pinned to it count too, but live on those logins.
   List<String> sites;
   int updatedAt;
+
+  /// When it was added to Keyhold; 0 for entries kept before this was recorded.
+  int createdAt;
   bool deleted;
 
   /// Filling it in somewhere asks for the owner first: a finger on the
@@ -61,10 +64,12 @@ class VaultEntry {
     this.twoFactor = '',
     List<String>? sites,
     int? updatedAt,
+    int? createdAt,
     this.deleted = false,
     this.guarded = false,
   })  : sites = sites ?? [],
-        updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch;
+        updatedAt = updatedAt ?? DateTime.now().millisecondsSinceEpoch,
+        createdAt = createdAt ?? DateTime.now().millisecondsSinceEpoch;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -78,6 +83,7 @@ class VaultEntry {
         if (twoFactor.isNotEmpty) 'twoFactor': twoFactor,
         if (sites.isNotEmpty) 'sites': sites,
         'updatedAt': updatedAt,
+        if (createdAt > 0) 'createdAt': createdAt,
         if (deleted) 'deleted': true,
         if (guarded) 'guarded': true,
       };
@@ -94,9 +100,22 @@ class VaultEntry {
         twoFactor: (j['twoFactor'] ?? '') as String,
         sites: (j['sites'] as List<dynamic>?)?.cast<String>().toList(),
         updatedAt: (j['updatedAt'] ?? 0) as int,
+        createdAt: (j['createdAt'] ?? 0) as int,
         deleted: (j['deleted'] ?? false) as bool,
         guarded: (j['guarded'] ?? false) as bool,
       );
+
+  /// For telling apart entries of the same name on the list: the day it was
+  /// added, or — for one kept before that was recorded — the day it last changed.
+  String get dayNote => createdAt > 0 ? t.addedOn(dayOf(createdAt)) : t.changedOn(dayOf(updatedAt));
+
+  /// Both dates, for the entry's own screen.
+  String get datesNote => [if (createdAt > 0) t.addedOn(dayOf(createdAt)), t.changedOn(dayOf(updatedAt))].join(' · ');
+
+  static String dayOf(int ms) {
+    final d = DateTime.fromMillisecondsSinceEpoch(ms);
+    return '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+  }
 
   void touch() => updatedAt = DateTime.now().millisecondsSinceEpoch;
 
@@ -420,6 +439,18 @@ class Vault {
       changed = true;
     }
     return changed;
+  }
+
+  /// Entries (logins and codes apart) that share their name with another
+  /// one: the list shows their dates so it is clear which is which.
+  Set<String> get lookAlikes {
+    final byName = <String, List<String>>{};
+    for (final e in visible) {
+      final name = e.title.trim().toLowerCase();
+      if (name.isEmpty) continue;
+      byName.putIfAbsent('${e.isCode}\n$name', () => []).add(e.id);
+    }
+    return {for (final ids in byName.values) if (ids.length > 1) ...ids};
   }
 
   /// Logins kept more than once: the same site (host and port; the title when

@@ -387,5 +387,6 @@
   "skippedSaves": "スキップ",
   "skippedSavesHint": "Keyhold がパスワードの保存を提案しなくなったサイトとアプリ",
   "skippedNone": "スキップしたサイトやアプリはありません。「Keyhold に保存しますか？」を断ると、そのサイトやアプリがここに表示されます。",
-  "askAgain": "再び確認する"
+  "askAgain": "再び確認する",
+  "addedOn": "{day} に追加"
 }

@@ -387,5 +387,6 @@
   "skippedSaves": "Pomijane",
   "skippedSavesHint": "Strony i aplikacje, w których Keyhold już nie proponuje zapisania hasła",
   "skippedNone": "Brak pomijanych stron i aplikacji. Gdy odmówisz „Zapisać w Keyhold?”, strona lub aplikacja pojawi się tutaj.",
-  "askAgain": "Pytaj znowu"
+  "askAgain": "Pytaj znowu",
+  "addedOn": "dodano {day}"
 }

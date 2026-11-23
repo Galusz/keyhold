@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../core/backup.dart';
@@ -591,9 +592,22 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     );
   }
 
+  // Entries sharing a name, worked out once per frame for all the rows.
+  Set<String> _twins = const {};
+  Duration? _twinsFrame;
+  bool _isTwin(VaultEntry e) {
+    final frame = SchedulerBinding.instance.currentFrameTimeStamp;
+    if (_twinsFrame != frame) {
+      _twins = _vault.lookAlikes;
+      _twinsFrame = frame;
+    }
+    return _twins.contains(e.id);
+  }
+
   Widget _row(VaultEntry e) {
     final code = _codes[e.id] ?? _codes[e.twoFactor];
     final next = _left <= 10 ? _next[e.id] ?? _next[e.twoFactor] : null;
+    final twin = _isTwin(e);
     final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     final warn = _left <= 5 ? Theme.of(context).colorScheme.error : null;
     return ListTile(
@@ -620,9 +634,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: e.isCode
-          ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
+          ? (pinnedTo.isEmpty && !twin
+              ? null
+              : Text([if (pinnedTo.isNotEmpty) '📌 $pinnedTo', if (twin) e.dayNote].join(' · '),
+                  maxLines: 1, overflow: TextOverflow.ellipsis))
           : Text(
-              e.username,
+              [if (e.username.isNotEmpty || !twin) e.username, if (twin) e.dayNote].join(' · '),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

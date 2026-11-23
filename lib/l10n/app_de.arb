@@ -245,7 +245,7 @@
   "noCodesFound": "Keine Codes gefunden.",
   "pinnedTo": "angeheftet an {hosts}",
   "notPinned": "nicht angeheftet",
-  "changedOn": "geändert am {day}",
+  "changedOn": "geändert {day}",
   "deleteCsvHint": "Sie enthält alle Passwörter im Klartext",
   "cameraHint": "Auf den Zwei-Faktor-QR-Code einer Website oder den Export aus Google Authenticator richten.",
   "deleteThisCode": "Diesen Zwei-Faktor-Code löschen?",
@@ -387,5 +387,6 @@
   "skippedSaves": "Übersprungen",
   "skippedSavesHint": "Websites und Apps, für die Keyhold kein Speichern des Passworts mehr anbietet",
   "skippedNone": "Keine übersprungenen Websites oder Apps. Wenn du „In Keyhold speichern?“ ablehnst, erscheint die Website oder App hier.",
-  "askAgain": "Wieder fragen"
+  "askAgain": "Wieder fragen",
+  "addedOn": "hinzugefügt {day}"
 }

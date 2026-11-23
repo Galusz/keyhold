@@ -245,7 +245,7 @@
   "noCodesFound": "未找到验证码。",
   "pinnedTo": "已关联到 {hosts}",
   "notPinned": "未关联",
-  "changedOn": "更改于 {day}",
+  "changedOn": "修改于 {day}",
   "deleteCsvHint": "它以明文保存了所有密码",
   "cameraHint": "对准网站的双重验证二维码，或 Google Authenticator 导出的二维码。",
   "deleteThisCode": "删除此双重验证码？",
@@ -387,5 +387,6 @@
   "skippedSaves": "已跳过",
   "skippedSavesHint": "Keyhold 不再提示保存密码的网站和应用",
   "skippedNone": "没有已跳过的网站或应用。当你拒绝“保存到 Keyhold？”时，该网站或应用会显示在这里。",
-  "askAgain": "再次询问"
+  "askAgain": "再次询问",
+  "addedOn": "添加于 {day}"
 }

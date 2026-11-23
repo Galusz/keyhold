@@ -958,7 +958,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String changedOn(String day) {
-    return 'cambiado el $day';
+    return 'cambiado $day';
   }
 
   @override
@@ -1477,4 +1477,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get askAgain => 'Volver a preguntar';
+
+  @override
+  String addedOn(String day) {
+    return 'añadido $day';
+  }
 }

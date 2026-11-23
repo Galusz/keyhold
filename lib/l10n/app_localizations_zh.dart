@@ -889,7 +889,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String changedOn(String day) {
-    return '更改于 $day';
+    return '修改于 $day';
   }
 
   @override
@@ -1370,4 +1370,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get askAgain => '再次询问';
+
+  @override
+  String addedOn(String day) {
+    return '添加于 $day';
+  }
 }

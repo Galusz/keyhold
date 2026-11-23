@@ -2439,6 +2439,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ask again'**
   String get askAgain;
+
+  /// No description provided for @addedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'added {day}'**
+  String addedOn(String day);
 }
 
 class _AppLocalizationsDelegate

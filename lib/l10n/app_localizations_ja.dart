@@ -1391,4 +1391,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get askAgain => '再び確認する';
+
+  @override
+  String addedOn(String day) {
+    return '$day に追加';
+  }
 }

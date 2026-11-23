@@ -387,5 +387,6 @@
   "skippedSaves": "Ignorés",
   "skippedSavesHint": "Sites et applis pour lesquels Keyhold ne propose plus d'enregistrer le mot de passe",
   "skippedNone": "Aucun site ni appli ignoré. Si vous refusez « Enregistrer dans Keyhold ? », le site ou l'appli apparaît ici.",
-  "askAgain": "Demander à nouveau"
+  "askAgain": "Demander à nouveau",
+  "addedOn": "ajouté le {day}"
 }
