@@ -86,7 +86,11 @@ class KeyholdAutofillService : AutofillService() {
 
     override fun onFillRequest(request: FillRequest, cancellationSignal: CancellationSignal, callback: FillCallback) {
         val form = LoginForm.parse(request.fillContexts.map { it.structure })
-        if (form.app == packageName || form.ids.isEmpty()) {
+        // A site or app on the "Skipped" list gets nothing from Keyhold: no
+        // suggestion under the field and no offer to save.
+        if (form.app == packageName || form.ids.isEmpty() ||
+            SkippedSaves.contains(this, SkippedSaves.keyOf(form.domain, form.app))
+        ) {
             callback.onSuccess(null)
             return
         }
@@ -182,9 +186,8 @@ class KeyholdAutofillService : AutofillService() {
         }.build()
         response.addDataset(search)
 
-        // A site or app the user said "no" to once is not asked about again.
         val skipKey = SkippedSaves.keyOf(form.domain, form.app)
-        if (form.passwords.isNotEmpty() && !SkippedSaves.contains(this, skipKey)) {
+        if (form.passwords.isNotEmpty()) {
             val type = SaveInfo.SAVE_DATA_TYPE_PASSWORD or
                 (if (form.usernames.isNotEmpty()) SaveInfo.SAVE_DATA_TYPE_USERNAME else 0)
             val save = SaveInfo.Builder(type, form.passwords.toTypedArray())

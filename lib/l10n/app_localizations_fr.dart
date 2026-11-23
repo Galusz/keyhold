@@ -1478,11 +1478,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get skippedSavesHint =>
-      'Sites et applis pour lesquels Keyhold ne propose plus d\'enregistrer le mot de passe';
+      'Sites et applis où Keyhold ne suggère rien et ne propose jamais d\'enregistrer';
 
   @override
   String get skippedNone =>
-      'Aucun site ni appli ignoré. Si vous refusez « Enregistrer dans Keyhold ? », le site ou l\'appli apparaît ici.';
+      'Aucun site ni appli ignoré. Refusez « Enregistrer dans Keyhold ? » ou touchez « Pas ici » dans la recherche Keyhold.';
 
   @override
   String get askAgain => 'Demander à nouveau';
@@ -1495,4 +1495,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get guardedSwitchHintPhone =>
       'Empreinte digitale avant que le mot de passe ou le code n\'aille dans une page ou une appli.';
+
+  @override
+  String get neverHere => 'Pas ici';
 }

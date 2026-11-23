@@ -1440,11 +1440,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get skippedSavesHint =>
-      'Websites und Apps, für die Keyhold kein Speichern des Passworts mehr anbietet';
+      'Websites und Apps, in denen Keyhold nichts vorschlägt und nie das Speichern anbietet';
 
   @override
   String get skippedNone =>
-      'Keine übersprungenen Websites oder Apps. Wenn du „In Keyhold speichern?“ ablehnst, erscheint die Website oder App hier.';
+      'Keine übersprungenen Websites oder Apps. Lehne „In Keyhold speichern?“ ab oder tippe in der Keyhold-Suche auf „Nicht hier“.';
 
   @override
   String get askAgain => 'Wieder fragen';
@@ -1457,4 +1457,7 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get guardedSwitchHintPhone =>
       'Fingerabdruck, bevor Passwort oder Code in eine Seite oder App kommt.';
+
+  @override
+  String get neverHere => 'Nicht hier';
 }

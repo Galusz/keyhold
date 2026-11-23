@@ -1363,10 +1363,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get skippedSaves => '已跳过';
 
   @override
-  String get skippedSavesHint => 'Keyhold 不再提示保存密码的网站和应用';
+  String get skippedSavesHint => 'Keyhold 不提供建议也不提示保存的网站和应用';
 
   @override
-  String get skippedNone => '没有已跳过的网站或应用。当你拒绝“保存到 Keyhold？”时，该网站或应用会显示在这里。';
+  String get skippedNone =>
+      '没有已跳过的网站或应用。拒绝“保存到 Keyhold？”或在 Keyhold 搜索界面点按“不在此处”即可添加。';
 
   @override
   String get askAgain => '再次询问';
@@ -1378,4 +1379,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get guardedSwitchHintPhone => '在密码或验证码填入网页或应用之前验证指纹。';
+
+  @override
+  String get neverHere => '不在此处';
 }

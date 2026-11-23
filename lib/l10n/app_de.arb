@@ -385,9 +385,10 @@
   "dontSave": "Nicht speichern",
   "privacyPolicy": "Datenschutzerklärung",
   "skippedSaves": "Übersprungen",
-  "skippedSavesHint": "Websites und Apps, für die Keyhold kein Speichern des Passworts mehr anbietet",
-  "skippedNone": "Keine übersprungenen Websites oder Apps. Wenn du „In Keyhold speichern?“ ablehnst, erscheint die Website oder App hier.",
+  "skippedSavesHint": "Websites und Apps, in denen Keyhold nichts vorschlägt und nie das Speichern anbietet",
+  "skippedNone": "Keine übersprungenen Websites oder Apps. Lehne „In Keyhold speichern?“ ab oder tippe in der Keyhold-Suche auf „Nicht hier“.",
   "askAgain": "Wieder fragen",
   "addedOn": "hinzugefügt {day}",
-  "guardedSwitchHintPhone": "Fingerabdruck, bevor Passwort oder Code in eine Seite oder App kommt."
+  "guardedSwitchHintPhone": "Fingerabdruck, bevor Passwort oder Code in eine Seite oder App kommt.",
+  "neverHere": "Nicht hier"
 }

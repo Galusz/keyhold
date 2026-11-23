@@ -385,9 +385,10 @@
   "dontSave": "No guardar",
   "privacyPolicy": "Política de privacidad",
   "skippedSaves": "Omitidos",
-  "skippedSavesHint": "Sitios y apps donde Keyhold ya no ofrece guardar la contraseña",
-  "skippedNone": "No hay sitios ni apps omitidos. Si dices que no a «¿Guardar en Keyhold?», el sitio o la app aparece aquí.",
+  "skippedSavesHint": "Sitios y apps donde Keyhold no sugiere nada ni ofrece guardar",
+  "skippedNone": "No hay sitios ni apps omitidos. Di que no a «¿Guardar en Keyhold?» o toca «Aquí no» en la búsqueda de Keyhold.",
   "askAgain": "Volver a preguntar",
   "addedOn": "añadido {day}",
-  "guardedSwitchHintPhone": "Huella dactilar antes de que la contraseña o el código entren en una página o app."
+  "guardedSwitchHintPhone": "Huella dactilar antes de que la contraseña o el código entren en una página o app.",
+  "neverHere": "Aquí no"
 }
