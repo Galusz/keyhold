@@ -928,7 +928,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String changedOn(String day) {
-    return 'geändert $day';
+    return 'geändert am $day';
   }
 
   @override

@@ -245,7 +245,7 @@
   "noCodesFound": "未找到验证码。",
   "pinnedTo": "已关联到 {hosts}",
   "notPinned": "未关联",
-  "changedOn": "修改于 {day}",
+  "changedOn": "更改于 {day}",
   "deleteCsvHint": "它以明文保存了所有密码",
   "cameraHint": "对准网站的双重验证二维码，或 Google Authenticator 导出的二维码。",
   "deleteThisCode": "删除此双重验证码？",

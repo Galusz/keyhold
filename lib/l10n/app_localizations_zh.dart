@@ -889,7 +889,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String changedOn(String day) {
-    return '修改于 $day';
+    return '更改于 $day';
   }
 
   @override

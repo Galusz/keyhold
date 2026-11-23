@@ -245,7 +245,7 @@
   "noCodesFound": "Keine Codes gefunden.",
   "pinnedTo": "angeheftet an {hosts}",
   "notPinned": "nicht angeheftet",
-  "changedOn": "geändert {day}",
+  "changedOn": "geändert am {day}",
   "deleteCsvHint": "Sie enthält alle Passwörter im Klartext",
   "cameraHint": "Auf den Zwei-Faktor-QR-Code einer Website oder den Export aus Google Authenticator richten.",
   "deleteThisCode": "Diesen Zwei-Faktor-Code löschen?",

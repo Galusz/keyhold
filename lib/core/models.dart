@@ -107,7 +107,7 @@ class VaultEntry {
 
   /// For telling apart entries of the same name on the list: the day it was
   /// added, or — for one kept before that was recorded — the day it last changed.
-  String get dayNote => createdAt > 0 ? t.addedOn(dayOf(createdAt)) : t.changedOn(dayOf(updatedAt));
+  String get dayNote => dayOf(createdAt > 0 ? createdAt : updatedAt);
 
   /// Both dates, for the entry's own screen.
   String get datesNote => [if (createdAt > 0) t.addedOn(dayOf(createdAt)), t.changedOn(dayOf(updatedAt))].join(' · ');

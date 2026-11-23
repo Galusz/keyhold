@@ -958,7 +958,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String changedOn(String day) {
-    return 'cambiado $day';
+    return 'cambiado el $day';
   }
 
   @override

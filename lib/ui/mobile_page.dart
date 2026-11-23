@@ -592,6 +592,12 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     );
   }
 
+  /// The day an entry was added, small, after what the row already says.
+  TextSpan _day(VaultEntry e, bool after) => TextSpan(
+        text: '${after ? '   ' : ''}${e.dayNote}',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).hintColor),
+      );
+
   // Entries sharing a name, worked out once per frame for all the rows.
   Set<String> _twins = const {};
   Duration? _twinsFrame;
@@ -636,10 +642,19 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
       subtitle: e.isCode
           ? (pinnedTo.isEmpty && !twin
               ? null
-              : Text([if (pinnedTo.isNotEmpty) '📌 $pinnedTo', if (twin) e.dayNote].join(' · '),
-                  maxLines: 1, overflow: TextOverflow.ellipsis))
-          : Text(
-              [if (e.username.isNotEmpty || !twin) e.username, if (twin) e.dayNote].join(' · '),
+              : Text.rich(
+                  TextSpan(children: [
+                    if (pinnedTo.isNotEmpty) TextSpan(text: '📌 $pinnedTo'),
+                    if (twin) _day(e, pinnedTo.isNotEmpty),
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ))
+          : Text.rich(
+              TextSpan(children: [
+                TextSpan(text: e.username),
+                if (twin) _day(e, e.username.isNotEmpty),
+              ]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

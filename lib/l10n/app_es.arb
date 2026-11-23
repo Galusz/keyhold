@@ -245,7 +245,7 @@
   "noCodesFound": "No se encontraron códigos.",
   "pinnedTo": "fijado en {hosts}",
   "notPinned": "sin fijar",
-  "changedOn": "cambiado {day}",
+  "changedOn": "cambiado el {day}",
   "deleteCsvHint": "Guarda todas las contraseñas sin cifrar",
   "cameraHint": "Apunta al código QR de dos factores de un sitio web, o a la exportación de Google Authenticator.",
   "deleteThisCode": "¿Eliminar este código de dos factores?",
