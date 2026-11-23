@@ -17,6 +17,7 @@ import 'import_page.dart';
 import 'owner.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
+import 'skipped_page.dart';
 import 'start_page.dart';
 import 'sync_page.dart';
 import 'vault_info_page.dart';
@@ -981,6 +982,15 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
                 ),
               ),
             ],
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.block),
+              title: Text(t.skippedSaves),
+              subtitle: Text(t.skippedSavesHint),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SkippedPage())),
+            ),
           ],
           const Divider(height: 40),
           ListTile(

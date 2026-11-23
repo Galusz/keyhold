@@ -383,5 +383,9 @@
   "guardOpenHint": "Desbloquear las entradas protegidas durante 5 minutos",
   "saveChanges": "¿Guardar los cambios?",
   "dontSave": "No guardar",
-  "privacyPolicy": "Política de privacidad"
+  "privacyPolicy": "Política de privacidad",
+  "skippedSaves": "Omitidos",
+  "skippedSavesHint": "Sitios y apps donde Keyhold ya no ofrece guardar la contraseña",
+  "skippedNone": "No hay sitios ni apps omitidos. Si dices que no a «¿Guardar en Keyhold?», el sitio o la app aparece aquí.",
+  "askAgain": "Volver a preguntar"
 }

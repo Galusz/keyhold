@@ -1358,4 +1358,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get privacyPolicy => '隐私政策';
+
+  @override
+  String get skippedSaves => '已跳过';
+
+  @override
+  String get skippedSavesHint => 'Keyhold 不再提示保存密码的网站和应用';
+
+  @override
+  String get skippedNone => '没有已跳过的网站或应用。当你拒绝“保存到 Keyhold？”时，该网站或应用会显示在这里。';
+
+  @override
+  String get askAgain => '再次询问';
 }

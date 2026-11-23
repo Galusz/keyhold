@@ -1462,4 +1462,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Política de privacidade';
+
+  @override
+  String get skippedSaves => 'Ignorados';
+
+  @override
+  String get skippedSavesHint =>
+      'Sites e apps onde o Keyhold já não oferece guardar a senha';
+
+  @override
+  String get skippedNone =>
+      'Nenhum site ou app ignorado. Quando você recusa \"Salvar no Keyhold?\", o site ou app aparece aqui.';
+
+  @override
+  String get askAgain => 'Perguntar de novo';
 }

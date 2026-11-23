@@ -1378,4 +1378,17 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'プライバシーポリシー';
+
+  @override
+  String get skippedSaves => 'スキップ';
+
+  @override
+  String get skippedSavesHint => 'Keyhold がパスワードの保存を提案しなくなったサイトとアプリ';
+
+  @override
+  String get skippedNone =>
+      'スキップしたサイトやアプリはありません。「Keyhold に保存しますか？」を断ると、そのサイトやアプリがここに表示されます。';
+
+  @override
+  String get askAgain => '再び確認する';
 }

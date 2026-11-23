@@ -179,7 +179,9 @@ class KeyholdAutofillService : AutofillService() {
         }.build()
         response.addDataset(search)
 
-        if (form.passwords.isNotEmpty()) {
+        // A site or app the user said "no" to once is not asked about again.
+        val skipKey = SkippedSaves.keyOf(form.domain, form.app)
+        if (form.passwords.isNotEmpty() && !SkippedSaves.contains(this, skipKey)) {
             val type = SaveInfo.SAVE_DATA_TYPE_PASSWORD or
                 (if (form.usernames.isNotEmpty()) SaveInfo.SAVE_DATA_TYPE_USERNAME else 0)
             val save = SaveInfo.Builder(type, form.passwords.toTypedArray())
@@ -187,6 +189,21 @@ class KeyholdAutofillService : AutofillService() {
             // Browsers and many apps never say "form sent"; the login fields
             // going away after the user typed in them is the sign instead.
             save.setFlags(SaveInfo.FLAG_SAVE_ON_ALL_VIEWS_INVISIBLE)
+            // "No" means never for this site or app; Settings → Skipped undoes it.
+            if (form.domain.isNotEmpty() || form.app.isNotEmpty()) {
+                val never = PendingIntent.getBroadcast(
+                    // One per site or app, so an older prompt's "no" never names another one.
+                    this, skipKey.hashCode(),
+                    Intent(this, SkipSaveReceiver::class.java).putExtra(SkipSaveReceiver.EXTRA_KEY, skipKey),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
+                val style = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    SaveInfo.NEGATIVE_BUTTON_STYLE_NEVER
+                } else {
+                    SaveInfo.NEGATIVE_BUTTON_STYLE_REJECT
+                }
+                save.setNegativeAction(style, never.intentSender)
+            }
             response.setSaveInfo(save.build())
         }
         return response.build()
@@ -244,7 +261,9 @@ class KeyholdAutofillService : AutofillService() {
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
         val form = LoginForm.parse(request.fillContexts.map { it.structure })
         val password = form.password
-        if (password.isNullOrEmpty() || form.app == packageName) {
+        if (password.isNullOrEmpty() || form.app == packageName ||
+            SkippedSaves.contains(this, SkippedSaves.keyOf(form.domain, form.app))
+        ) {
             callback.onSuccess()
             return
         }

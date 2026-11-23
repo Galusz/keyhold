@@ -383,5 +383,9 @@
   "guardOpenHint": "将受保护的条目解锁 5 分钟",
   "saveChanges": "保存更改吗？",
   "dontSave": "不保存",
-  "privacyPolicy": "隐私政策"
+  "privacyPolicy": "隐私政策",
+  "skippedSaves": "已跳过",
+  "skippedSavesHint": "Keyhold 不再提示保存密码的网站和应用",
+  "skippedNone": "没有已跳过的网站或应用。当你拒绝“保存到 Keyhold？”时，该网站或应用会显示在这里。",
+  "askAgain": "再次询问"
 }

@@ -383,5 +383,9 @@
   "guardOpenHint": "Déverrouiller les entrées protégées pour 5 minutes",
   "saveChanges": "Enregistrer les modifications ?",
   "dontSave": "Ne pas enregistrer",
-  "privacyPolicy": "Politique de confidentialité"
+  "privacyPolicy": "Politique de confidentialité",
+  "skippedSaves": "Ignorés",
+  "skippedSavesHint": "Sites et applis pour lesquels Keyhold ne propose plus d'enregistrer le mot de passe",
+  "skippedNone": "Aucun site ni appli ignoré. Si vous refusez « Enregistrer dans Keyhold ? », le site ou l'appli apparaît ici.",
+  "askAgain": "Demander à nouveau"
 }
