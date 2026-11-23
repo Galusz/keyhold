@@ -8,6 +8,7 @@ import '../core/models.dart';
 import '../core/totp.dart';
 import '../l10n/l10n.dart';
 import 'code_picker_page.dart';
+import 'guard_switch.dart';
 
 /// Edits a login, or a two-factor code of its own: name, key, note, address.
 class EntryPage extends StatefulWidget {
@@ -326,12 +327,12 @@ class _EntryPageState extends State<EntryPage> {
     ];
   }
 
-  Widget _guardSwitch() => SwitchListTile(
-        contentPadding: EdgeInsets.zero,
+  Widget _guardSwitch() => GuardSwitch(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         value: _guarded,
         onChanged: (on) => setState(() => _guarded = on),
-        title: Text(t.guardedSwitch),
-        subtitle: Text(Platform.isWindows ? t.guardedSwitchHint : t.guardedSwitchHintPhone),
+        title: t.guardedSwitch,
+        hint: Platform.isWindows ? t.guardedSwitchHint : t.guardedSwitchHintPhone,
       );
 
   List<Widget> _loginFields() {

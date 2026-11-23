@@ -14,6 +14,7 @@ import '../l10n/l10n.dart';
 import 'backup_page.dart';
 import 'copy_page.dart';
 import 'entry_page.dart';
+import 'guard_switch.dart';
 import 'import_page.dart';
 import 'owner.dart';
 import 'password_page.dart';
@@ -807,10 +808,10 @@ class _DetailsState extends State<_Details> {
             _field(t.codeSeconds(widget.left()), '${code.substring(0, 3)} ${code.substring(3)}', copy: code),
           _field(t.username, e.username),
           _field(t.password, e.password, secret: true),
-          SwitchListTile(
+          GuardSwitch(
             value: e.guarded,
-            title: Text(t.guardedSwitch),
-            subtitle: Text(t.guardedSwitchHintPhone),
+            title: t.guardedSwitch,
+            hint: t.guardedSwitchHintPhone,
             onChanged: (_) async {
               await widget.onGuard();
               if (mounted) setState(() {});
