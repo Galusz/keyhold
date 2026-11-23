@@ -889,5 +889,9 @@
   "guardOpenHint": "Unlock protected entries for 5 minutes",
   "saveChanges": "Save the changes?",
   "dontSave": "Don't save",
-  "privacyPolicy": "Privacy policy"
+  "privacyPolicy": "Privacy policy",
+  "skippedSaves": "Skipped",
+  "skippedSavesHint": "Sites and apps where Keyhold no longer offers to save a password",
+  "skippedNone": "No skipped sites or apps. When you say no to \"Save to Keyhold?\", the site or app shows up here.",
+  "askAgain": "Ask again"
 }

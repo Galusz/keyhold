@@ -1417,4 +1417,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get skippedSaves => 'Skipped';
+
+  @override
+  String get skippedSavesHint =>
+      'Sites and apps where Keyhold no longer offers to save a password';
+
+  @override
+  String get skippedNone =>
+      'No skipped sites or apps. When you say no to \"Save to Keyhold?\", the site or app shows up here.';
+
+  @override
+  String get askAgain => 'Ask again';
 }

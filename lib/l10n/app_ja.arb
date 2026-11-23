@@ -383,5 +383,9 @@
   "guardOpenHint": "保護された項目を 5 分間ロック解除",
   "saveChanges": "変更を保存しますか？",
   "dontSave": "保存しない",
-  "privacyPolicy": "プライバシーポリシー"
+  "privacyPolicy": "プライバシーポリシー",
+  "skippedSaves": "スキップ",
+  "skippedSavesHint": "Keyhold がパスワードの保存を提案しなくなったサイトとアプリ",
+  "skippedNone": "スキップしたサイトやアプリはありません。「Keyhold に保存しますか？」を断ると、そのサイトやアプリがここに表示されます。",
+  "askAgain": "再び確認する"
 }

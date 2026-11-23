@@ -2415,6 +2415,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy policy'**
   String get privacyPolicy;
+
+  /// No description provided for @skippedSaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skippedSaves;
+
+  /// No description provided for @skippedSavesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites and apps where Keyhold no longer offers to save a password'**
+  String get skippedSavesHint;
+
+  /// No description provided for @skippedNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No skipped sites or apps. When you say no to \"Save to Keyhold?\", the site or app shows up here.'**
+  String get skippedNone;
+
+  /// No description provided for @askAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask again'**
+  String get askAgain;
 }
 
 class _AppLocalizationsDelegate

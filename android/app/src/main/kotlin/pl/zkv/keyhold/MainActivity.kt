@@ -132,6 +132,16 @@ class MainActivity : FlutterFragmentActivity() {
                         }
                         result.success(null)
                     }
+                    // Sites and apps where "Save to Keyhold?" is no longer asked.
+                    "skipped" -> result.success(
+                        SkippedSaves.all(this)
+                            .map { mapOf("key" to it, "label" to SkippedSaves.label(this, it)) }
+                            .sortedBy { (it["label"] ?: "").lowercase() }
+                    )
+                    "unskip" -> {
+                        SkippedSaves.remove(this, call.arguments as String)
+                        result.success(null)
+                    }
                     else -> result.notImplemented()
                 }
             }

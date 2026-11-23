@@ -1472,4 +1472,18 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String get skippedSaves => 'Ignorés';
+
+  @override
+  String get skippedSavesHint =>
+      'Sites et applis pour lesquels Keyhold ne propose plus d\'enregistrer le mot de passe';
+
+  @override
+  String get skippedNone =>
+      'Aucun site ni appli ignoré. Si vous refusez « Enregistrer dans Keyhold ? », le site ou l\'appli apparaît ici.';
+
+  @override
+  String get askAgain => 'Demander à nouveau';
 }

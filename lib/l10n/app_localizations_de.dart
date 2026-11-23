@@ -1434,4 +1434,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Datenschutzerklärung';
+
+  @override
+  String get skippedSaves => 'Übersprungen';
+
+  @override
+  String get skippedSavesHint =>
+      'Websites und Apps, für die Keyhold kein Speichern des Passworts mehr anbietet';
+
+  @override
+  String get skippedNone =>
+      'Keine übersprungenen Websites oder Apps. Wenn du „In Keyhold speichern?“ ablehnst, erscheint die Website oder App hier.';
+
+  @override
+  String get askAgain => 'Wieder fragen';
 }

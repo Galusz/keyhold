@@ -1444,4 +1444,18 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Polityka prywatności';
+
+  @override
+  String get skippedSaves => 'Pomijane';
+
+  @override
+  String get skippedSavesHint =>
+      'Strony i aplikacje, w których Keyhold już nie proponuje zapisania hasła';
+
+  @override
+  String get skippedNone =>
+      'Brak pomijanych stron i aplikacji. Gdy odmówisz „Zapisać w Keyhold?”, strona lub aplikacja pojawi się tutaj.';
+
+  @override
+  String get askAgain => 'Pytaj znowu';
 }
