@@ -1436,4 +1436,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String addedOn(String day) {
     return 'added $day';
   }
+
+  @override
+  String get guardedSwitchHintPhone =>
+      'Your fingerprint is asked before the password or code goes into a page or an app.';
 }

@@ -1481,4 +1481,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String addedOn(String day) {
     return 'adicionado em $day';
   }
+
+  @override
+  String get guardedSwitchHintPhone =>
+      'Impressão digital antes de a senha ou o código ir para uma página ou app.';
 }

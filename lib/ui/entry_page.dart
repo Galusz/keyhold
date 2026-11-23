@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -327,11 +328,10 @@ class _EntryPageState extends State<EntryPage> {
 
   Widget _guardSwitch() => SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        secondary: const Icon(Icons.fingerprint),
         value: _guarded,
         onChanged: (on) => setState(() => _guarded = on),
         title: Text(t.guardedSwitch),
-        subtitle: Text(t.guardedSwitchHint),
+        subtitle: Text(Platform.isWindows ? t.guardedSwitchHint : t.guardedSwitchHintPhone),
       );
 
   List<Widget> _loginFields() {

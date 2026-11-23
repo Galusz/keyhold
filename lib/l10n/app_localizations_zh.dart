@@ -1375,4 +1375,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String addedOn(String day) {
     return '添加于 $day';
   }
+
+  @override
+  String get guardedSwitchHintPhone => '在密码或验证码填入网页或应用之前验证指纹。';
 }

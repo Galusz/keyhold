@@ -1453,4 +1453,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String addedOn(String day) {
     return 'hinzugefügt $day';
   }
+
+  @override
+  String get guardedSwitchHintPhone =>
+      'Fingerabdruck, bevor Passwort oder Code in eine Seite oder App kommt.';
 }

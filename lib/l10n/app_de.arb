@@ -388,5 +388,6 @@
   "skippedSavesHint": "Websites und Apps, für die Keyhold kein Speichern des Passworts mehr anbietet",
   "skippedNone": "Keine übersprungenen Websites oder Apps. Wenn du „In Keyhold speichern?“ ablehnst, erscheint die Website oder App hier.",
   "askAgain": "Wieder fragen",
-  "addedOn": "hinzugefügt {day}"
+  "addedOn": "hinzugefügt {day}",
+  "guardedSwitchHintPhone": "Fingerabdruck, bevor Passwort oder Code in eine Seite oder App kommt."
 }

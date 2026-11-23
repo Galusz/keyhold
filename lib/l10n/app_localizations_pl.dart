@@ -1463,4 +1463,8 @@ class AppLocalizationsPl extends AppLocalizations {
   String addedOn(String day) {
     return 'dodano $day';
   }
+
+  @override
+  String get guardedSwitchHintPhone =>
+      'Odcisk palca, zanim hasło lub kod trafi do strony albo aplikacji.';
 }

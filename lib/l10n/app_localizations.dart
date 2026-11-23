@@ -2445,6 +2445,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'added {day}'**
   String addedOn(String day);
+
+  /// No description provided for @guardedSwitchHintPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your fingerprint is asked before the password or code goes into a page or an app.'**
+  String get guardedSwitchHintPhone;
 }
 
 class _AppLocalizationsDelegate

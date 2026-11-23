@@ -808,10 +808,9 @@ class _DetailsState extends State<_Details> {
           _field(t.username, e.username),
           _field(t.password, e.password, secret: true),
           SwitchListTile(
-            secondary: const Icon(Icons.fingerprint),
             value: e.guarded,
             title: Text(t.guardedSwitch),
-            subtitle: Text(t.guardedSwitchHint),
+            subtitle: Text(t.guardedSwitchHintPhone),
             onChanged: (_) async {
               await widget.onGuard();
               if (mounted) setState(() {});

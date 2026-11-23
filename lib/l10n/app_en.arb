@@ -901,5 +901,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "guardedSwitchHintPhone": "Your fingerprint is asked before the password or code goes into a page or an app."
 }

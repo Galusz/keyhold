@@ -1482,4 +1482,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String addedOn(String day) {
     return 'añadido $day';
   }
+
+  @override
+  String get guardedSwitchHintPhone =>
+      'Huella dactilar antes de que la contraseña o el código entren en una página o app.';
 }

@@ -388,5 +388,6 @@
   "skippedSavesHint": "Sites e apps onde o Keyhold já não oferece guardar a senha",
   "skippedNone": "Nenhum site ou app ignorado. Quando você recusa \"Salvar no Keyhold?\", o site ou app aparece aqui.",
   "askAgain": "Perguntar de novo",
-  "addedOn": "adicionado em {day}"
+  "addedOn": "adicionado em {day}",
+  "guardedSwitchHintPhone": "Impressão digital antes de a senha ou o código ir para uma página ou app."
 }

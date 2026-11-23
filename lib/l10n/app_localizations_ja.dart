@@ -1396,4 +1396,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String addedOn(String day) {
     return '$day に追加';
   }
+
+  @override
+  String get guardedSwitchHintPhone => 'パスワードやコードをページやアプリに入力する前に指紋を確認します。';
 }

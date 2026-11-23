@@ -388,5 +388,6 @@
   "skippedSavesHint": "Sites et applis pour lesquels Keyhold ne propose plus d'enregistrer le mot de passe",
   "skippedNone": "Aucun site ni appli ignoré. Si vous refusez « Enregistrer dans Keyhold ? », le site ou l'appli apparaît ici.",
   "askAgain": "Demander à nouveau",
-  "addedOn": "ajouté le {day}"
+  "addedOn": "ajouté le {day}",
+  "guardedSwitchHintPhone": "Empreinte digitale avant que le mot de passe ou le code n'aille dans une page ou une appli."
 }

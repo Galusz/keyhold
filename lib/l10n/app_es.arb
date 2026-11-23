@@ -388,5 +388,6 @@
   "skippedSavesHint": "Sitios y apps donde Keyhold ya no ofrece guardar la contraseña",
   "skippedNone": "No hay sitios ni apps omitidos. Si dices que no a «¿Guardar en Keyhold?», el sitio o la app aparece aquí.",
   "askAgain": "Volver a preguntar",
-  "addedOn": "añadido {day}"
+  "addedOn": "añadido {day}",
+  "guardedSwitchHintPhone": "Huella dactilar antes de que la contraseña o el código entren en una página o app."
 }

@@ -388,5 +388,6 @@
   "skippedSavesHint": "Keyhold がパスワードの保存を提案しなくなったサイトとアプリ",
   "skippedNone": "スキップしたサイトやアプリはありません。「Keyhold に保存しますか？」を断ると、そのサイトやアプリがここに表示されます。",
   "askAgain": "再び確認する",
-  "addedOn": "{day} に追加"
+  "addedOn": "{day} に追加",
+  "guardedSwitchHintPhone": "パスワードやコードをページやアプリに入力する前に指紋を確認します。"
 }

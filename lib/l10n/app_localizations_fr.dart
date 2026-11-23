@@ -1491,4 +1491,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String addedOn(String day) {
     return 'ajouté le $day';
   }
+
+  @override
+  String get guardedSwitchHintPhone =>
+      'Empreinte digitale avant que le mot de passe ou le code n\'aille dans une page ou une appli.';
 }
