@@ -86,17 +86,24 @@ class KeyholdAutofillService : AutofillService() {
 
     override fun onFillRequest(request: FillRequest, cancellationSignal: CancellationSignal, callback: FillCallback) {
         val form = LoginForm.parse(request.fillContexts.map { it.structure })
-        if (form.app == packageName || form.ids.isEmpty()) {
+        // A site or app on the "Skipped" list gets nothing from Keyhold: no
+        // suggestion under the field and no offer to save.
+        if (form.app == packageName || form.ids.isEmpty() ||
+            SkippedSaves.contains(this, SkippedSaves.keyOf(form.domain, form.app))
+        ) {
             callback.onSuccess(null)
             return
         }
 
         val inline = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) request.inlineSuggestionsRequest else null
         var answered = false
+        // A lone field that only looks like a username is a login only when
+        // the vault has something for this app or site.
+        val login = form.passwords.isNotEmpty() || form.codes.isNotEmpty()
         fun answer(logins: List<Map<*, *>>) {
             if (answered) return
             answered = true
-            callback.onSuccess(response(form, logins, inline))
+            callback.onSuccess(if (login || logins.isNotEmpty()) response(form, logins, inline) else null)
         }
         // Android waits only a few seconds; then at least "Keyhold" shows up.
         main.postDelayed({ answer(emptyList()) }, 3000)
@@ -179,6 +186,7 @@ class KeyholdAutofillService : AutofillService() {
         }.build()
         response.addDataset(search)
 
+        val skipKey = SkippedSaves.keyOf(form.domain, form.app)
         if (form.passwords.isNotEmpty()) {
             val type = SaveInfo.SAVE_DATA_TYPE_PASSWORD or
                 (if (form.usernames.isNotEmpty()) SaveInfo.SAVE_DATA_TYPE_USERNAME else 0)
@@ -187,6 +195,21 @@ class KeyholdAutofillService : AutofillService() {
             // Browsers and many apps never say "form sent"; the login fields
             // going away after the user typed in them is the sign instead.
             save.setFlags(SaveInfo.FLAG_SAVE_ON_ALL_VIEWS_INVISIBLE)
+            // "No" means never for this site or app; Settings → Skipped undoes it.
+            if (form.domain.isNotEmpty() || form.app.isNotEmpty()) {
+                val never = PendingIntent.getBroadcast(
+                    // One per site or app, so an older prompt's "no" never names another one.
+                    this, skipKey.hashCode(),
+                    Intent(this, SkipSaveReceiver::class.java).putExtra(SkipSaveReceiver.EXTRA_KEY, skipKey),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
+                val style = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    SaveInfo.NEGATIVE_BUTTON_STYLE_NEVER
+                } else {
+                    SaveInfo.NEGATIVE_BUTTON_STYLE_REJECT
+                }
+                save.setNegativeAction(style, never.intentSender)
+            }
             response.setSaveInfo(save.build())
         }
         return response.build()
@@ -244,7 +267,9 @@ class KeyholdAutofillService : AutofillService() {
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
         val form = LoginForm.parse(request.fillContexts.map { it.structure })
         val password = form.password
-        if (password.isNullOrEmpty() || form.app == packageName) {
+        if (password.isNullOrEmpty() || form.app == packageName ||
+            SkippedSaves.contains(this, SkippedSaves.keyOf(form.domain, form.app))
+        ) {
             callback.onSuccess()
             return
         }

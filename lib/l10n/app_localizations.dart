@@ -2415,6 +2415,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy policy'**
   String get privacyPolicy;
+
+  /// No description provided for @skippedSaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skippedSaves;
+
+  /// No description provided for @skippedSavesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites and apps where Keyhold suggests nothing and never offers to save'**
+  String get skippedSavesHint;
+
+  /// No description provided for @skippedNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No skipped sites or apps. Say no to \"Save to Keyhold?\" or tap \"Not here\" on Keyhold\'s search screen, and the site or app shows up here.'**
+  String get skippedNone;
+
+  /// No description provided for @askAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask again'**
+  String get askAgain;
+
+  /// No description provided for @addedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'added {day}'**
+  String addedOn(String day);
+
+  /// No description provided for @guardedSwitchHintPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your fingerprint is asked before the password or code goes into a page or an app.'**
+  String get guardedSwitchHintPhone;
+
+  /// No description provided for @neverHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Not here'**
+  String get neverHere;
 }
 
 class _AppLocalizationsDelegate

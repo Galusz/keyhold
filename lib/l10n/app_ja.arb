@@ -383,5 +383,12 @@
   "guardOpenHint": "保護された項目を 5 分間ロック解除",
   "saveChanges": "変更を保存しますか？",
   "dontSave": "保存しない",
-  "privacyPolicy": "プライバシーポリシー"
+  "privacyPolicy": "プライバシーポリシー",
+  "skippedSaves": "スキップ",
+  "skippedSavesHint": "Keyhold が何も提案せず、保存も提案しないサイトとアプリ",
+  "skippedNone": "スキップしたサイトやアプリはありません。「Keyhold に保存しますか？」を断るか、Keyhold の検索画面で「ここでは不要」をタップすると追加されます。",
+  "askAgain": "再び確認する",
+  "addedOn": "{day} に追加",
+  "guardedSwitchHintPhone": "パスワードやコードをページやアプリに入力する前に指紋を確認します。",
+  "neverHere": "ここでは不要"
 }

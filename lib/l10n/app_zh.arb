@@ -383,5 +383,12 @@
   "guardOpenHint": "将受保护的条目解锁 5 分钟",
   "saveChanges": "保存更改吗？",
   "dontSave": "不保存",
-  "privacyPolicy": "隐私政策"
+  "privacyPolicy": "隐私政策",
+  "skippedSaves": "已跳过",
+  "skippedSavesHint": "Keyhold 不提供建议也不提示保存的网站和应用",
+  "skippedNone": "没有已跳过的网站或应用。拒绝“保存到 Keyhold？”或在 Keyhold 搜索界面点按“不在此处”即可添加。",
+  "askAgain": "再次询问",
+  "addedOn": "添加于 {day}",
+  "guardedSwitchHintPhone": "在密码或验证码填入网页或应用之前验证指纹。",
+  "neverHere": "不在此处"
 }

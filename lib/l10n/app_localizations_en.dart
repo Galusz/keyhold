@@ -1417,4 +1417,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get skippedSaves => 'Skipped';
+
+  @override
+  String get skippedSavesHint =>
+      'Sites and apps where Keyhold suggests nothing and never offers to save';
+
+  @override
+  String get skippedNone =>
+      'No skipped sites or apps. Say no to \"Save to Keyhold?\" or tap \"Not here\" on Keyhold\'s search screen, and the site or app shows up here.';
+
+  @override
+  String get askAgain => 'Ask again';
+
+  @override
+  String addedOn(String day) {
+    return 'added $day';
+  }
+
+  @override
+  String get guardedSwitchHintPhone =>
+      'Your fingerprint is asked before the password or code goes into a page or an app.';
+
+  @override
+  String get neverHere => 'Not here';
 }

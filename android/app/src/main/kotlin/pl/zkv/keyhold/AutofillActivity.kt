@@ -37,6 +37,15 @@ open class AutofillActivity : FlutterFragmentActivity() {
                         fill(args["username"] as String?, args["password"] as String?, args["code"] as String?)
                         result.success(null)
                     }
+                    // "Don't show Keyhold here": this site or app goes on the Skipped list.
+                    "skip" -> {
+                        val domain = intent.getStringExtra(EXTRA_DOMAIN) ?: ""
+                        val app = intent.getStringExtra(EXTRA_APP) ?: ""
+                        if (domain.isNotEmpty() || app.isNotEmpty()) SkippedSaves.add(this, SkippedSaves.keyOf(domain, app))
+                        setResult(RESULT_CANCELED)
+                        finish()
+                        result.success(null)
+                    }
                     "close" -> {
                         setResult(RESULT_CANCELED)
                         finish()

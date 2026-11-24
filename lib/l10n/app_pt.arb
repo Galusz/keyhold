@@ -383,5 +383,12 @@
   "guardOpenHint": "Desbloquear as entradas protegidas por 5 minutos",
   "saveChanges": "Salvar as alterações?",
   "dontSave": "Não salvar",
-  "privacyPolicy": "Política de privacidade"
+  "privacyPolicy": "Política de privacidade",
+  "skippedSaves": "Ignorados",
+  "skippedSavesHint": "Sites e apps onde o Keyhold não sugere nada nem oferece guardar",
+  "skippedNone": "Nenhum site ou app ignorado. Recuse \"Salvar no Keyhold?\" ou toque em \"Aqui não\" na pesquisa do Keyhold.",
+  "askAgain": "Perguntar de novo",
+  "addedOn": "adicionado em {day}",
+  "guardedSwitchHintPhone": "Impressão digital antes de a senha ou o código ir para uma página ou app.",
+  "neverHere": "Aqui não"
 }

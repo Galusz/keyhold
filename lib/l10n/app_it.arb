@@ -383,5 +383,12 @@
   "guardOpenHint": "Sblocca le voci protette per 5 minuti",
   "saveChanges": "Salvare le modifiche?",
   "dontSave": "Non salvare",
-  "privacyPolicy": "Informativa sulla privacy"
+  "privacyPolicy": "Informativa sulla privacy",
+  "skippedSaves": "Ignorati",
+  "skippedSavesHint": "Siti e app in cui Keyhold non suggerisce nulla e non propone di salvare",
+  "skippedNone": "Nessun sito o app ignorato. Rispondi no a «Salvare in Keyhold?» o tocca «Non qui» nella ricerca di Keyhold.",
+  "askAgain": "Chiedi di nuovo",
+  "addedOn": "aggiunto il {day}",
+  "guardedSwitchHintPhone": "Impronta digitale prima che password o codice finiscano in una pagina o un'app.",
+  "neverHere": "Non qui"
 }

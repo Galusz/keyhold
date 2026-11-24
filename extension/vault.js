@@ -730,6 +730,7 @@ const Standalone = (() => {
             // Like the app: an older vault's English web group keeps its name.
             group: fresh.entries.some((x) => !x.deleted && x.group === 'Web') ? 'Web' : t('groupWeb'),
             updatedAt: Date.now(),
+            createdAt: Date.now(),
           });
           return 'saved';
         }));

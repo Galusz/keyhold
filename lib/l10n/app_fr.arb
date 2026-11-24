@@ -383,5 +383,12 @@
   "guardOpenHint": "Déverrouiller les entrées protégées pour 5 minutes",
   "saveChanges": "Enregistrer les modifications ?",
   "dontSave": "Ne pas enregistrer",
-  "privacyPolicy": "Politique de confidentialité"
+  "privacyPolicy": "Politique de confidentialité",
+  "skippedSaves": "Ignorés",
+  "skippedSavesHint": "Sites et applis où Keyhold ne suggère rien et ne propose jamais d'enregistrer",
+  "skippedNone": "Aucun site ni appli ignoré. Refusez « Enregistrer dans Keyhold ? » ou touchez « Pas ici » dans la recherche Keyhold.",
+  "askAgain": "Demander à nouveau",
+  "addedOn": "ajouté le {day}",
+  "guardedSwitchHintPhone": "Empreinte digitale avant que le mot de passe ou le code n'aille dans une page ou une appli.",
+  "neverHere": "Pas ici"
 }

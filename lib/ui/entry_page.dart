@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../core/models.dart';
 import '../core/totp.dart';
 import '../l10n/l10n.dart';
 import 'code_picker_page.dart';
+import 'guard_switch.dart';
 
 /// Edits a login, or a two-factor code of its own: name, key, note, address.
 class EntryPage extends StatefulWidget {
@@ -119,7 +121,7 @@ class _EntryPageState extends State<EntryPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(name.isNotEmpty ? t.deleteNamed(name) : _isCode ? t.deleteThisCode : t.deleteThisLogin),
-        content: Text(_isCode ? t.deleteCodeWarning : t.deleteLoginWarning),
+        content: Text('${e.datesNote}\n\n${_isCode ? t.deleteCodeWarning : t.deleteLoginWarning}'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: Text(t.cancel)),
           FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(t.delete)),
@@ -234,7 +236,14 @@ class _EntryPageState extends State<EntryPage> {
         ),
         body: ListView(
           padding: const EdgeInsets.all(24),
-          children: _isCode ? _codeFields() : _loginFields(),
+          children: [
+            ...(_isCode ? _codeFields() : _loginFields()),
+            // Which of two alike entries this is: when it was added and last changed.
+            if (!widget.isNew) ...[
+              const SizedBox(height: 16),
+              Text(widget.entry.datesNote, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor)),
+            ],
+          ],
         ),
       ),
     );
@@ -318,13 +327,12 @@ class _EntryPageState extends State<EntryPage> {
     ];
   }
 
-  Widget _guardSwitch() => SwitchListTile(
-        contentPadding: EdgeInsets.zero,
-        secondary: const Icon(Icons.fingerprint),
+  Widget _guardSwitch() => GuardSwitch(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         value: _guarded,
         onChanged: (on) => setState(() => _guarded = on),
-        title: Text(t.guardedSwitch),
-        subtitle: Text(t.guardedSwitchHint),
+        title: t.guardedSwitch,
+        hint: Platform.isWindows ? t.guardedSwitchHint : t.guardedSwitchHintPhone,
       );
 
   List<Widget> _loginFields() {

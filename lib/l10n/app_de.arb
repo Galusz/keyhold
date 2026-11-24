@@ -383,5 +383,12 @@
   "guardOpenHint": "Geschützte Einträge für 5 Minuten entsperren",
   "saveChanges": "Änderungen speichern?",
   "dontSave": "Nicht speichern",
-  "privacyPolicy": "Datenschutzerklärung"
+  "privacyPolicy": "Datenschutzerklärung",
+  "skippedSaves": "Übersprungen",
+  "skippedSavesHint": "Websites und Apps, in denen Keyhold nichts vorschlägt und nie das Speichern anbietet",
+  "skippedNone": "Keine übersprungenen Websites oder Apps. Lehne „In Keyhold speichern?“ ab oder tippe in der Keyhold-Suche auf „Nicht hier“.",
+  "askAgain": "Wieder fragen",
+  "addedOn": "hinzugefügt {day}",
+  "guardedSwitchHintPhone": "Fingerabdruck, bevor Passwort oder Code in eine Seite oder App kommt.",
+  "neverHere": "Nicht hier"
 }

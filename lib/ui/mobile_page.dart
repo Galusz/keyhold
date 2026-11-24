@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../core/backup.dart';
@@ -13,10 +14,12 @@ import '../l10n/l10n.dart';
 import 'backup_page.dart';
 import 'copy_page.dart';
 import 'entry_page.dart';
+import 'guard_switch.dart';
 import 'import_page.dart';
 import 'owner.dart';
 import 'password_page.dart';
 import 'qr_page.dart';
+import 'skipped_page.dart';
 import 'start_page.dart';
 import 'sync_page.dart';
 import 'vault_info_page.dart';
@@ -590,9 +593,28 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
     );
   }
 
+  /// The day an entry was added, small, after what the row already says.
+  TextSpan _day(VaultEntry e, bool after) => TextSpan(
+        text: '${after ? '   ' : ''}${e.dayNote}',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).hintColor),
+      );
+
+  // Entries sharing a name, worked out once per frame for all the rows.
+  Set<String> _twins = const {};
+  Duration? _twinsFrame;
+  bool _isTwin(VaultEntry e) {
+    final frame = SchedulerBinding.instance.currentFrameTimeStamp;
+    if (_twinsFrame != frame) {
+      _twins = _vault.lookAlikes;
+      _twinsFrame = frame;
+    }
+    return _twins.contains(e.id);
+  }
+
   Widget _row(VaultEntry e) {
     final code = _codes[e.id] ?? _codes[e.twoFactor];
     final next = _left <= 10 ? _next[e.id] ?? _next[e.twoFactor] : null;
+    final twin = _isTwin(e);
     final pinnedTo = e.isCode ? {for (final s in _vault.sitesOf(e)) hostOf(s)}.where((h) => h.isNotEmpty).join(', ') : '';
     final warn = _left <= 5 ? Theme.of(context).colorScheme.error : null;
     return ListTile(
@@ -619,9 +641,21 @@ class _MobilePageState extends State<MobilePage> with WidgetsBindingObserver {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: e.isCode
-          ? (pinnedTo.isEmpty ? null : Text('📌 $pinnedTo', maxLines: 1, overflow: TextOverflow.ellipsis))
-          : Text(
-              e.username,
+          ? (pinnedTo.isEmpty && !twin
+              ? null
+              : Text.rich(
+                  TextSpan(children: [
+                    if (pinnedTo.isNotEmpty) TextSpan(text: '📌 $pinnedTo'),
+                    if (twin) _day(e, pinnedTo.isNotEmpty),
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ))
+          : Text.rich(
+              TextSpan(children: [
+                TextSpan(text: e.username),
+                if (twin) _day(e, e.username.isNotEmpty),
+              ]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -774,11 +808,10 @@ class _DetailsState extends State<_Details> {
             _field(t.codeSeconds(widget.left()), '${code.substring(0, 3)} ${code.substring(3)}', copy: code),
           _field(t.username, e.username),
           _field(t.password, e.password, secret: true),
-          SwitchListTile(
-            secondary: const Icon(Icons.fingerprint),
+          GuardSwitch(
             value: e.guarded,
-            title: Text(t.guardedSwitch),
-            subtitle: Text(t.guardedSwitchHint),
+            title: t.guardedSwitch,
+            hint: t.guardedSwitchHintPhone,
             onChanged: (_) async {
               await widget.onGuard();
               if (mounted) setState(() {});
@@ -981,6 +1014,15 @@ class _SettingsState extends State<_Settings> with WidgetsBindingObserver {
                 ),
               ),
             ],
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.block),
+              title: Text(t.skippedSaves),
+              subtitle: Text(t.skippedSavesHint),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SkippedPage())),
+            ),
           ],
           const Divider(height: 40),
           ListTile(

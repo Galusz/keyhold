@@ -291,6 +291,14 @@ class _AutofillPageState extends State<AutofillPage> {
           icon: const Icon(Icons.close),
           onPressed: () => _channel.invokeMethod('close'),
         ),
+        actions: [
+          // Never again here: no suggestion and no offer to save (Settings → Skipped undoes it).
+          if (_request['mode'] != 'save' && (_site.isNotEmpty || _app.isNotEmpty))
+            TextButton(
+              onPressed: () => _channel.invokeMethod('skip'),
+              child: Text(t.neverHere),
+            ),
+        ],
       ),
       body: _body(context),
     );
